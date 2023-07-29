@@ -20,9 +20,9 @@
 <body class="img js-fullheight" style="background-image: url(images/unimi.jpg);">
 <section class="ftco-section">
     <div class="container">
-        <div class="row justify-content-center">
+        <div class="row justify-content-center sansation">
             <div class="col-md-6 text-center mb-5">
-                <h1> <b>PiGEU</b></h1>
+                <h1 class="bigtitle"> <b>PiGEU</b></h1>
                 <h4>piattaforma di gestione per esami universitari</h4>>
             </div>
         </div>

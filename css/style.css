@@ -8346,3 +8346,16 @@ textarea.form-control {
         border: 1px solid transparent;
         background: #fbceb5;
         color: #fff; }
+
+.bigtitle{
+    font-size: 30;
+}
+
+@font-face {
+   font-family: fontf;
+   src: url(sansation_light.woff);
+}
+
+.sansation{
+    font-family: fontf;
+}
