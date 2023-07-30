@@ -17,7 +17,7 @@
 
   </head>
   <body>
-  <!-- INIZIO NAVBAR -->
+  <!-- INIZIO NAVBAR  -->
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a class="nav-link" aria-current="page" href="../segreteria.php">Homepage</a>
