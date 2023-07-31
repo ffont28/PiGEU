@@ -1,3 +1,13 @@
+if (window.XMLHttpRequest) {
+    console.log("uaooo");
+     // Supports Ajax.
+
+    } else {
+    console.log("buuuuuhhh");
+
+     //No.
+}
+
 
 //tipoDocente.style.display = "none";
 
@@ -58,3 +68,16 @@ function computeEmailUser(){
     document.cookie = "username = " + provvisorio;
 
 }
+
+function aggiungiCdL(){
+    document.cookie = document.cookie + 1 + "@studenti.unimi.it"
+}
+
+function valutaAnno(){
+    var tipo = document.getElementById('cdl').value;
+    let tipoinsegnamento = document.getElementById("cdl");
+    let anni = tipoinsegnamento.getAttribute("title");
+ //   console.log(anni);
+ //   console.log(tipoinsegnamento);
+}
+

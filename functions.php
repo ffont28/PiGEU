@@ -57,4 +57,46 @@ function inserisciSegreteria($arg){
     $result = pg_execute($db,'insseg', $arg);
 }
 
+
+function docentiCandidatiResponsabili(){
+   include('../conf.php');
+   try {
+       // Connessione al database utilizzando PDO
+       $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+       $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+       // Query con CTE
+       $query = "
+           WITH selezione AS (
+                                  SELECT utente FROM docente
+                                  EXCEPT
+                                  SELECT docente FROM docente_responsabile
+                                  GROUP BY 1
+                                  HAVING count(*) >2
+                                  )
+                                  SELECT u.nome, u.cognome FROM utente u
+                                  INNER JOIN selezione s ON u.email = s.utente
+       ";
+
+       // Esecuzione della query e recupero dei risultati
+       $stmt = $conn->query($query);
+       $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  //     $c = 0;
+  //     $risultato = array();
+
+       foreach ($results as $row) {
+               // Utilizza $row per accedere ai dati dei singoli record
+               echo $row['nome'] . ' - ' . $row['cognome'] . '<br>';
+             //  $risultato[$c] = $row['nome'] . ' ' . $row['cognome'];
+             }
+   } catch (PDOException $e) {
+       echo "Errore: " . $e->getMessage();
+   }
+
+   // return $risultato;
+
+}
+
+
 ?>
