@@ -1,24 +1,43 @@
+
+//tipoDocente.style.display = "none";
+
 function computeEmailDomain(){
+//var tipoDocente = document.getElementById('tipodocente');
 var tipo = document.getElementById('tipo').value;
 var dominio = document.getElementById('dominio');
+let tipodocente = document.getElementById("tipodocente");
+let tiposegreteria = document.getElementById("tiposegreteria");
+let hidden = tipodocente.getAttribute("hidden");
 
-console.log("init");
-console.log(tipo);
+    document.cookie = "dominio = " + "@studenti.unimi.it";
 
-if (tipo == "Studente"){
-console.log("è studente");
-dominio.innerText = "@studenti.unimi.it";
-}
 
-if (tipo == "Docente"){
-console.log("è docente");
-dominio.innerText = "@unimi.it";
-}
+    if (tipo == "studente"){
+        console.log("è studente");
+        dominio.innerText = "@studenti.unimi.it";
+        document.cookie = "dominio = " + "@studenti.unimi.it";
 
-if (tipo == "Segreteria"){
-console.log("è segreteria");
-dominio.innerText = "@unimi.it";
-}
+        tipodocente.setAttribute("hidden", "hidden");
+        tiposegreteria.setAttribute("hidden", "hidden");
+    }
+
+    if (tipo == "docente"){
+        console.log("è docente");
+        dominio.innerText = "@unimi.it";
+        document.cookie = "dominio = " + "@unimi.it";
+
+        tipodocente.removeAttribute("hidden");
+        tiposegreteria.setAttribute("hidden", "hidden");
+    }
+
+    if (tipo == "segreteria"){
+        console.log("è segreteria");
+        dominio.innerText = "@unimi.it";
+        document.cookie = "dominio = " + "@unimi.it";
+
+        tiposegreteria.removeAttribute("hidden");
+        tipodocente.setAttribute("hidden", "hidden");
+    }
 
 }
 
@@ -30,10 +49,12 @@ function computeEmailUser(){
 
 
 
-    provvisorio = cognome + "." + nome;
+    provvisorio = nome+ "." + cognome;
     console.log(cognome);
     console.log(nome);
     console.log(provvisorio);
     document.getElementById('username').placeholder = provvisorio;
+    document.getElementById('username').innerText = provvisorio;
+    document.cookie = "username = " + provvisorio;
 
 }

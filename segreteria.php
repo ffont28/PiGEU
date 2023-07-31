@@ -22,6 +22,9 @@
       <a class="nav-link" href="segreteria/aggiungiutente.php">Aggiungi Utenza</a>
     </li>
     <li class="nav-item">
+      <a class="nav-link" href="segreteria/rimuoviutente.php">Rimuovi Utenza</a>
+    </li>
+    <li class="nav-item">
       <a class="nav-link" href="#">Inserisci corso di laurea</a>
     </li>
     <li class="nav-item">
