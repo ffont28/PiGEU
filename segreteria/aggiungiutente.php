@@ -137,6 +137,12 @@
     $result = pg_prepare($db,'ins',$sql);
     $result = pg_execute($db,'ins', $params);
 
+    //inserimento delle credenziali di primo accesso
+    $params = array ($istitemail, $persemail);
+    $sql = "INSERT INTO credenziali VALUES ($1,$2)";
+    $result = pg_prepare($db,'inscred',$sql);
+    $result = pg_execute($db,'inscred', $params);
+
 
     // casistica di inserimento
     $params = array ($istitemail);
