@@ -189,6 +189,52 @@
     </script>
 
 
+<div class="mb-3">
+<label for="exampleFormControlInput1" class="form-label">Propedeuticità - per questa materia è necessario aver superato l'esame di:</label>
+        <select class="form-select" aria-label="Default select example" id="prop" name="prop">
+
+        </select>
+ </div>
+    <script>
+    function updateSecondMenutendina() {
+                console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
+                var cdl = document.getElementById("cdl");
+                var anno = document.getElementById("prop");
+
+                // Ottieni il valore selezionato nel primo menù a tendina
+                var selezionecdl = cdl.value;
+
+                // Effettua una richiesta AJAX al server per ottenere il contenuto del secondo menù a tendina
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                    console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
+                        if (xhr.status === 200) {
+                               console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
+                            // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
+                            anno.innerHTML = xhr.responseText;
+                        } else {
+                            // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
+                            console.error("Errore durante la richiesta AJAX");
+                        }
+                    }
+                };
+
+                // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
+                xhr.open("GET", "propedeuticita.php?value=" + selezionecdl, true);
+                xhr.send();
+            }
+
+            // Aggiungi un ascoltatore di eventi per il menù a tendina 1
+            document.getElementById("cdl").addEventListener('change', updateSecondMenutendina);
+
+            // Inizializza il contenuto del secondo menù a tendina inizialmente
+            updateSecondMenutendina();
+    </script>
+
+
+
+
   <input type="submit" class="button1 green" value="INSERISCI L'INSEGNAMENTO NEL CORSO DI LAUREA" />
     </div>
 </form>
@@ -208,6 +254,8 @@
     $cfu = $_POST['cfu'];
     $responsabile = $_POST['responsabile'];
     $cdl = $_POST['cdl'];
+    $prop = $_POST['prop'];
+
 
 
     // inserimento dell'insegnamento nella tabella insegnamento
@@ -227,6 +275,15 @@
     $sql = "INSERT INTO insegnamento_parte_di_cdl VALUES ($1,$2)";
     $result = pg_prepare($db,'insParte',$sql);
     $result = pg_execute($db,'insParte', $params);
+
+    //inserimento della eventuale RELAZIONE propedeuticita
+    if ($prop != "no"){
+    $params = array ($prop, $codice);
+    $sql = "INSERT INTO propedeuticita VALUES ($1,$2)";
+    $result = pg_prepare($db,'insProp',$sql);
+    $result = pg_execute($db,'insProp', $params);
+
+    }
 
 }
  ?>
