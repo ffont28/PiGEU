@@ -83,24 +83,49 @@
         }
        ?>
         </select>
- <!--
- <div>
- <button type="button" class="button2 orange" action="segreteria/aggiungiinsegnamento.php?increment=true">Aggiungi CdL</button>
- </div>
-<form action="segreteria/aggiungiinsegnamento.php?increment=true">
-    <input type="submit" class="orange" value="aggiungi insegnamento" />
-    </form>
--->
+
 
 <label for="exampleFormControlInput1" class="form-label">Anno dell'insegnamento:</label>
         <select class="form-select" aria-label="Default select example" id="anno" name="anno">
-                <!--  <option selected>Open this select menu</option> -->
-                 <!-- <option value="1">primo</option>
-                  <option value="2">secondo</option>
-                  <option value="3">terzo</option>
-                  <option value="4">quarto</option>
-                  <option value="5">quinto</option> -->
-                </select>
+
+        </select>
+
+    <script>
+    function updateSecondMenutendina() {
+                console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
+                var cdl = document.getElementById("cdl");
+                var anno = document.getElementById("anno");
+
+                // Ottieni il valore selezionato nel primo menù a tendina
+                var selezionecdl = cdl.value;
+
+                // Effettua una richiesta AJAX al server per ottenere il contenuto del secondo menù a tendina
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                    console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
+                        if (xhr.status === 200) {
+                               console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
+                            // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
+                            anno.innerHTML = xhr.responseText;
+                        } else {
+                            // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
+                            console.error("Errore durante la richiesta AJAX");
+                        }
+                    }
+                };
+
+                // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
+                xhr.open("GET", "query.php?value=" + selezionecdl, true);
+                xhr.send();
+            }
+
+            // Aggiungi un ascoltatore di eventi per il menù a tendina 1
+            document.getElementById("cdl").addEventListener('change', updateSecondMenutendina);
+
+            // Inizializza il contenuto del secondo menù a tendina inizialmente
+            updateSecondMenutendina();
+    </script>
 
 
   <input type="submit" class="button1 green" value="INSERISCI L'INSEGNAMENTO NEL CORSO DI LAUREA" />

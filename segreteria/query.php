@@ -14,7 +14,7 @@ try {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Esegui la query per ottenere i dati del secondo menù a tendina in base alla selezione del primo
-    $stmt = $conn->prepare("SELECT * FROM corso_di_laurea WHERE nome = :valore");
+    $stmt = $conn->prepare("SELECT * FROM corso_di_laurea WHERE codice = :valore");
     $stmt->bindParam(':valore', $selezioneMenutendina1);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
