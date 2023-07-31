@@ -23,8 +23,10 @@ try {
     foreach ($results as $row) {
         echo '<option value="' . 1 . '">' . "primo" . '</option>';
         echo '<option value="' . 2 . '">' . "secondo" . '</option>';
+        if ($row['tipo'] == 'magistrale a ciclo unico' || $row['tipo'] == 'triennale' ){
         echo '<option value="' . 3 . '">' . "terzo" . '</option>';
-        if ($row['tipo'] == 'magistrale'){
+        }
+        if ($row['tipo'] == 'magistrale a ciclo unico'){
         echo '<option value="' . 4 . '">' . "quarto" . '</option>';
         echo '<option value="' . 5 . '">' . "quinto" . '</option>';
         }

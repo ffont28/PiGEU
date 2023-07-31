@@ -42,14 +42,74 @@
     <div class="center">
         <div class="mb-3">
           <label for="exampleFormControlInput1" class="form-label">Nome dell'insegnamento</label>
-          <input type="text" class="form-control"  id="nome" placeholder="inserisci il Nome del CdL" name="nome">
+          <input type="text" class="form-control"  id="nome" placeholder="inserisci il Nome dell'insegnamento" name="nome">
         </div>
 
         <div class="mb-3">
           <label for="exampleFormControlInput1" class="form-label">CODICE INSEGNAMENTO</label>
-          <input type="text" class="form-control" id="codice" placeholder="inserisci il codice del CdL" name="codice">
+          <input type="text" class="form-control" id="codice" placeholder="inserisci il codice dell'insegnamento" name="codice">
         </div>
 
+        <div class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">DOCENTE RESPONSABILE:</label>
+
+
+               <select class="form-select" id="responsabile" name="responsabile">
+               <!--<option selected value="ciao">Open this select menu</option>-->
+               <?php
+                    include('../conf.php');
+
+                try {
+                    // Connessione al database utilizzando PDO
+                    $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    // Query con CTE
+                    $query = "
+                               WITH selezione AS (
+                                                      SELECT utente FROM docente
+                                                      EXCEPT
+                                                      SELECT docente FROM docente_responsabile
+                                                      GROUP BY 1
+                                                      HAVING count(*) >2
+                                                      )
+                                                      SELECT u.nome, u.cognome, u.email FROM utente u
+                                                      INNER JOIN selezione s ON u.email = s.utente
+                           ";
+
+                           // Esecuzione della query e recupero dei risultati
+                           $stmt = $conn->query($query);
+                           $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+                           foreach ($results as $row) {
+                                   // Utilizza $row per accedere ai dati dei singoli record
+                                 echo "<option value=\"".$row['email']."\">".$row['nome']." ".$row['cognome']."</option> ";
+                                 }
+                       } catch (PDOException $e) {
+                           echo "Errore: " . $e->getMessage();
+                       }
+
+               ?>
+                </select>
+             </div>
+
+        <div class="mb-3">
+                  <label for="exampleFormControlInput1" class="form-label">descrizione dell'insegnamento</label>
+                  <input type="text" class="form-control" id="descrizione" placeholder="inserisci la descrizione dell'insegnamento" name="descrizione">
+                </div>
+
+        <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">CFU previsti per l'insegnamento</label>
+                <select class="form-select"  aria-label="Default select example" id="cfu" name="cfu">
+                <!--  <option selected>Open this select menu</option> -->
+                  <option value="6">6</option>
+                  <option value="9">9</option>
+                  <option value="12">12</option>
+                </select>
+        </div>
+
+    <div class="mb-3">
     <label for="exampleFormControlInput1" class="form-label">Corso di Laurea a cui appartiene questo insegnamento:</label>
 
 
@@ -83,13 +143,14 @@
         }
        ?>
         </select>
+     </div>
 
-
+<div class="mb-3">
 <label for="exampleFormControlInput1" class="form-label">Anno dell'insegnamento:</label>
         <select class="form-select" aria-label="Default select example" id="anno" name="anno">
 
         </select>
-
+ </div>
     <script>
     function updateSecondMenutendina() {
                 console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
@@ -140,22 +201,32 @@
     $db = open_pg_connection();
 
     // definisco le variabili
-    $nome = $_POST['nome'];
-    $tipo = $_POST['tipo'];
     $codice = $_POST['codice'];
-    $docenteresponsabile = $_POST['docenteresponsabile'];
+    $nome = $_POST['nome'];
+    $anno = $_POST['anno'];
+    $descrizione = $_POST['descrizione'];
+    $cfu = $_POST['cfu'];
+    $responsabile = $_POST['responsabile'];
+    $cdl = $_POST['cdl'];
 
-    // inserimento del corso in corso_di_laurea
-    $params = array ($codice, $nome ,$tipo);
-    $sql = "INSERT INTO corso_di_laurea VALUES ($1,$2,$3)";
-    $result = pg_prepare($db,'insCdL',$sql);
-    $result = pg_execute($db,'insCdL', $params);
 
-    //inserimento del docente responsabile
-    $params = array ($codice, $docenteresponsabile);
-    $sql = "INSERT INTO credenziali VALUES ($1,$2)";
+    // inserimento dell'insegnamento nella tabella insegnamento
+    $params = array ($codice, $nome , $anno, $descrizione, $cfu);
+    $sql = "INSERT INTO insegnamento VALUES ($1,$2,$3,$4,$5)";
+    $result = pg_prepare($db,'insIns',$sql);
+    $result = pg_execute($db,'insIns', $params);
+
+    //inserimento della RELAZIONE insegnamento -> docente responsabile
+    $params = array ($responsabile, $codice);
+    $sql = "INSERT INTO docente_responsabile VALUES ($1,$2)";
     $result = pg_prepare($db,'insResp',$sql);
     $result = pg_execute($db,'insResp', $params);
+
+    //inserimento della RELAZIONE insegnamento -> corso di laurea
+    $params = array ($codice, $cdl);
+    $sql = "INSERT INTO insegnamento_parte_di_cdl VALUES ($1,$2)";
+    $result = pg_prepare($db,'insParte',$sql);
+    $result = pg_execute($db,'insParte', $params);
 
 }
  ?>
