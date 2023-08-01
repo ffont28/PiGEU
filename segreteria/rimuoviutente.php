@@ -36,17 +36,20 @@
     </li>
   </ul>
   <!-- FINE NAVBAR -->
-  PAGINA DI NUOVA UTENZA
+ <h1> PAGINA DI RIMOZIONE UTENZA </h1>
 
 <form method="post" >
-    <div class="center">
+    <div class="center bred">
         <div class="mb-3">
           <label for="exampleFormControlInput1" class="form-label">Nome Utente da rimuovere</label>
           <input type="text" class="form-control" id="nome" placeholder="inserisci l'ID utente che si vuole rimuovere" name="utente">
+
         </div>
 
 
   <input type="submit" class="button1 red" value="RIMUOVI UTENTE" />
+
+
     </div>
 </form>
 
