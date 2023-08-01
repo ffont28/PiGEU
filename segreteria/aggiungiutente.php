@@ -17,21 +17,32 @@
 
   </head>
   <body>
-  <!-- INIZIO NAVBAR  -->
+ <!-- INIZIO NAVBAR -->
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a class="nav-link" aria-current="page" href="../segreteria.php">Homepage</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link active" href="/segreteria/aggiungiutente.php">Aggiungi Utenza</a>
+      <a class="nav-link active" href="aggiungiutente.php">Aggiungi Utenza</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">Inserisci corso di laurea</a>
+      <a class="nav-link" href="gestisciutente.php">Gestisci Utenza</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="rimuoviutente.php">Rimuovi Utenza</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="aggiungiinsegnamento.php">Inserisci Insegnamento</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="aggiungicdl.php">Inserisci corso di laurea</a>
     </li>
     <li class="nav-item">
       <a class="nav-link disabled" aria-disabled="true">Modifica Corso di Laurea</a>
     </li>
   </ul>
+
+
   <!-- FINE NAVBAR -->
   PAGINA DI NUOVA UTENZA
 
