@@ -38,7 +38,7 @@ function check_login($user, $password){
 
 function inserisciStudente($arg){
     $db = open_pg_connection();
-    $sql = "INSERT INTO studente (utente) VALUES ($1)";
+    $sql = "INSERT INTO studente (utente, corso_di_laurea) VALUES ($1,$2)";
     $result = pg_prepare($db,'insstud',$sql);
     $result = pg_execute($db,'insstud', $arg);
 }

@@ -4,9 +4,9 @@
 -- RICHIESTA 2.2.1 = RIMOZIONE DI STUDENTE PER LAUREA O RINUNCIA AGLI STUDI
 --  L'UTENTE VIENE SPOSTATO IN UN'APPOSITA TABELLA DI "STORICO STUDENTE"
     -- TABELLE INTERESSATE:
-        -- UTENTE   --> STORICO UTENTE
-        -- STUDENTE --> STORICO STUDENTE
-        -- CARRIERA --> STORICO CARRIERA
+        -- utente   --> utente_storico
+        -- studente --> studente_storico
+        -- carriera --> carriera_storica
 
 CREATE OR REPLACE FUNCTION sposta_dati_studente() RETURNS TEXT AS $$
 DECLARE
@@ -19,9 +19,10 @@ BEGIN
 
 
   RETURN status;
+-- Gestione delle eccezioni
 EXCEPTION
   WHEN OTHERS THEN
-    -- In caso di errore, restituiamo un messaggio di errore
+    -- Nel caso in cui si verifica un errore, restituisco il messaggio con il tipo di errore
     status := 'Errore: ' || SQLERRM;
     RETURN status;
 END;

@@ -68,19 +68,26 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
         $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
 
         // Query
-        $query = "SELECT * FROM utente where email = :value";
+        $query = "SELECT * FROM utente u 
+                  LEFT JOIN studente s ON u.email = s.utente
+                  LEFT JOIN docente d ON u.email = d.utente
+                  LEFT JOIN segreteria a ON u.email = a.utente
+                  where u.email = :value";
         $stmt = $conn->prepare($query);
 
         $stmt->bindParam(':value', $ricercato, PDO::PARAM_STR);
-               // Esecuzione della query e recupero dei risultati
+        // Esecuzione della query e recupero dei risultati
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo '<script>console.log("sono qui prima dell\'echo")</script>'; //////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////
 
         echo "<form method=\"POST\" > <div class=\"center bblue\">";
 
            foreach ($results as $row) {
+               $corsoinq = $row['corso_di_laurea'];
+               $tipoinq = $row['tipo'];
 
+               echo '<script>console.log(\'>>'.$corsoinq." & ".$tipoinq.'<<\')</script>';
                  echo "<div class=\"mb-3\">
                                 <label for=\"exampleFormControlInput1\" class=\"form-label\">Nome</label>
                       <input hidden type=\"text\" value=\"".$row['email']."\" class=\"form-control\" id=\"hricercato\" name=\"hricercato\">
@@ -107,11 +114,69 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
                      <div class=\"mb-3\">
                                <label for=\"exampleFormControlInput1\" class=\"form-label\">email personale</label>
                      <input type=\"text\" value=\"".$row['emailpersonale']."\" class=\"form-control\" id=\"emailpersonale\" name=\"emailpersonale\">
-                       </div>
-                      <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA UTENTE\" />
+                       </div> ";
+
+
+               // caso in cui l'utente sia uno STUDENTE
+               if ($corsoinq != ""){
+                  echo '  <div id="cdl" class="mb-3">
+                        <label for="exampleFormControlInput1" class="form-label">Corso di Laurea a cui lo studente risulta iscritto:</label>
+                        <select class="form-select" id="cdl" name="cdl">';
+             //   <!--<option selected value="ciao">Open this select menu</option>-->
+
+
+                try {
+                    // Connessione al database utilizzando PDO
+                    $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    // Query con CTE
+                    $query = " SELECT c.nome, c.codice FROM corso_di_laurea c";
+
+                    // Esecuzione della query e recupero dei risultati
+                    $stmt = $conn->query($query);
+                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    // Elaborazione dei risultati
+                    foreach ($results as $row) {
+                        // Utilizza $row per accedere ai dati dei singoli record
+                        echo "<option ";
+                        if ($row['codice'] == $corsoinq){ echo "selected ";}
+                        echo "value=\"".$row['codice']."\">".$row['nome']."</option> ";
+                    }
+                } catch (PDOException $e) {
+                    echo "Errore: " . $e->getMessage();
+                }
+
+                 echo ' </select>
+                        </div>';
+               }
+               // caso in cui l'utente sia un DOCENTE
+               if ($tipoinq != "") {
+                   echo '<script>console.log(\'>>'.$corsoinq." &2 ".$tipoinq.'<<\')</script>';
+
+                 echo '<div id="tipodocente">
+                       Tipo di contratto che ha il docente:
+                        <select class="form-select" aria-label="Default select example" id="tipo" name="tipodocente">
+                              <option ';
+                            if ($tipoinq == "a contratto") {echo "selected ";}
+                                echo 'value="a contratto">A contratto</option>
+                              <option ';
+                            if ($tipoinq == "ricercatore") {echo 'selected ';}
+                                echo 'value="ricercatore">Ricercatore</option>
+                              <option ';
+                            if ($tipoinq == "associato") {echo 'selected ';}
+                                echo 'value="associato">Associato</option>
+                            </select>
+                    </div>';
+               }
+
+
+               echo " <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA ANAGRAFICA UTENTE\" />
                         </div>
                     </form>
                     ";
+
                  }
        } catch (PDOException $e) {
            echo "Errore: " . $e->getMessage();

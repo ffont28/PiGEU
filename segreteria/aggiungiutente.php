@@ -72,13 +72,50 @@
               <label for="exampleFormControlInput1" class="form-label">città</label>
               <input type="text" class="form-control" id="exampleFormControlInput1" placeholder="inserisci la città di residenza dell'utente" name="citta">
             </div>
-        Seleziona un'utenza
+
+        <div class="mb-3">
+        <label for="exampleFormControlInput1" class="form-label">Seleziona un'utenza</label>
         <select class="form-select" onchange="computeEmailDomain()"  aria-label="Default select example" id="tipo" name="tipo">
-        <!--  <option selected>Open this select menu</option> -->
+
           <option value="studente">Studente</option>
           <option value="docente">Docente</option>
           <option value="segreteria">Segreteria</option>
         </select>
+        </div>
+
+        <div id="cdl" class="mb-3">
+            <label for="exampleFormControlInput1" class="form-label">Corso di Laurea a cui appartiene questo insegnamento:</label>
+            <select class="form-select" id="cdl" name="cdl">
+                <!--<option selected value="ciao">Open this select menu</option>-->
+                <?php
+                include('../conf.php');
+
+                try {
+                    // Connessione al database utilizzando PDO
+                    $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                    // Query con CTE
+                    $query = " SELECT c.nome, c.codice, c.tipo FROM corso_di_laurea c";
+
+                    // Esecuzione della query e recupero dei risultati
+                    $stmt = $conn->query($query);
+                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+
+
+                    // Elaborazione dei risultati
+                    foreach ($results as $row) {
+                        // Utilizza $row per accedere ai dati dei singoli record
+                        echo "<option value=\"".$row['codice']."\">".$row['nome']."</option> ";
+                    }
+                } catch (PDOException $e) {
+                    echo "Errore: " . $e->getMessage();
+                }
+                ?>
+            </select>
+        </div>
 
         <div id="tipodocente" hidden="hidden">
         Tipo di contratto:
@@ -139,7 +176,7 @@
     $tipo = $_POST['tipo'];
     $tipodocente = $_POST['tipodocente'];
     $tiposegreteria = $_POST['tiposegreteria'];
-
+    $cdl = $_POST['cdl'];
     ///////echo $_POST['tipo'];
 
     // inserimento generale a livello di utente sia che sia docente, studente o segreteria
@@ -149,14 +186,14 @@
     $result = pg_execute($db,'ins', $params);
 
     //inserimento delle credenziali di primo accesso
-    $params = array ($istitemail, $persemail);
+    $params = array ($istitemail, md5($persemail));
     $sql = "INSERT INTO credenziali VALUES ($1,$2)";
     $result = pg_prepare($db,'inscred',$sql);
     $result = pg_execute($db,'inscred', $params);
 
 
     // casistica di inserimento
-    $params = array ($istitemail);
+    $params = array ($istitemail,$cdl);
     // STUDENTE
     if ($tipo == "studente"){
     inserisciStudente($params);

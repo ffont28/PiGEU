@@ -17,7 +17,9 @@ var tipo = document.getElementById('tipo').value;
 var dominio = document.getElementById('dominio');
 let tipodocente = document.getElementById("tipodocente");
 let tiposegreteria = document.getElementById("tiposegreteria");
-let hidden = tipodocente.getAttribute("hidden");
+let cdl = document.getElementById("cdl");
+
+//let hidden = tipodocente.getAttribute("hidden");
 
     document.cookie = "dominio = " + "@studenti.unimi.it";
 
@@ -29,6 +31,8 @@ let hidden = tipodocente.getAttribute("hidden");
 
         tipodocente.setAttribute("hidden", "hidden");
         tiposegreteria.setAttribute("hidden", "hidden");
+        cdl.removeAttribute("hidden");
+
     }
 
     if (tipo == "docente"){
@@ -38,6 +42,8 @@ let hidden = tipodocente.getAttribute("hidden");
 
         tipodocente.removeAttribute("hidden");
         tiposegreteria.setAttribute("hidden", "hidden");
+        cdl.setAttribute("hidden", "hidden");
+
     }
 
     if (tipo == "segreteria"){
@@ -47,6 +53,8 @@ let hidden = tipodocente.getAttribute("hidden");
 
         tiposegreteria.removeAttribute("hidden");
         tipodocente.setAttribute("hidden", "hidden");
+        cdl.setAttribute("hidden", "hidden");
+
     }
 
 }
@@ -60,6 +68,9 @@ function computeEmailUser(){
 
 
     provvisorio = nome+ "." + cognome;
+
+    //dominio.value = provvisorio;
+
     console.log(cognome);
     console.log(nome);
     console.log(provvisorio);
@@ -69,15 +80,4 @@ function computeEmailUser(){
 
 }
 
-function aggiungiCdL(){
-    document.cookie = document.cookie + 1 + "@studenti.unimi.it"
-}
-
-function valutaAnno(){
-    var tipo = document.getElementById('cdl').value;
-    let tipoinsegnamento = document.getElementById("cdl");
-    let anni = tipoinsegnamento.getAttribute("title");
- //   console.log(anni);
- //   console.log(tipoinsegnamento);
-}
 
