@@ -13,9 +13,9 @@ DECLARE
   status TEXT := 'Dati spostati con successo.';
 BEGIN
   -- Eseguire l'istruzione INSERT per spostare i dati dalla tabella di origine alla tabella di destinazione
-  INSERT INTO tabella_utenti_destinazione (id, nome, cognome, email)
-  SELECT id, nome, cognome, email
-  FROM tabella_utenti_originale;
+  INSERT INTO utente_storico (email, nome, cognome, indirizzo, citta, codicefiscale, emailpersonale)
+  SELECT email, nome, cognome, indirizzo, citta, codicefiscale, emailpersonale
+  FROM utente;
 
 
   RETURN status;

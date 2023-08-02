@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
   <head>
-<!-- import di Bootstrap-->
+<!-- import di Bootstrap -->
 <link rel="stylesheet" href="../css/cssSegreteria.css">
 
 
