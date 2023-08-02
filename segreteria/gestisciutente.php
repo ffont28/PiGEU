@@ -49,7 +49,6 @@
      include('../conf.php');
      include('../functions.php');
      $ricercato="";
-     $upd = false;
 
 echo '<script>console.log("sono qui")</script>'; //////////////////////////////////////////////////////////////
  if($_SERVER['REQUEST_METHOD']=='GET'){
@@ -85,45 +84,34 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
                  echo "<div class=\"mb-3\">
                                 <label for=\"exampleFormControlInput1\" class=\"form-label\">Nome</label>
                       <input hidden type=\"text\" value=\"".$row['email']."\" class=\"form-control\" id=\"hricercato\" name=\"hricercato\">
-                      <input hidden type=\"text\" value=\"".$row['nome']."\" class=\"form-control\" id=\"hnome\" name=\"hnome\">
-                      <input type=\"text\" class=\"form-control\" id=\"nome\" name=\"nome\">
+                      <input type=\"text\" value=\"".$row['nome']."\" class=\"form-control\" id=\"nome\" name=\"nome\">
                         </div>
                        <div class=\"mb-3\">
-                                <label for=\"exampleFormControlInput1\" class=\"form-label\">Cognme</label>
-                     <input hidden type=\"text\" value=\"".$row['cognome']."\" class=\"form-control\" id=\"hcognome\" name=\"hcognome\">
-                     <input type=\"text\"  class=\"form-control\" id=\"cognome\" name=\"cognome\">
+                                <label for=\"exampleFormControlInput1\" class=\"form-label\">Cognome</label>
+                     <input type=\"text\" value=\"".$row['cognome']."\" class=\"form-control\" id=\"cognome\" name=\"cognome\">
                        </div>
                        <div class=\"mb-3\">
                                <label for=\"exampleFormControlInput1\" class=\"form-label\">CODICE FISCALE</label>
-                     <input hidden type=\"text\" value=\"".$row['codicefiscale']."\" class=\"form-control\" id=\"hcodicefiscale\" name=\"hcodicefiscale\">
-                     <input type=\"text\" class=\"form-control\" id=\"codicefiscale\" name=\"codicefiscale\">
+                     <input type=\"text\" value=\"".$row['codicefiscale']."\" class=\"form-control\" id=\"codicefiscale\" name=\"codicefiscale\">
                        </div>
                      <div class=\"mb-3\">
                                 <label for=\"exampleFormControlInput1\" class=\"form-label\">indirizzo</label>
-                      <input hidden type=\"text\" value=\"".$row['indirizzo']."\" class=\"form-control\" id=\"hindirizzo\" name=\"hindirizzo\">
-                      <input type=\"text\" class=\"form-control\" id=\"indirizzo\" name=\"indirizzo\">
-                        </div>
+                      <input  type=\"text\" value=\"".$row['indirizzo']."\" class=\"form-control\" id=\"indirizzo\" name=\"indirizzo\">
+                       </div>
                      <div class=\"mb-3\">
                                <label for=\"exampleFormControlInput1\" class=\"form-label\">città</label>
-                     <input hidden type=\"text\" value=\"".$row['citta']."\" class=\"form-control\" id=\"hcitta\" name=\"hcitta\">
-                     <input type=\"text\" class=\"form-control\" id=\"citta\" name=\"citta\">
-                       </div>
+                     <input type=\"text\" value=\"".$row['citta']."\" class=\"form-control\" id=\"citta\" name=\"citta\">
+                      </div>
 
 
                      <div class=\"mb-3\">
                                <label for=\"exampleFormControlInput1\" class=\"form-label\">email personale</label>
-                     <input hidden type=\"text\" value=\"".$row['emailpersonale']."\" class=\"form-control\" id=\"hemailpersonale\" name=\"hemailpersonale\">
-                     <input type=\"text\" class=\"form-control\" id=\"emailpersonale\" name=\"emailpersonale\">
+                     <input type=\"text\" value=\"".$row['emailpersonale']."\" class=\"form-control\" id=\"emailpersonale\" name=\"emailpersonale\">
                        </div>
                       <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA UTENTE\" />
                         </div>
                     </form>
-                    <body onload='calcolaCampi()'>
-
                     ";
-
-                $upd = true;
-               //  echo "<option value=\"".$row['email']."\">".$row['nome']." ".$row['cognome']."</option> ";
                  }
        } catch (PDOException $e) {
            echo "Errore: " . $e->getMessage();
@@ -185,18 +173,12 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
         echo "sono qui";
         // definisco le variabili
         $targ = $_POST['hricercato'];
-        $nome = $_COOKIE['nome'];
-                if ($_POST['nome'] != ""){ $nome = $_POST['nome'];}
-        $cognome = $_COOKIE['cognome'];
-                if ($_POST['cognome'] != ""){ $cognome = $_POST['cognome'];}
-        $indirizzo= $_COOKIE['indirizzo'];
-                if ($_POST['indirizzo'] != ""){ $indirizzo = $_POST['indirizzo'];}
-        $citta= $_COOKIE['citta'];
-                if ($_POST['citta'] != ""){ $citta = $_POST['citta'];}        
-        $cf= $_COOKIE['codicefiscale'];
-                if ($_POST['codicefiscale'] != ""){ $cf = $_POST['codicefiscale'];}
-        $persemail= $_COOKIE['emailpersonale'];
-                if ($_POST['emailpersonale'] != ""){ $persemail = $_POST['emailpersonale'];}
+        $nome = $_POST['nome'];
+        $cognome = $_POST['cognome'];
+        $indirizzo = $_POST['indirizzo'];
+        $citta = $_POST['citta'];
+        $cf = $_POST['codicefiscale'];
+        $persemail = $_POST['emailpersonale'];
       //  $tipo = $_POST['tipo'];
       //  $tipodocente = $_POST['tipodocente'];
       //  $tiposegreteria = $_POST['tiposegreteria'];
@@ -287,7 +269,7 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
 }
  ?>
--->
+
 
 <form action="../index.php">
     <input type="submit" class="button1 lightblue" value="RITORNA ALLA HOMEPAGE" />

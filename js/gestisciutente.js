@@ -8,8 +8,8 @@ function calcolaCampi(){
     var citta = document.getElementById('hcitta').value;
     var email = document.getElementById('hemailpersonale').value;
 
-    document.getElementById('nome').placeholder = nome;
-    document.cookie = "nome = " + nome;
+  //  document.getElementById('nome').placeholder = nome;
+  //  document.cookie = "nome = " + nome;
     
     document.getElementById('cognome').placeholder = cognome;
     document.cookie = "cognome = " + cognome;
