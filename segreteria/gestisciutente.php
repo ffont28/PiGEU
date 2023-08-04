@@ -171,8 +171,8 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
                     </div>';
                }
 
-
-               echo " <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA ANAGRAFICA UTENTE\" />
+               echo " <input type=\"submit\" class=\"button1 red\" value=\"SPOSTA UTENTE IN STORICO\" name='action' />
+                      <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA ANAGRAFICA UTENTE\" name='action'/>
                         </div>
                     </form>
                     ";
@@ -232,32 +232,44 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
 <?php
  if($_SERVER['REQUEST_METHOD']=='POST'){
-
-
-        $db = open_pg_connection();
-        echo "sono qui";
-        // definisco le variabili
         $targ = $_POST['hricercato'];
-        $nome = $_POST['nome'];
-        $cognome = $_POST['cognome'];
-        $indirizzo = $_POST['indirizzo'];
-        $citta = $_POST['citta'];
-        $cf = $_POST['codicefiscale'];
-        $persemail = $_POST['emailpersonale'];
-      //  $tipo = $_POST['tipo'];
-      //  $tipodocente = $_POST['tipodocente'];
-      //  $tiposegreteria = $_POST['tiposegreteria'];
-      //  $cf = $_POST['codicefiscale'];
-        ///////echo $_POST['tipo'];
-        echo "<script>console.log('Debug Objects: " . $nome. " ". $cognome ." ". $cf." ".$targ. " ' );</script>";
-        sleep(3);
-      //  echo "elems= ".$nome.$cognome.$cf.$indirizzo.$citta.$persemail.$ricercato;
-        // inserimento generale a livello di utente sia che sia docente, studente o segreteria
-        try {
-              ///////////////////////////
+        if ($_POST['action'] == 'SPOSTA UTENTE IN STORICO'){
+            echo "<script>console.log('Debug Objects: " . $targ . " sono qui2 ' );</script>";
 
-                $pdo = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
-                  $sql = "UPDATE utente SET nome = :nome,
+            $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+            $sql = "SELECT * FROM sposta_dati_studente(:targ)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->bindParam(':targ', $targ, PDO::PARAM_STR);
+            $stmt->execute();
+        }
+
+        if ($_POST['action'] == 'MODIFICA ANAGRAFICA UTENTE') {
+
+
+            $db = open_pg_connection();
+            echo "sono qui";
+            // definisco le variabili
+
+            $nome = $_POST['nome'];
+            $cognome = $_POST['cognome'];
+            $indirizzo = $_POST['indirizzo'];
+            $citta = $_POST['citta'];
+            $cf = $_POST['codicefiscale'];
+            $persemail = $_POST['emailpersonale'];
+            //  $tipo = $_POST['tipo'];
+            //  $tipodocente = $_POST['tipodocente'];
+            //  $tiposegreteria = $_POST['tiposegreteria'];
+            //  $cf = $_POST['codicefiscale'];
+            ///////echo $_POST['tipo'];
+            echo "<script>console.log('Debug Objects: " . $nome . " " . $cognome . " " . $cf . " " . $targ . " ' );</script>";
+            //sleep(3);
+            //  echo "elems= ".$nome.$cognome.$cf.$indirizzo.$citta.$persemail.$ricercato;
+            // inserimento generale a livello di utente sia che sia docente, studente o segreteria
+            try {
+                ///////////////////////////
+
+                $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+                $sql = "UPDATE utente SET nome = :nome,
                                             cognome = :cognome,
                                             codicefiscale = :cf,
                                             indirizzo = :indirizzo,
@@ -265,33 +277,33 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
                                             emailpersonale = :persemail
                                             WHERE email = :ricercato";
 
-                    // Step 3: Create a prepared statement
-                    $stmt = $pdo->prepare($sql);
+                // Step 3: Create a prepared statement
+                $stmt = $pdo->prepare($sql);
 
-                    // Step 4: Bind parameters to the prepared statement
-                    $stmt->bindParam(':nome', $nome, PDO::PARAM_STR);
-                    $stmt->bindParam(':cognome', $cognome, PDO::PARAM_STR);
-                    $stmt->bindParam(':cf', $cf, PDO::PARAM_STR);
-                    $stmt->bindParam(':indirizzo', $indirizzo, PDO::PARAM_STR);
-                    $stmt->bindParam(':citta', $citta, PDO::PARAM_STR);
-                    $stmt->bindParam(':persemail', $persemail, PDO::PARAM_STR);
-                    $stmt->bindParam(':ricercato', $targ, PDO::PARAM_STR);
+                // Step 4: Bind parameters to the prepared statement
+                $stmt->bindParam(':nome', $nome, PDO::PARAM_STR);
+                $stmt->bindParam(':cognome', $cognome, PDO::PARAM_STR);
+                $stmt->bindParam(':cf', $cf, PDO::PARAM_STR);
+                $stmt->bindParam(':indirizzo', $indirizzo, PDO::PARAM_STR);
+                $stmt->bindParam(':citta', $citta, PDO::PARAM_STR);
+                $stmt->bindParam(':persemail', $persemail, PDO::PARAM_STR);
+                $stmt->bindParam(':ricercato', $targ, PDO::PARAM_STR);
 
-                    // Step 5: Execute the prepared statement
-                    $stmt->execute();
+                // Step 5: Execute the prepared statement
+                $stmt->execute();
 
-                    // Step 6: Check for success or handle any errors
-                    $rowCount = $stmt->rowCount();
-                    if ($rowCount > 0) {
-                        echo "Update successful.";
-                    } else {
-                        echo "No rows updated.";
-                    }
-                } catch (PDOException $e) {
-                    // Handle any errors that occurred during the process
-                    echo "Error: " . $e->getMessage();
+                // Step 6: Check for success or handle any errors
+                $rowCount = $stmt->rowCount();
+                if ($rowCount > 0) {
+                    echo "Update successful.";
+                } else {
+                    echo "No rows updated.";
                 }
-
+            } catch (PDOException $e) {
+                // Handle any errors that occurred during the process
+                echo "Error: " . $e->getMessage();
+            }
+        }
 
 /*
         $params = array ($nome, $cognome, $cf ,$indirizzo, $citta, $persemail ,$ricercato);

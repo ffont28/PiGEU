@@ -1,27 +1,34 @@
+var dominio;
+
 if (window.XMLHttpRequest) {
-    console.log("uaooo");
+    console.log("JS properly UP and RUNNING");
      // Supports Ajax.
-
     } else {
-    console.log("buuuuuhhh");
-
+    console.log("JS not working ;(");
      //No.
 }
 
+
+
+function setup() {
+    dominio = document.getElementById('dominio');
+    console.log("default: studente!");
+    dominio.innerText = "@studenti.unimi.it";
+    document.cookie = "dominio = " + "@studenti.unimi.it";
+}
 
 //tipoDocente.style.display = "none";
 
 function computeEmailDomain(){
 //var tipoDocente = document.getElementById('tipodocente');
 var tipo = document.getElementById('tipo').value;
-var dominio = document.getElementById('dominio');
+
 let tipodocente = document.getElementById("tipodocente");
 let tiposegreteria = document.getElementById("tiposegreteria");
 let cdl = document.getElementById("cdl");
 
 //let hidden = tipodocente.getAttribute("hidden");
 
-    document.cookie = "dominio = " + "@studenti.unimi.it";
 
 
     if (tipo == "studente"){
