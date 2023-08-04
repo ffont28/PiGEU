@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION sposta_dati_studente(E varchar) RETURNS TEXT AS $$
 DECLARE
   status TEXT := 'Dati spostati con successo.';
 BEGIN
-  -- INSERT per spostare i dati dalla tabella di origine alla tabella di destinazione
+  -- INSERT utente --> utente_storico
   INSERT INTO utente_storico (email, nome, cognome, indirizzo, citta, codicefiscale, emailpersonale)
   SELECT email, nome, cognome, indirizzo, citta, codicefiscale, emailpersonale
   FROM utente where email = $1;
@@ -22,7 +22,7 @@ BEGIN
   SELECT utente, matricola, corso_di_laurea
   FROM studente WHERE utente = $1;
 
-  -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
+  -- cancello i dati dalla tabella stutente dopo averli spostati in stutente_storico
   DELETE FROM studente WHERE utente = $1;
 
   -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
