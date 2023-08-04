@@ -34,10 +34,6 @@
 </ul>
 <!-- FINE NAVBAR -->
 
-<?php
-// Start the session
-session_start();
-?>
 
 <h1>Benvenuto <?php echo $_SESSION['username']." ".$_SESSION['nome'] ?></h1>
 

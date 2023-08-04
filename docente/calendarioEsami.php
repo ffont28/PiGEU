@@ -49,7 +49,23 @@
             </form>
     </div>
 
-    <div>
+<?php
+    include_once('functions.php');
+    include_once('conf.php');
+    try {
+        $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $query = "  SELECT i.codice, i.nome, c.data, c.ora FROM insegnamento i
+                    INNER JOIN calendario_esami c ON i.codice = c.insegnamento";
+
+
+        $stmt = $conn->query($query);
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        echo ' <label for="exampleFormControlInput1" class="form-label">Esami attualmente calendarizzati</label> 
+        <div>
         <table class="table">
             <thead>
             <tr>
@@ -59,7 +75,16 @@
                 <th scope="col">Handle</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody>';
+
+        foreach ($results as $row) {
+            echo "<option value=\"".$row['codice']."\">".$row['nome']."</option> ";
+        }
+    } catch (PDOException $e) {
+        echo "Errore: " . $e->getMessage();
+    }
+?>
+
             <tr>
                 <th scope="row">1</th>
                 <td>Mark</td>
