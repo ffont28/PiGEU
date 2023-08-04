@@ -8,21 +8,31 @@
         -- studente --> studente_storico
         -- carriera --> carriera_storica
 
-CREATE OR REPLACE FUNCTION sposta_dati_studente() RETURNS TEXT AS $$
+CREATE OR REPLACE FUNCTION sposta_dati_studente(E varchar) RETURNS TEXT AS $$
 DECLARE
   status TEXT := 'Dati spostati con successo.';
 BEGIN
-  -- Eseguire l'istruzione INSERT per spostare i dati dalla tabella di origine alla tabella di destinazione
+  -- INSERT per spostare i dati dalla tabella di origine alla tabella di destinazione
   INSERT INTO utente_storico (email, nome, cognome, indirizzo, citta, codicefiscale, emailpersonale)
   SELECT email, nome, cognome, indirizzo, citta, codicefiscale, emailpersonale
-  FROM utente;
+  FROM utente where email = $1;
 
+  -- INSERT studente --> studente_storico
+  INSERT INTO studente_storico (utente, matricola, corso_di_laurea)
+  SELECT utente, matricola, corso_di_laurea
+  FROM studente WHERE utente = $1;
+
+  -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
+  DELETE FROM studente WHERE utente = $1;
+
+  -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
+  DELETE FROM utente where email = $1;
 
   RETURN status;
 -- Gestione delle eccezioni
 EXCEPTION
   WHEN OTHERS THEN
-    -- Nel caso in cui si verifica un errore, restituisco il messaggio con il tipo di errore
+    -- In caso di errore restituisco il messaggio di errore
     status := 'Errore: ' || SQLERRM;
     RETURN status;
 END;
