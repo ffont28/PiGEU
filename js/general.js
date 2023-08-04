@@ -18,8 +18,9 @@ function testpassword(modulo){
 function indietro() {
     window.history.back();
 }
-
+/*
 // Data Picker Initialization
 $('.datepicker').datepicker({
     inline: true
 });
+ */

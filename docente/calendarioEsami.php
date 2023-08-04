@@ -19,7 +19,7 @@
     <!-- INIZIO NAVBAR -->
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link " aria-current="page" href="#">Homepage</a>
+            <a class="nav-link " aria-current="page" href="main.php">Homepage</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="../modificaPassword.php">Modifica la tua password</a>
@@ -40,29 +40,102 @@
     </div>
     <div>
         <label for="exampleFormControlInput1" class="form-label">Inserisci la data e l'ora per l'esame</label>
-            <form action="/action_page.php">
+            <form action="" method="POST">
+                <label for="exampleFormControlInput1" class="form-label">Insegnamento:</label>
+                <select class="form-select" id="insegnamento" name="insegnamento">
+                <?php
+                include('../functions.php');
+                include('../conf.php');
+                $docente = $_SESSION['username'];
+                echo "<script>console.log('Debug Objects:>> " . $docente .  " ' );</script>";
+
+                try {
+                    $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
+                    // Query con CTE
+                    $query = "  SELECT i.codice, i.nome  FROM insegnamento i
+                        INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
+                        WHERE d.docente = :docente";
+                    //echo "<script>console.log('Qui3');</script>";
+                    // Esecuzione della query e recupero dei risultati
+                    $stmt = $conn->prepare($query);
+
+                    $stmt->bindParam(':docente', $docente, PDO::PARAM_STR);
+                    $stmt->execute();
+
+                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+                    // Elaborazione dei risultati
+                    foreach ($results as $row) {
+
+                        // Utilizza $row per accedere ai dati dei singoli record
+                        echo "<option value=\"".$row['codice']."\">".$row['nome']."</option> ";
+                    }
+                    echo ' </select>';
+
+                } catch (PDOException $e) {
+                    echo "Errore: " . $e->getMessage();
+                }
+
+
+                ?>
                 <label for="data">Data:</label>
                 <input type="date" id="data" name="data">
-                <label for="birthday">Ora:</label>
+                <label for="time">Ora:</label>
                 <input type="time" id="ora" name="ora">
-                <input type="submit">
+                <input type="submit" class="button1 orange">
             </form>
     </div>
 
 <?php
-    include_once('functions.php');
-    include_once('conf.php');
+
+        if($_SERVER['REQUEST_METHOD']=='POST'){
+            try {
+                $insegnamento = $_POST['insegnamento'];
+                $data = $_POST['data'];
+                $ora = $_POST['ora'];
+
+                $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                $sql = "INSERT INTO calendario_esami (insegnamento, data, ora) VALUES (:insegnamento, :data, :ora)";
+
+                $stmt = $db->prepare($sql);
+
+                $stmt->bindParam(':insegnamento', $insegnamento, PDO::PARAM_STR);
+                $stmt->bindParam(':data', $data, PDO::PARAM_STR);
+                $stmt->bindParam(':ora', $ora, PDO::PARAM_STR);
+
+
+                $stmt->execute();
+
+                echo "Data inserted successfully!";
+            } catch (PDOException $e) {
+                echo "Error: " . $e->getMessage();
+            }
+    }
+
     try {
+
+
         $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $query = "  SELECT i.codice, i.nome, c.data, c.ora FROM insegnamento i
-                    INNER JOIN calendario_esami c ON i.codice = c.insegnamento";
 
+        $query = "SELECT DISTINCT i.codice, i.nome, c.data, c.ora FROM insegnamento i
+          INNER JOIN calendario_esami c ON i.codice = c.insegnamento
+          INNER JOIN docente_responsabile d ON d.docente = :docente
+          ";
 
-        $stmt = $conn->query($query);
+        $stmt = $conn->prepare($query);
+
+        $stmt->bindParam(':docente', $docente, PDO::PARAM_STR);
+        $stmt->execute();
+
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 
         echo ' <label for="exampleFormControlInput1" class="form-label">Esami attualmente calendarizzati</label> 
         <div>
@@ -70,42 +143,34 @@
             <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">First</th>
-                <th scope="col">Last</th>
-                <th scope="col">Handle</th>
+                <th scope="col">Codice </th>
+                <th scope="col">Nome Insegnamento</th>
+                <th scope="col">Data</th>
+                <th scope="col">Ora</th>
             </tr>
             </thead>
             <tbody>';
 
+        $counter = 1;
         foreach ($results as $row) {
-            echo "<option value=\"".$row['codice']."\">".$row['nome']."</option> ";
+            echo '  <tr>
+                    <th scope="row">'.$counter++.'</th>
+                    <td>'.$row["codice"].'</td>
+                    <td>'.$row["nome"].'</td>
+                    <td>'.$row["data"].'</td>
+                    <td>'.$row["ora"].'</td>
+                    </tr>';
         }
+
+        echo '</tbody>
+        </table>
+    </div>';
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
+
 ?>
 
-            <tr>
-                <th scope="row">1</th>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
-            </tr>
-            <tr>
-                <th scope="row">2</th>
-                <td>Jacob</td>
-                <td>Thornton</td>
-                <td>@fat</td>
-            </tr>
-            <tr>
-                <th scope="row">3</th>
-                <td>Larry</td>
-                <td>the Bird</td>
-                <td>@twitter</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
 </body>
 
 </html>
