@@ -186,25 +186,51 @@ $studente = $_SESSION['username'];
 
         $counter = 1;
         foreach ($results as $row) {
-            echo '  <tr>
-                    <th scope="row">'.$counter++.'</th>
-                    <td>'.$row["codice"].'</td>
-                    <td>'.$row["nome"].'</td>
-                    <td>'.$row["data"].'</td>
-                    <td>'.$row["ora"].'</td>
-                    <td>
-                      <button class="button-iscr" 
-                              data-cod="'. $row["id"] .'"
-                              data-user="'. $studente .'" >ISCRIVITI</button></td>
-                    </tr> ';
+            // VERIFICO ISISCRITTO
+            try {
+                $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            } catch (PDOException $e) {
+                die("Errore nella connessione al database: " . $e->getMessage());
+            }
+
+        // Query per verificare se lo studente è iscritto all'esame corrente
+            $esameId = $row["id"]; // L'ID dell'esame corrente preso dal ciclo foreach
+
+        // Nota: Assicurati che il nome della tabella delle iscrizioni e delle colonne sia corretto
+            $query = "SELECT * FROM iscrizione WHERE studente = :studente AND esame = :esame";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':studente', $studente);
+            $stmt->bindParam(':esame', $esameId);
+            $stmt->execute();
+
+            $isIscritto = $stmt->rowCount() > 0; // true se l'utente è iscritto, false altrimenti
+
+            $tableHTML .= '<tr>
+                    <th scope="row">' . $counter++ . '</th>
+                    <td>' . $row["codice"] . '</td>
+                    <td>' . $row["nome"] . '</td>
+                    <td>' . $row["data"] . '</td>
+                    <td>' . $row["ora"] . '</td>
+                    <td>';
+            if ($isIscritto) {
+                // Se l'utente è iscritto, mostra il bottone "cancella iscrizione"
+                $tableHTML .= '<button class="button-canc"
+                              data-cod="' . $row["id"] . '"
+                              data-user="' . $studente . '">cancella iscrizione</button>';
+            } else {
+                // Altrimenti, mostra il bottone "iscriviti"
+                $tableHTML .= '<button class="button-iscr"
+                              data-cod="' . $row["id"] . '"
+                              data-user="' . $studente . '">ISCRIVITI</button>';
+            }
+            $tableHTML .= '</td>
+                    </tr>';
         }
 
+        $tableHTML .= '</tbody></table></div>';
 
-
-        echo '
-            </tbody>
-        </table>
-    </div>';
+        echo $tableHTML;
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
@@ -246,6 +272,46 @@ iscrButtons.forEach(button => {
 
     // Effettua la richiesta AJAX
     iscriviti(utente, id);
+  });
+});
+</script>
+
+<!-- Assicurati di includere jQuery prima di includere il tuo script JavaScript -->
+<script src=\"https://code.jquery.com/jquery-3.6.0.min.js\"></script>
+
+<!-- Il tuo script JavaScript -->
+<script>
+$(document).ready(function() {
+  // Aggiungi un gestore di eventi al click del bottone \"cancella iscrizione\"
+  $('.button-canc').on('click', function() {
+    // Ottieni i dati dal bottone cliccato
+    var codice = $(this).data('cod');
+    var user = $(this).data('user');
+
+    // Crea l'oggetto di dati da inviare al server
+    var dataToSend = {
+      codice: codice,
+      user: user
+    };
+
+    // Effettua la chiamata AJAX per cancellare l'iscrizione
+    $.ajax({
+      url: 'cancellati.php', // Sostituisci con il percorso del tuo script PHP per la cancellazione
+      type: 'POST', // O 'GET' a seconda del metodo del tuo script PHP
+      data: dataToSend,
+      success: function(response) {
+        // La risposta dal server dopo la cancellazione (puoi gestirla qui se necessario)
+        console.log(response);
+        
+        // Aggiorna l'interfaccia utente, nascondendo il bottone \"cancella iscrizione\"
+        $(this).hide();
+        location.reload();
+      },
+      error: function(error) {
+        // Gestisci eventuali errori durante la chiamata AJAX
+        console.error('Errore durante la chiamata AJAX:', error);
+      }
+    });
   });
 });
 </script>";
