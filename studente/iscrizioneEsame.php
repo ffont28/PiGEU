@@ -146,6 +146,7 @@
     }*/
 include('../functions.php');
 include('../conf.php');
+
 $studente = $_SESSION['username'];
     try {
 
@@ -154,7 +155,7 @@ $studente = $_SESSION['username'];
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
-        $query = "SELECT DISTINCT i.codice, i.nome, c.data, c.ora FROM insegnamento i
+        $query = "SELECT DISTINCT i.codice, i.nome, c.data, c.ora, c.id FROM insegnamento i
           INNER JOIN calendario_esami c ON i.codice = c.insegnamento
           INNER JOIN insegnamento_parte_di_cdl ip ON ip.insegnamento = i.codice
           INNER JOIN studente s ON s.corso_di_laurea = ip.corso_di_laurea
@@ -193,9 +194,8 @@ $studente = $_SESSION['username'];
                     <td>'.$row["ora"].'</td>
                     <td>
                       <button class="button-iscr" 
-                              data-cod="'. $row["codice"] .'" 
-                              data-dat="' . $row["data"]. '"
-                              data-ora="' . $row["ora"]. '">ISCRIVITI</button></td>
+                              data-cod="'. $row["id"] .'"
+                              data-user="'. $studente .'" >ISCRIVITI</button></td>
                     </tr> ';
         }
 
@@ -208,51 +208,48 @@ $studente = $_SESSION['username'];
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
-/*
+
 echo "
         <script>
-  // Funzione per effettuare la richiesta AJAX
-  function deleteRow(cod, data, ora) {
-    const xhttp = new XMLHttpRequest();
+// Funzione per effettuare la richiesta AJAX
+function iscriviti(utente, id) {
+  const xhttp = new XMLHttpRequest();
 
-    xhttp.onreadystatechange = function() {
-      if (this.readyState === 4) {
-        if (this.status === 200) {
-          // Gestisci la risposta del server
-          const response = JSON.parse(this.responseText);
-          console.log(response);
-        if (response.success) {
-            window.location.reload();
-          }
-        } else {
-          // Gestisci eventuali errori
-          console.error('Errore nella richiesta AJAX:', this.statusText);
-         }
+  xhttp.onreadystatechange = function() {
+    if (this.readyState === 4) {
+      if (this.status === 200) {
+        // Gestisci la risposta del server
+        const response = JSON.parse(this.responseText);
+        console.log(response);
+
+        // Ricarica la pagina indipendentemente dal successo o dall'errore
+        window.location.reload();
+      } else {
+        // Gestisci eventuali errori
+        console.error('Errore nella richiesta AJAX:', this.statusText);
       }
-    };
+    }
+  };
 
-    
-    xhttp.open('POST', '../cancella_esame.php', true);
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const params = 'cod=' + encodeURIComponent(cod) + '&data=' + encodeURIComponent(data) + '&ora=' + encodeURIComponent(ora);
-    xhttp.send(params);
-  }
+  xhttp.open('POST', 'iscriviti.php', true);
+  xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+  const params = 'id=' + encodeURIComponent(id) + '&utente=' + encodeURIComponent(utente);
+  xhttp.send(params);
+}
 
-  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
-  const deleteButtons = document.querySelectorAll('.button-canc');
-  deleteButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const cod = this.getAttribute('data-cod');
-      const data = this.getAttribute('data-dat');
-      const ora = this.getAttribute('data-ora');
-      console.log(\"ma dai qui\");
+// Aggiungi un evento clic per i pulsanti di classe \"button-iscr\"
+const iscrButtons = document.querySelectorAll('.button-iscr');
+iscrButtons.forEach(button => {
+  button.addEventListener('click', function() {
+    const id = this.getAttribute('data-cod');
+    const utente = this.getAttribute('data-user');
 
-      // Effettua la richiesta AJAX
-      deleteRow(cod, data, ora);
-    });
+    // Effettua la richiesta AJAX
+    iscriviti(utente, id);
   });
+});
 </script>";
-*/
+
 ?>
 
 </body>
