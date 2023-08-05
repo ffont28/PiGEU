@@ -37,3 +37,14 @@ input[type="submit"] {
 input[type="submit"]:hover {
     background-color: #45a049; /* Colore di sfondo più scuro quando si passa sopra il pulsante */
 }
+
+/* Stile per il pulsante di cancellazione */
+.button-canc {
+    padding: 1px 10px;
+    background-color: #fc1800; /* Colore di sfondo rosso */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+

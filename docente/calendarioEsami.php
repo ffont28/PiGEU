@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../css/cssSegreteria.css">
     <link rel="stylesheet" href="../css/calendarioesami.css">
     <script src="../js/general.js"></script>
+ <!--   <script src="../js/calendarioesami.js"></script> -->
 
     <meta charset="utf-8">
     <title>Calendario Esami · PiGEU</title>
@@ -94,7 +95,10 @@
 
 <?php
 
-        if($_SERVER['REQUEST_METHOD']=='POST'){
+    if($_SERVER['REQUEST_METHOD']=='POST'){
+
+        if (isset($_POST['data']) && isset($_POST['ora']) && $_POST['data'] != "") {
+
             try {
                 $insegnamento = $_POST['insegnamento'];
                 $data = $_POST['data'];
@@ -123,13 +127,15 @@
                         break;
                     } else {
                         echo '  <div class="alert alert-danger" role="alert">
-                                  '.$notify["payload"].'
+                                  ' . $notify["payload"] . '
                                 </div>';
                     }
                 }
             } catch (PDOException $e) {
-                echo "Error: " . $e->getMessage();
+                echo "Errore in inserimento: " . $e->getMessage();
             }
+            $_POST['data'] = "";
+        }
     }
 
     try {
@@ -174,15 +180,67 @@
                     <td>'.$row["nome"].'</td>
                     <td>'.$row["data"].'</td>
                     <td>'.$row["ora"].'</td>
-                    </tr>';
+                    <td>
+                      <button class="button-canc" 
+                              data-cod="'. $row["codice"] .'" 
+                              data-dat="' . $row["data"]. '"
+                              data-ora="' . $row["ora"]. '">🗑️</button></td>
+                    </tr> ';
         }
 
-        echo '</tbody>
+
+
+        echo '
+            </tbody>
         </table>
     </div>';
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
+
+echo "
+        <script>
+  // Funzione per effettuare la richiesta AJAX
+  function deleteRow(cod, data, ora) {
+    const xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function() {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          // Gestisci la risposta del server
+          const response = JSON.parse(this.responseText);
+          console.log(response);
+        if (response.success) {
+            window.location.reload();
+          }
+        } else {
+          // Gestisci eventuali errori
+          console.error('Errore nella richiesta AJAX:', this.statusText);
+         }
+      }
+    };
+
+    
+    xhttp.open('POST', '../cancella_esame.php', true);
+    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    const params = 'cod=' + encodeURIComponent(cod) + '&data=' + encodeURIComponent(data) + '&ora=' + encodeURIComponent(ora);
+    xhttp.send(params);
+  }
+
+  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
+  const deleteButtons = document.querySelectorAll('.button-canc');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const cod = this.getAttribute('data-cod');
+      const data = this.getAttribute('data-dat');
+      const ora = this.getAttribute('data-ora');
+      console.log(\"ma dai qui\");
+
+      // Effettua la richiesta AJAX
+      deleteRow(cod, data, ora);
+    });
+  });
+</script>";
 
 ?>
 
