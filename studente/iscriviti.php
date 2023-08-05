@@ -6,8 +6,6 @@ if (isset($_POST['id']) && isset($_POST['utente'])) {
     $id = $_POST['id'];
     $utente = $_POST['utente'];
 
-
-
     $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
