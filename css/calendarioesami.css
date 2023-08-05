@@ -48,3 +48,12 @@ input[type="submit"]:hover {
     cursor: pointer;
 }
 
+.button-iscr {
+    padding: 1px 10px;
+    background-color: #28930a; /* Colore di sfondo rosso */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
