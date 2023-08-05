@@ -67,8 +67,8 @@ let cdl = document.getElementById("cdl");
 }
 
 function computeEmailUser(){
-    var nome = document.getElementById('nome').value;
-    var cognome = document.getElementById('cognome').value;
+    var nome = document.getElementById('nome').value.toLowerCase().replace(/\s/g, '');
+    var cognome = document.getElementById('cognome').value.toLowerCase().replace(/\s/g, '');
 
     var dominio = document.getElementById('username');
 

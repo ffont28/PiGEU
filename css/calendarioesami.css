@@ -1,0 +1,39 @@
+/* Stile per il modulo */
+#inserimentoDataOra {
+    width: 970px; /* Larghezza del modulo, puoi regolarla come preferisci */
+    margin: 0 auto; /* Centra il modulo orizzontalmente sulla pagina */
+}
+
+/* Stile per le etichette */
+label {
+ /* display: block; /* Rende le etichette su una riga separata */
+    margin-left: 9px; /* Spazio tra le etichette */
+    font-weight: bold; /* Rendi il testo delle etichette in grassetto */
+}
+
+/* Stile per gli input date e time */
+input[type="date"], select[type="insegnamento"],
+input[type="time"] {
+    padding: 8px; /* Spaziatura interna dell'input */
+    border: 1px solid #ccc; /* Bordo grigio per l'input */
+    border-radius: 4px; /* Rendi i bordi arrotondati */
+}
+
+select[type="insegnamento"]{
+    width: 350px;
+}
+
+/* Stile per il pulsante di invio */
+input[type="submit"] {
+    padding: 10px 20px; /* Spaziatura interna del pulsante */
+    background-color: #4CAF50; /* Colore di sfondo verde */
+    color: white; /* Colore del testo bianco */
+    border: none; /* Rimuovi il bordo */
+    border-radius: 4px; /* Rendi i bordi arrotondati */
+    cursor: pointer; /* Mostra una mano quando si passa sopra il pulsante */
+}
+
+/* Hover style per il pulsante di invio */
+input[type="submit"]:hover {
+    background-color: #45a049; /* Colore di sfondo più scuro quando si passa sopra il pulsante */
+}

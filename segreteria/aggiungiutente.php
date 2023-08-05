@@ -125,8 +125,10 @@
         <select class="form-select" aria-label="Default select example" id="tipo" name="tipodocente">
                 <!--  <option selected>Open this select menu</option> -->
                   <option value="a contratto">A contratto</option>
-                  <option value="ricercatore">Ricercatore</option>
                   <option value="associato">Associato</option>
+                  <option value="ordinario">Ordinario</option>
+                  <option value="ricercatore">Ricercatore</option>
+
                 </select>
         </div>
 

@@ -8,6 +8,7 @@
 
     <link rel="stylesheet" href="../css/from-re.css">
     <link rel="stylesheet" href="../css/cssSegreteria.css">
+    <link rel="stylesheet" href="../css/calendarioesami.css">
     <script src="../js/general.js"></script>
 
     <meta charset="utf-8">
@@ -40,9 +41,9 @@
     </div>
     <div>
         <label for="exampleFormControlInput1" class="form-label">Inserisci la data e l'ora per l'esame</label>
-            <form action="" method="POST">
-                <label for="exampleFormControlInput1" class="form-label">Insegnamento:</label>
-                <select class="form-select" id="insegnamento" name="insegnamento">
+            <form id="inserimentoDataOra" action="" method="POST">
+                <label for="insegnamento" >Insegnamento:</label>
+                <select type='insegnamento' id="insegnamento" name="insegnamento">
                 <?php
                 include('../functions.php');
                 include('../conf.php');
@@ -86,7 +87,8 @@
                 <input type="date" id="data" name="data">
                 <label for="time">Ora:</label>
                 <input type="time" id="ora" name="ora">
-                <input type="submit" class="button1 orange">
+           <!-- <label for="submit">conferma l'inserimento</label> -->
+                <input type="submit" class="button1 green" value="INSERISCI">
             </form>
     </div>
 
@@ -100,7 +102,7 @@
 
                 $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
                 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+                $db->query("LISTEN notifica");
                 $sql = "INSERT INTO calendario_esami (insegnamento, data, ora) VALUES (:insegnamento, :data, :ora)";
 
                 $stmt = $db->prepare($sql);
@@ -112,7 +114,19 @@
 
                 $stmt->execute();
 
-                echo "Data inserted successfully!";
+                while (true) {
+                    $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 5 secondi
+                    if ($notify === false) {
+                        echo '  <div class="alert alert-success" role="alert">
+                                  Inserimento dell\'esame andato a buon fine 
+                                </div>';
+                        break;
+                    } else {
+                        echo '  <div class="alert alert-danger" role="alert">
+                                  '.$notify["payload"].'
+                                </div>';
+                    }
+                }
             } catch (PDOException $e) {
                 echo "Error: " . $e->getMessage();
             }
@@ -137,7 +151,7 @@
 
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo ' <label for="exampleFormControlInput1" class="form-label">Esami attualmente calendarizzati</label> 
+        echo ' <div><label for="exampleFormControlInput1" class="form-label"><h3>Esami attualmente calendarizzati</h3></label></div> 
         <div>
         <table class="table">
             <thead>
@@ -147,6 +161,7 @@
                 <th scope="col">Nome Insegnamento</th>
                 <th scope="col">Data</th>
                 <th scope="col">Ora</th>
+                <th scope="col">CANC</th>
             </tr>
             </thead>
             <tbody>';
