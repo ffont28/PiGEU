@@ -4,7 +4,7 @@ BEGIN
         INNER JOIN insegnamento i ON c.insegnamento = i.codice
         WHERE c.data = NEW.data AND i.anno = (SELECT anno FROM insegnamento WHERE codice = NEW.insegnamento);
     IF FOUND THEN
-        RAISE NOTICE 'Impossibile inserire esame di due insegnamenti dello stesso anno nello stesso giorno';
+        RAISE NOTICE 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata';
         PERFORM pg_notify('notifica', 'Impossibile inserire esame di due insegnamenti dello stesso anno nello stesso giorno');
         RETURN NULL;
     ELSE

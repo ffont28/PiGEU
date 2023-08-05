@@ -89,7 +89,7 @@
                 <label for="time">Ora:</label>
                 <input type="time" id="ora" name="ora">
            <!-- <label for="submit">conferma l'inserimento</label> -->
-                <input type="submit" class="button1 green" value="INSERISCI">
+                <input type="submit" class="button1 green" value="INSERISCI" onclick="showAlertMessage()">
             </form>
     </div>
 
@@ -97,8 +97,12 @@
 
     if($_SERVER['REQUEST_METHOD']=='POST'){
 
-        if (isset($_POST['data']) && isset($_POST['ora']) && $_POST['data'] != "") {
-
+        if (isset($_POST['data']) && isset($_POST['ora'])) {
+            if ($_POST['data'] == "") {
+                echo '<div class="alert alert-warning" role="alert" name="alert-message" >
+                Attenzione: devi inserire una data e un\'ora prima di selezionare INSERISCI
+                      </div>';
+            }
             try {
                 $insegnamento = $_POST['insegnamento'];
                 $data = $_POST['data'];
@@ -119,20 +123,22 @@
                 $stmt->execute();
 
                 while (true) {
-                    $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 5 secondi
+                    $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
                     if ($notify === false) {
-                        echo '  <div class="alert alert-success" role="alert">
+                        echo '  <div class="alert alert-success" role="alert" name="alert-message" >
                                   Inserimento dell\'esame andato a buon fine 
                                 </div>';
                         break;
                     } else {
-                        echo '  <div class="alert alert-danger" role="alert">
+                        echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
                                   ' . $notify["payload"] . '
                                 </div>';
+                        break;
                     }
                 }
             } catch (PDOException $e) {
-                echo "Errore in inserimento: " . $e->getMessage();
+
+               // echo "Errore in inserimento: " . $e->getMessage();
             }
             $_POST['data'] = "";
         }
@@ -147,7 +153,7 @@
 
         $query = "SELECT DISTINCT i.codice, i.nome, c.data, c.ora FROM insegnamento i
           INNER JOIN calendario_esami c ON i.codice = c.insegnamento
-          INNER JOIN docente_responsabile d ON d.docente = :docente
+          INNER JOIN docente_responsabile d ON d.docente = :docente AND d.insegnamento = i.codice
           ";
 
         $stmt = $conn->prepare($query);

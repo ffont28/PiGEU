@@ -24,3 +24,14 @@ $('.datepicker').datepicker({
     inline: true
 });
  */
+
+const alertMessage = document.getElementsByName('alert-message');
+console.log(alertMessage);
+function showAlertMessage() {
+
+    alertMessage.style.display = 'block'; // Mostra il messaggio di avviso
+
+    setTimeout(function() {
+        alertMessage.style.display = 'none'; // Nascondi il messaggio di avviso dopo 5 secondi
+    }, 5000);
+}
