@@ -1,5 +1,5 @@
 <?php
-
+session_start();
 function open_pg_connection(){
     include_once('conf.php');
     $connection= "host=".myhost." dbname=".mydbname." user=".myuser." password=".mypassword;
@@ -7,7 +7,7 @@ function open_pg_connection(){
 }
 
 function check_login($user, $password){
-    session_start();
+
     $_SESSION["username"] = $user;
     $_SESSION["password"] = $password;
     $params = array ($user, $password);
@@ -15,26 +15,52 @@ function check_login($user, $password){
     //echo "stai verificando con user= ".$user." e passwd= ".md5($password);
 
     $db = open_pg_connection();
+    // anzitutto verifico che esistano le credenziali nel DB
+    $sql = "SELECT * FROM credenziali WHERE username = $1 AND password = $2";
+    $result = pg_query_params($db, $sql, $params);
 
-    $sql_s = "SELECT *
-         FROM segreteria s INNER JOIN credenziali c ON s.utente=c.username AND
-         s.utente = $1 AND c.password = $2";
-
-    $result_s = pg_prepare($db,'dis',$sql_s);
-    $result_s = pg_execute($db, 'dis', $params);
-
-    if ($row = pg_fetch_assoc($result_s)){
-
-        header("Location: segreteria.php");
-        exit();
-        //echo "sono qui";
-        return "UTENTE AUTENTICATO come ".$row['livello']; //$row['email'];
-        } else {
-        header("Location: 404.php");
-        return "ci hai provato!";
+    if (pg_num_rows($result) > 0) {
+        $param = array ($user);
+        //caso in cui è SEGRETERIA
+        $sql = "SELECT * FROM segreteria WHERE utente = $1";
+        $result = pg_query_params($db, $sql, $param);
+        if (pg_num_rows($result) > 0) {
+            $_SESSION["tipo"] = "segreteria";
+            header("Location: segreteria.php");
+            exit();
+        }
+        //caso in cui è DOCENTE
+        $sql = "SELECT * FROM docente WHERE utente = $1";
+        $result = pg_query_params($db, $sql, $param);
+        if (pg_num_rows($result) > 0) {
+            $_SESSION["tipo"] = "docente";
+            header("Location: docente/main.php");
+        }
+        //caso in cui è STUDENTE
+        $sql = "SELECT * FROM studente WHERE utente = $1";
+        $result = pg_query_params($db, $sql, $param);
+        if (pg_num_rows($result) > 0) {
+            $_SESSION["tipo"] = "studente";
+            header("Location: studente/main.php");
         }
 
+        //prelevo il NOME e il COGNOME dell'utente
+        $sql = "SELECT nome, cognome FROM utente WHERE email = $1";
+        $result = pg_query_params($db, $sql, $param);
+        if ($row = pg_fetch_assoc($result)) {
+            $_SESSION['nome'] = $row['nome'];
+            $_SESSION['cognome'] = $row['cognome'];
+        }
+
+    } else {
+        header("Location: 404.php");
+        return "ci hai provato!";
+    }
+    echo "<script>console.log('Debug Objects: " . $_SESSION['nome'] . " sono qui2 ' );</script>";
+
+
 }
+
 
 function inserisciStudente($arg){
     $db = open_pg_connection();
@@ -98,5 +124,9 @@ function docentiCandidatiResponsabili(){
 
 }
 
+function logout(){
+    $_SESSION["username"] = " ";
+    $_SESSION["password"] = " ";
+}
 
 ?>
