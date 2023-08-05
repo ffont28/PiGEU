@@ -12,7 +12,7 @@
 
     <meta charset="utf-8">
 
-    <title>Docente · PiGEU</title>
+    <title>Studente · PiGEU</title>
 
 
 </head>
@@ -26,10 +26,7 @@
         <a class="nav-link" href="../modificaPassword.php">Modifica la tua password</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="calendarioEsami.php">Gestisci Calendario Esami</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="verbalizzazione.php">Verbalizza esiti</a>
+        <a class="nav-link" href="iscrizioneEsame.php">Iscrizione Esami</a>
     </li>
     <li class="nav-item mr-2">
         <a class="nav-link" href="../index.php">LOGOUT</a>
