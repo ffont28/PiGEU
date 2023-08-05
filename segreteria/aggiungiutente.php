@@ -1,3 +1,5 @@
+<?php session_start();?>
+
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
   <head>
@@ -76,11 +78,12 @@
         <div class="mb-3">
         <label for="exampleFormControlInput1" class="form-label">Seleziona un'utenza</label>
         <select class="form-select" onchange="computeEmailDomain()"  aria-label="Default select example" id="tipo" name="tipo">
-
+      <!--    <option selected value="">seleziona un valore</option> -->
           <option value="studente">Studente</option>
           <option value="docente">Docente</option>
           <option value="segreteria">Segreteria</option>
         </select>
+            <body onload="setup()">
         </div>
 
         <div id="cdl" class="mb-3">
@@ -122,8 +125,10 @@
         <select class="form-select" aria-label="Default select example" id="tipo" name="tipodocente">
                 <!--  <option selected>Open this select menu</option> -->
                   <option value="a contratto">A contratto</option>
-                  <option value="ricercatore">Ricercatore</option>
                   <option value="associato">Associato</option>
+                  <option value="ordinario">Ordinario</option>
+                  <option value="ricercatore">Ricercatore</option>
+
                 </select>
         </div>
 
@@ -153,6 +158,7 @@
 </form>
 
 <?php
+
  if($_SERVER['REQUEST_METHOD']=='POST'){  //if(isset($_POST)){
   //  echo "sono qui con dominio ".$_COOKIE['dominio']."  .....  ";
   //  echo $_POST['username'].$_POST['dominionascosto']." ".$_POST['nome']." ".$_POST['cognome']." ".$_POST['indirizzo']." ".$_POST['citta']." ".$_POST['codicefiscale']." ".$_POST['emailpersonale'];
