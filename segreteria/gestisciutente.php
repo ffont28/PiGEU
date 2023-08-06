@@ -86,7 +86,7 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
            foreach ($results as $row) {
                $corsoinq = $row['corso_di_laurea'];
                $tipoinq = $row['tipo'];
-
+               $email = $row['email'];
                echo '<script>console.log(\'>>'.$corsoinq." & ".$tipoinq.'<<\')</script>';
                  echo "<div class=\"mb-3\">
                                 <label for=\"exampleFormControlInput1\" class=\"form-label\">Nome</label>
@@ -170,9 +170,17 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
                             </select>
                     </div>';
                }
+               $query2 = "SELECT * FROM studente WHERE utente = :email";
+               $stmt2 = $conn->prepare($query2);
+               $stmt2->bindParam(':email', $email);
+               $stmt2->execute();
+              //  echo "------->>>".$email;
+               $isStudente = $stmt2->rowCount() > 0;
 
-               echo " <input type=\"submit\" class=\"button1 red\" value=\"SPOSTA UTENTE IN STORICO\" name='action' />
-                      <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA ANAGRAFICA UTENTE\" name='action'/>
+               if($isStudente){
+                   echo " <input type=\"submit\" class=\"button1 red\" value=\"SPOSTA STUDENTE IN STORICO\" name='action' />";
+               }
+               echo " <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA ANAGRAFICA UTENTE\" name='action'/>
                         </div>
                     </form>
                     ";
