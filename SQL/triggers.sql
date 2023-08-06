@@ -29,9 +29,9 @@ BEGIN
         INNER JOIN calendario_esami ce ON ce.insegnamento = p.insegnamento2 and ce.id = NEW.esame
     WHERE c.valutazione < 18;
     IF FOUND THEN
-        RAISE EXCEPTION 'ATTENZIONE: non è possibile iscriversi ad un esame senza aver superato la sua propedeuticità';
-     --   PERFORM pg_notify('notifica', 'ATTENZIONE: non è possibile iscriversi ad un esame senza aver superato la sua propedeuticità');
-     --   RETURN NULL;
+        RAISE NOTICE 'ATTENZIONE: non è possibile iscriversi ad un esame senza aver superato la sua propedeuticità';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: non è possibile iscriversi ad un esame senza aver superato la sua propedeuticità');
+        RETURN NULL;
     ELSE
         RETURN NEW;
     END IF;

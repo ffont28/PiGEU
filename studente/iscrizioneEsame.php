@@ -148,6 +148,92 @@ include('../functions.php');
 include('../conf.php');
 
 $studente = $_SESSION['username'];
+
+if($_SERVER['REQUEST_METHOD']=='POST'){
+    $operazione = $_POST['op'];
+    $studente = $_POST['studente'];
+    $esame = $_POST['esame'];
+
+    if ($operazione == "ISCR"){
+
+        //echo "ciao ISCR=" . $_POST['esame'] . " CANC= " ;
+
+        try {
+            $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $db->query("LISTEN notifica");
+            $sql = "INSERT INTO iscrizione (studente, esame) VALUES (:s, :e)";
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(':s', $studente, PDO::PARAM_STR);
+            $stmt->bindParam(':e', $esame, PDO::PARAM_INT);
+
+            $stmt->execute();
+
+            while (true) {
+                $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
+                if ($notify === false) {
+                    //echo '<script> console.log("qui"); window.location.reload();</script>';
+                    echo '  <div class="alert alert-success" role="alert" name="alert-message" >
+                                  Iscrizione andata a buon fine 
+                                </div>';
+                    //  echo '<script> console.log("qui"); window.location.reload();</script>';
+                    break;
+                } else {
+                    //echo '<script> console.log("qui"); window.location.reload();</script>';
+                    echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
+                                  ' . $notify["payload"] . '
+                                </div>';
+                    break;
+                }
+            }
+        } catch (PDOException $e) {
+
+            // echo "Errore in inserimento: " . $e->getMessage();
+        }
+    }
+
+    if ($operazione == "CANC"){
+
+        //echo "ciao ISCR=" . $_POST['esame'] . " CANC= " ;
+
+        try {
+            $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+            $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $db->query("LISTEN notifica");
+            $sql = "DELETE FROM iscrizione WHERE studente = :s AND esame = :e";
+            $stmt = $db->prepare($sql);
+            $stmt->bindParam(':s', $studente, PDO::PARAM_STR);
+            $stmt->bindParam(':e', $esame, PDO::PARAM_INT);
+
+            $stmt->execute();
+            //echo '<script> console.log("qui"); window.location.reload();</script>';
+            while (true) {
+                $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
+                if ($notify === false) {
+
+                    echo '  <div class="alert alert-success" role="alert" name="alert-message" >
+                                  Ti sei cancellato correttamene dall\'iscrizione 
+                                </div>';
+                    break;
+                } else {
+                    echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
+                                  ' . $notify["payload"] . '
+                                </div>';
+                    break;
+                }
+            }
+        } catch (PDOException $e) {
+
+            // echo "Errore in inserimento: " . $e->getMessage();
+        }
+    }
+
+}
+
+
+
     try {
 
 
@@ -215,14 +301,18 @@ $studente = $_SESSION['username'];
                     <td>';
             if ($isIscritto) {
                 // Se l'utente è iscritto, mostra il bottone "cancella iscrizione"
-                $tableHTML .= '<button class="button-canc"
-                              data-cod="' . $row["id"] . '"
-                              data-user="' . $studente . '">cancella iscrizione</button>';
+                $tableHTML .= '<form action="" method="POST">
+                              <input type="text" id="esame" name="esame" value="'.$row["id"].'" hidden>
+                              <input type="text" id="studente" name="studente" value="'.$studente.'" hidden>
+                              <input type="text" id="op" name="op" value="CANC" hidden>
+                              <button type="submit" class="button-canc">cancella iscrizione</button></form>';
             } else {
                 // Altrimenti, mostra il bottone "iscriviti"
-                $tableHTML .= '<button class="button-iscr"
-                              data-cod="' . $row["id"] . '"
-                              data-user="' . $studente . '">ISCRIVITI</button>';
+                $tableHTML .= '<form action="" method="POST">
+                              <input type="text" id="esame" name="esame" value="'.$row["id"].'" hidden>
+                              <input type="text" id="studente" name="studente" value="'.$studente.'" hidden>
+                              <input type="text" id="op" name="op" value="ISCR" hidden>
+                              <button type="submit" class="button-iscr">ISCRIVITI</button></form>';
             }
             $tableHTML .= '</td>
                     </tr>';
@@ -235,6 +325,10 @@ $studente = $_SESSION['username'];
         echo "Errore: " . $e->getMessage();
     }
 
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*
 echo "
         <script>
 // Funzione per effettuare la richiesta AJAX
@@ -315,7 +409,7 @@ $(document).ready(function() {
   });
 });
 </script>";
-
+*/
 ?>
 
 </body>
