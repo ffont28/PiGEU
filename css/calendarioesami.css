@@ -72,3 +72,12 @@ input[type="submit"]:hover {
     border-radius: 4px;
     cursor: pointer;
 }
+
+.button-info {
+    padding: 1px 10px;
+    background-color: #ffb317; /* Colore di sfondo rosso */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: not-allowed;
+}
