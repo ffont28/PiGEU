@@ -89,7 +89,7 @@
                 <label for="time">Ora:</label>
                 <input type="time" id="ora" name="ora">
            <!-- <label for="submit">conferma l'inserimento</label> -->
-                <input type="submit" class="button1 green" value="INSERISCI" onclick="showAlertMessage()">
+                <input type="submit" class="button1 green" value="INSERISCI" >
             </form>
     </div>
 
@@ -125,6 +125,7 @@
                 while (true) {
                     $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
                     if ($notify === false) {
+
                         echo '  <div class="alert alert-success" role="alert" name="alert-message" >
                                   Inserimento dell\'esame andato a buon fine 
                                 </div>';

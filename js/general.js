@@ -26,7 +26,7 @@ $('.datepicker').datepicker({
  */
 
 const alertMessage = document.getElementsByName('alert-message');
-console.log(alertMessage);
+console.log("ALERT MESSAGES: " + alertMessage.length);
 function showAlertMessage() {
 
     alertMessage.style.display = 'block'; // Mostra il messaggio di avviso
