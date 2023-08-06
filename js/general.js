@@ -35,3 +35,11 @@ function showAlertMessage() {
         alertMessage.style.display = 'none'; // Nascondi il messaggio di avviso dopo 5 secondi
     }, 5000);
 }
+function submitForm() {
+    // Trova il form utilizzando l'ID del form
+    var form = document.getElementById('inserimentoInsegnamentoEData');
+
+    // Esegui il submit del form
+    form.submit();
+}
+

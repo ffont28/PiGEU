@@ -283,14 +283,27 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
         // Query per verificare se lo studente è iscritto all'esame corrente
             $esameId = $row["id"]; // L'ID dell'esame corrente preso dal ciclo foreach
 
-        // Nota: Assicurati che il nome della tabella delle iscrizioni e delle colonne sia corretto
             $query = "SELECT * FROM iscrizione WHERE studente = :studente AND esame = :esame";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':studente', $studente);
             $stmt->bindParam(':esame', $esameId);
             $stmt->execute();
 
-            $isIscritto = $stmt->rowCount() > 0; // true se l'utente è iscritto, false altrimenti
+            $isIscritto = $stmt->rowCount() > 0;
+
+            // Query per verificare l'esame corrente è già stato verbalizzato
+            $esameCodice = $row["codice"]; // il codice dell'esame corrente preso dal ciclo foreach
+            $esameData= $row["data"]; // a data dell'esame corrente preso dal ciclo foreach
+
+            $query2 = "SELECT * FROM carriera WHERE
+                       studente = :studente AND insegnamento = :insegnamento AND data = :data";
+            $stmt2 = $conn->prepare($query2);
+            $stmt2->bindParam(':studente', $studente);
+            $stmt2->bindParam(':insegnamento', $esameCodice);
+            $stmt2->bindParam(':data', $esameData);
+            $stmt2->execute();
+
+            $isVerbalizzato = $stmt2->rowCount() > 0; // true se l'utente è iscritto, false altrimenti
 
             $tableHTML .= '<tr>
                     <th scope="row">' . $counter++ . '</th>
@@ -299,6 +312,14 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
                     <td>' . $row["data"] . '</td>
                     <td>' . $row["ora"] . '</td>
                     <td>';
+            if ($isVerbalizzato) {
+                // Se alll'utente è stato già verbalizzato il voto per quella data, non può fare nulla
+                $tableHTML .= '<form action="" method="POST">
+                              <input type="text" id="esame" name="esame" value="' . $row["id"] . '" hidden>
+                              <input type="text" id="studente" name="studente" value="' . $studente . '" hidden>
+                              <input type="text" id="op" name="op" value="CANC" hidden>
+                              <button type="submit" class="button-info" disabled>ESITO GIA VERBALIZZATO</button></form>';
+            } else
             if ($isIscritto) {
                 // Se l'utente è iscritto, mostra il bottone "cancella iscrizione"
                 $tableHTML .= '<form action="" method="POST">

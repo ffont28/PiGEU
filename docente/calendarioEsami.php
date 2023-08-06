@@ -1,6 +1,6 @@
 <?php session_start(); ?>
 <!doctype html>
-<html lang="en" data-bs-theme="auto">
+<html lang="it" data-bs-theme="auto">
 <head>
     <!-- import di Bootstrap-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
@@ -30,7 +30,7 @@
             <a class="nav-link active" href="calendarioEsami.php">Gestisci Calendario Esami</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="segreteria/rimuoviutente.php">Verbalizza esiti</a>
+            <a class="nav-link" href="verbalizzazione.php">Verbalizza esiti</a>
         </li>
     </ul>
     <!-- FINE NAVBAR -->
