@@ -21,9 +21,14 @@
 
 <?php
 if(array_key_exists('logout', $_POST)) {
-            echo '<script>alert("LOGOUT EFFETTUATO CON SUCCESSO")</script>';
-            unset($_SESSION['email']);
-            session_destroy();
+    $_SESSION['username'] = null;
+    $_SESSION['password'] = null;
+
+    echo '<script>alert("LOGOUT EFFETTUATO CON SUCCESSO")</script>';
+
+    unset($_SESSION['username']);
+    unset($_SESSION['password']);
+    session_destroy();
         }
 // Start the session
 session_start();

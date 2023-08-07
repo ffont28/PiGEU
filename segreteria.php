@@ -1,25 +1,8 @@
 <?php
     session_start();
-    if(!isset($_SESSION['username'])){
-        header("Location: ../index.php");
-    }
     include('functions.php');
     include('conf.php');
-
-    $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    $query = "SELECT * FROM segreteria s INNER JOIN credenziali c ON s.utente = c.username
-               WHERE s.utente = :u AND c.password = :p";
-    $stmt = $conn->prepare($query);
-    $stmt->bindParam(':u', $_SESSION['username']);
-    $stmt->bindParam(':p', $_SESSION['password']);
-    $stmt->execute();
-
-    if ($stmt->rowCount() == 0){
-        echo "utente non autorizzato con le credenziali di " . $_SESSION['username']. " | " . $_SESSION['password'];
-        die();
-    }
+    controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 ?>
 <!doctype html>
 <html lang="IT" data-bs-theme="auto">
@@ -60,7 +43,7 @@
       <a class="nav-link" href="segreteria/aggiungicdl.php">Inserisci corso di laurea</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Modifica Corso di Laurea</a>
+      <a class="nav-link" href="segreteria/modificacdl.php" aria-disabled="true">Modifica Corso di Laurea</a>
     </li>
   </ul>
 
@@ -72,7 +55,7 @@
     session_start();
     ?>
 
-    <h1>Benvenuto <?php echo $_SESSION['username']." ".$_SESSION['nome'] ?></h1>
+    <h1>Benvenuto <?php echo $_SESSION['nome']." ".$_SESSION['cognome'] ?></h1>
 
 <form action="../index.php" method="post">
         <input type="submit" name="logout" class="button1 black" value="logout" />

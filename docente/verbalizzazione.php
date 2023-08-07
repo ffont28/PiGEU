@@ -74,6 +74,7 @@
                 // Elaborazione dei risultati
                 foreach ($results as $row) {
 
+
                     // Utilizza $row per accedere ai dati dei singoli record
                     echo "<option ";
                     if ($_POST['insegnamento'] == $row['codice']){ echo "selected";}
@@ -138,60 +139,10 @@
 <?php
 
 if($_SERVER['REQUEST_METHOD']=='POST') {
-
         $insegnamento = $_POST['insegnamento'];
         $data = $_POST['data'];
-
-    /*
-        if (isset($_POST['data']) && isset($_POST['ora'])) {
-            if ($_POST['data'] == "") {
-                echo '<div class="alert alert-warning" role="alert" name="alert-message" >
-                    Attenzione: devi inserire una data e un\'ora prima di selezionare INSERISCI
-                          </div>';
-            }
-            try {
-                $insegnamento = $_POST['insegnamento'];
-                $data = $_POST['data'];
-                $ora = $_POST['ora'];
-
-                $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $db->query("LISTEN notifica");
-                $sql = "INSERT INTO calendario_esami (insegnamento, data, ora) VALUES (:insegnamento, :data, :ora)";
-
-                $stmt = $db->prepare($sql);
-
-                $stmt->bindParam(':insegnamento', $insegnamento, PDO::PARAM_STR);
-                $stmt->bindParam(':data', $data, PDO::PARAM_STR);
-                $stmt->bindParam(':ora', $ora, PDO::PARAM_STR);
-
-
-                $stmt->execute();
-
-                while (true) {
-                    $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
-                    if ($notify === false) {
-
-                        echo '  <div class="alert alert-success" role="alert" name="alert-message" >
-                                      Inserimento dell\'esame andato a buon fine
-                                    </div>';
-                        break;
-                    } else {
-                        echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
-                                      ' . $notify["payload"] . '
-                                    </div>';
-                        break;
-                    }
-                }
-            } catch (PDOException $e) {
-
-                // echo "Errore in inserimento: " . $e->getMessage();
-            }
-            $_POST['data'] = "";
-        }
-    } */
         $_SESSION['dataimpostata'] = $_POST['data'];
-       // echo $_SESSION['dataimpostata'];
+
             try {
 
 

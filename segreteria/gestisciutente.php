@@ -63,7 +63,7 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
     try {
         // Connessione al database utilizzando PDO
-        echo '<script>console.log("sono qui nel try")</script>'; //////////////////////////////////////////////////////////////
+       // echo '<script>console.log("sono qui nel try")</script>'; //////////////////////////////////////////////////////////////
 
         $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
 

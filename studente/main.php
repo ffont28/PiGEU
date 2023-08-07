@@ -38,7 +38,7 @@
 <!-- FINE NAVBAR -->
 
 
-<h1>Benvenuto <?php echo $_SESSION['username']." ".$_SESSION['nome'] ?></h1>
+<h1>Benvenuto <?php echo $_SESSION['nome']." ".$_SESSION['cognome'] ?></h1>
 
 <form action="../index.php" method="post">
     <input type="submit" name="logout" class="button1 black" value="logout" />
