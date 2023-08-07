@@ -1,0 +1,25 @@
+/* Stile di base per la navbar */
+.navbar {
+    background-color: #343a40; /* Colore di sfondo */
+}
+
+.nav-link {
+    color: #000000; /* Colore del testo */
+}
+
+/* Stile per gli elementi della navbar */
+.nav-tabs .nav-item {
+    margin-right: 10px; /* Spaziatura tra gli elementi */
+}
+
+/* Stile per il link attivo */
+.nav-tabs .nav-item .nav-link.active {
+    background-color: #007bff; /* Colore di sfondo per il link attivo */
+    color: #ffffff; /* Colore del testo per il link attivo */
+    border-radius: 5px; /* Angoli arrotondati per il link attivo */
+}
+
+/* Effetto hover sui link */
+.nav-tabs .nav-item .nav-link:hover {
+    color: #007bff; /* Cambia colore del testo al passaggio del mouse */
+}
