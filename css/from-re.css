@@ -15,7 +15,7 @@
 
   div.main_page {
     position: relative;
-    display:+* table;
+  //  display:+* table;
 
     width: 800px;
 
@@ -50,7 +50,7 @@
   div.page_header img {
     margin: 3px 0px 0px 40px;
 
-    border: 0px 0px 0px;
+   // border: 0px 0px 0px;
   }
 
   div.banner {

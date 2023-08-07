@@ -22,6 +22,15 @@ function check_login($user, $password){
 
     if (pg_num_rows($result) > 0) {
         $param = array ($user);
+
+        //prelevo il NOME e il COGNOME dell'utente
+        $sql = "SELECT nome, cognome FROM utente WHERE email = $1";
+        $result = pg_query_params($db, $sql, $param);
+        if ($row = pg_fetch_assoc($result)) {
+            $_SESSION['nome'] = $row['nome'];
+            $_SESSION['cognome'] = $row['cognome'];
+        }
+
         //caso in cui è SEGRETERIA
         $sql = "SELECT * FROM segreteria WHERE utente = $1";
         $result = pg_query_params($db, $sql, $param);
@@ -45,13 +54,7 @@ function check_login($user, $password){
             header("Location: studente/main.php");
         }
 
-        //prelevo il NOME e il COGNOME dell'utente
-        $sql = "SELECT nome, cognome FROM utente WHERE email = $1";
-        $result = pg_query_params($db, $sql, $param);
-        if ($row = pg_fetch_assoc($result)) {
-            $_SESSION['nome'] = $row['nome'];
-            $_SESSION['cognome'] = $row['cognome'];
-        }
+
 
     } else {
         header("Location: 404.php");
