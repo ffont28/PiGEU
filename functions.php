@@ -1,5 +1,6 @@
 <?php
 session_start();
+include('conf.php');
 function open_pg_connection(){
     include_once('conf.php');
     $connection= "host=".myhost." dbname=".mydbname." user=".myuser." password=".mypassword;
@@ -127,6 +128,27 @@ function docentiCandidatiResponsabili(){
 function logout(){
     $_SESSION["username"] = " ";
     $_SESSION["password"] = " ";
+}
+
+function controller($tipo, $username, $password){
+    if(!isset($username)){
+        header("Location: ../index.php");
+    }
+
+    $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $query = "SELECT * FROM ". $tipo ." t INNER JOIN credenziali c ON t.utente = c.username
+               WHERE t.utente = :u AND c.password = :p";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':u', $username);
+    $stmt->bindParam(':p', $password);
+    $stmt->execute();
+
+    if ($stmt->rowCount() == 0){
+        echo "utente non autorizzato con le credenziali di " . $_SESSION['username']. " | " . $_SESSION['password'];
+        die();
+    }
 }
 
 ?>
