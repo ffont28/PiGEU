@@ -2,9 +2,7 @@
     session_start();
     include('functions.php');
     include('conf.php');
-
     controller("segreteria", $_SESSION['username'], $_SESSION['password']);
-
 ?>
 <!doctype html>
 <html lang="IT" data-bs-theme="auto">
