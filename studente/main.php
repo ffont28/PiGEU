@@ -28,6 +28,9 @@
     <li class="nav-item">
         <a class="nav-link" href="iscrizioneEsame.php">Iscrizione Esami</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="infoCdL.php">Info sui Corsi di Laurea</a>
+    </li>
     <li class="nav-item mr-2">
         <a class="nav-link" href="../index.php">LOGOUT</a>
     </li>
