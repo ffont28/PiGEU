@@ -15,7 +15,8 @@ try {
 
     // Esegui la query per ottenere i dati del secondo menù a tendina in base alla selezione del primo
     $stmt = $conn->prepare("SELECT distinct(i.nome), i.codice FROM insegnamento i
-                            INNER JOIN insegnamento_parte_di_cdl p ON p.corso_di_laurea = :valore
+                            INNER JOIN insegnamento_parte_di_cdl p ON p.corso_di_laurea = :valore 
+                                                                        AND p.insegnamento = i.codice 
                             ");
     $stmt->bindParam(':valore', $selezioneMenutendina1);
     $stmt->execute();
