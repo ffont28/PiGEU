@@ -1,3 +1,26 @@
+<?php
+    session_start();
+    if(!isset($_SESSION['username'])){
+        header("Location: ../index.php");
+    }
+    include('functions.php');
+    include('conf.php');
+
+    $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $query = "SELECT * FROM segreteria s INNER JOIN credenziali c ON s.utente = c.username
+               WHERE s.utente = :u AND c.password = :p";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':u', $_SESSION['username']);
+    $stmt->bindParam(':p', $_SESSION['password']);
+    $stmt->execute();
+
+    if ($stmt->rowCount() == 0){
+        echo "utente non autorizzato con le credenziali di " . $_SESSION['username']. " | " . $_SESSION['password'];
+        die();
+    }
+?>
 <!doctype html>
 <html lang="IT" data-bs-theme="auto">
   <head>
