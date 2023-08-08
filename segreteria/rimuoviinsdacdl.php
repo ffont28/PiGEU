@@ -16,15 +16,24 @@ if (isset($_POST['insegnamento']) && isset($_POST['cdl'])) {
     $stmt->bindParam(':insegnamento', $insegnamento, PDO::PARAM_STR);
     $stmt->bindParam(':cdl', $cdl, PDO::PARAM_STR);
 
-    // Esegui la query di eliminazione
-    if ($stmt->execute()) {
+    if (!$stmt->execute()) {
         // La riga è stata eliminata con successo
         // Puoi fare altre operazioni o restituire una risposta JSON per gestire la notifica lato client, se necessario
-        echo json_encode(['success' => true, 'message' => 'Riga con '.$insegnamento.' e '.$cdl.' eliminata con successo']);
-    } else {
-        // Si è verificato un errore durante l'eliminazione
-        // Puoi restituire un messaggio di errore come risposta JSON, se necessario
-        echo json_encode(['success' => false, 'message' => 'Errore durante l\'eliminazione della riga']);
+        echo json_encode(['success' => false, 'message' => 'Errore durante la DELETE in insegnamento_parte_di_cdl']);
     }
+
+    $sql = "DELETE FROM propedeuticita
+            WHERE (insegnamento1 = :insegnamento OR insegnamento2 = :insegnamento) AND corso_di_laurea = :cdl";
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':insegnamento', $insegnamento, PDO::PARAM_STR);
+    $stmt->bindParam(':cdl', $cdl, PDO::PARAM_STR);
+
+    if (!$stmt->execute()) {
+        // La riga è stata eliminata con successo
+        // Puoi fare altre operazioni o restituire una risposta JSON per gestire la notifica lato client, se necessario
+        echo json_encode(['success' => false, 'message' => 'Errore durante la DELETE in insegnamento_parte_di_cdl']);
+    }
+
+    echo json_encode(['success' => true, 'message' => 'Riga eliminata con successo anche eventualmente nella propedeuticita']);
 }
 ?>

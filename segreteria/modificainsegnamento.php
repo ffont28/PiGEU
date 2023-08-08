@@ -523,7 +523,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
           const response = JSON.parse(this.responseText);
           console.log(response);
         if (response.success) {
-            window.location.reload();
+          window.location.reload();
           }
         } else {
           // Gestisci eventuali errori
