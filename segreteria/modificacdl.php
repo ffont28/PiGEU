@@ -11,6 +11,9 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
 
+    <!-- Includi jQuery dalla rete tramite un link CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <link rel="stylesheet" href="../css/from-re.css">
     <link rel="stylesheet" href="../css/cssSegreteria.css">
     <link rel="stylesheet" href="../css/calendarioesami.css">
@@ -289,13 +292,43 @@ echo "
         $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+ /*       $query= "WITH selezione AS (
+                     SELECT insegnamento
+                     FROM insegnamento_parte_di_cdl
+                     EXCEPT
+                     SELECT insegnamento
+                     FROM insegnamento_parte_di_cdl
+                     WHERE corso_di_laurea = :c
+                 ), tab AS (
+                 SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+                    INNER JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
+                    INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
+                    INNER JOIN utente u ON d.docente = u.email
+                    WHERE i.codice = ANY (SELECT * FROM selezione) 
+                    ORDER BY anno, cfu
+                 ) SELECT * FROM tab t1 
+                   SELECT * tab t2
+                   "; */
 
-        $query = "SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+//        $query= "WITH selezione AS (
+//                 SELECT insegnamento
+//                 FROM insegnamento_parte_di_cdl
+//                 EXCEPT
+//                 SELECT insegnamento
+//                 FROM insegnamento_parte_di_cdl
+//                 WHERE corso_di_laurea = :c
+//                 ) SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+//                            INNER JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
+//                            INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
+//                            INNER JOIN utente u ON d.docente = u.email
+//                            WHERE i.codice = ANY (SELECT * FROM selezione)
+//                            ";
+        $query = "SELECT DISTINCT i.codice, i.nome, 'ip.anno', i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
                             LEFT JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
                             INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
                             INNER JOIN utente u ON d.docente = u.email
                   EXCEPT
-                            SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+                            SELECT DISTINCT i.codice, i.nome, 'ip.anno', i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
                             LEFT JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
                             INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
                             INNER JOIN utente u ON d.docente = u.email
@@ -426,8 +459,249 @@ echo "
     });
   });
 </script>";
+?>
+    <div id="sezionepropedeuticita">
+        <div><label for="exampleFormControlInput1" class="form-label"><h3>GESTIONE PROPEDEUTICITÀ</h3></label></div>
+        <div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Codice </th>
+                    <th scope="col">Nome Insegnamento</th>
+                    <th scope="col" style="text-align: center">PROPEDEUTICO A</th>
+                    <th scope="col">Codice</th>
+                    <th scope="col">Nome Insegnamento</th>
+                    <th scope="col" style="text-align: center;">RIMUOVI</th>
+                </tr>
+                </thead>
+                <tbody id="propedeuticita">
 
 
+                </tbody>
+
+
+
+        </div>
+
+<script>
+    function updateTabPropedInBaseACdL() {
+        console.log("richiesta funzione123"); ////////////////////////////////////////////////////////////////////////////
+        var sezioneHtml = document.getElementById("propedeuticita");
+        var codiceCdL = '<?php echo $codiceCdL?>' ;
+
+        // Ottieni il valore selezionato nel primo menù a tendina
+        //var selezionecdl = codiceCdL.value;
+
+        // Effettua una richiesta AJAX al server per ottenere il contenuto della tabella Propedeuticità
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                console.log("qui nell'XMLHTTP...."); ////////////////////////////////////////////////////////////////////////////////////////
+                if (xhr.status === 200) {
+                    console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
+                    // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
+                    sezioneHtml.innerHTML = xhr.responseText;
+                } else {
+                    // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
+                    console.error("Errore durante la richiesta AJAX");
+                }
+            }
+        };
+
+        // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
+        xhr.open("GET", "tabellapropedeuticita.php?value=" + codiceCdL, true);
+        xhr.send();
+    }
+
+    // Aggiungi un ascoltatore di eventi per il menù a tendina 1
+    document.getElementById("cdl").addEventListener('change', updateTabPropedInBaseACdL);
+
+    // Inizializza il contenuto del secondo menù a tendina inizialmente
+    updateTabPropedInBaseACdL();
+
+    // Gestione evento di pressione del bottone
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('button-canc')) {
+            const ins1 = event.target.getAttribute('ins1');
+            const ins2 = event.target.getAttribute('ins2');
+            const cdl = event.target.getAttribute('cdl');
+
+            // Seconda chiamata AJAX per cancellare la riga
+            const xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function() {
+                if (this.readyState === 4 && this.status === 200) {
+                    const response = JSON.parse(this.responseText);
+                    if (response.success) {
+                        // Richiama la funzione per aggiornare la tabella
+                        updateTabPropedInBaseACdL();
+                    }
+                }
+            };
+
+            // Configura e invia la seconda chiamata AJAX per cancellare la riga
+            xhttp2.open('POST', 'rimuovipropedeuticita.php', true);
+            xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            const params = 'insegnamento1=' + encodeURIComponent(ins1) +
+                '&insegnamento2=' + encodeURIComponent(ins2) +
+                '&cdl=' + encodeURIComponent(cdl);
+            xhttp2.send(params);
+        }
+    });
+    console.log("fine del MODIFICA CDL -----------------");
+</script>
+
+
+
+
+<?php
+    /*
+///////////////////////////// GESTIONE PROPEDEUTICITÀ //////////////////////
+    try {
+
+
+        $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
+        $query = "SELECT DISTINCT i.codice, i.nome, 'ip.anno', i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+                            LEFT JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
+                            INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
+                            INNER JOIN utente u ON d.docente = u.email
+                  EXCEPT
+                            SELECT DISTINCT i.codice, i.nome, 'ip.anno', i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+                            LEFT JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
+                            INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
+                            INNER JOIN utente u ON d.docente = u.email
+                            WHERE ip.corso_di_laurea = :c 
+                  ORDER BY nome";
+
+        $stmt = $conn->prepare($query);
+
+        $stmt->bindParam(':c', $codiceCdL, PDO::PARAM_STR);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo '  
+        <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Codice </th>
+                <th scope="col">Nome Insegnamento</th>
+                <th scope="col">PROPEDEUTICO A</th>
+                <th scope="col">Codice</th>
+                <th scope="col">Nome Insegnamento</th>
+                <th scope="col" style="text-align: center;">RIMUOVI</th>
+            </tr>
+            </thead>
+            <tbody>';
+
+        $counter = 1;
+        foreach ($results as $row) {
+            $cfu = $row['cfu'];
+            $docResp = $row['cognome']." ".$row['nomedoc'];
+            $codiceIns = $row["codice"];
+            echo '  <tr>
+                    <th scope="row">'.$counter++.'</th>
+                    <td>'.$row["codice"].'</td>
+                    <td>'.$row["nome"].'</td>
+                    <td>  
+                    <select class="form-control" id=\"anno\" name=\"anno\">';
+
+            try {
+                // Connessione al database utilizzando PDO
+                $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                // Query con CTE
+                $query = "SELECT tipo
+                              FROM corso_di_laurea
+                              WHERE codice = :c";
+                $stmt = $conn->prepare($query);
+
+                $stmt->bindParam(':c', $codiceCdL, PDO::PARAM_STR);
+                $stmt->execute();
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $tipo = "";
+                foreach ($results as $row) {
+                    echo '<option value="' . 1 . '">' . "primo" . '</option>';
+                    echo '<option value="' . 2 . '">' . "secondo" . '</option>';
+                    if ($row['tipo'] == 'magistrale a ciclo unico' || $row['tipo'] == 'triennale' ){
+                        echo '<option value="' . 3 . '">' . "terzo" . '</option>';
+                    }
+                    if ($row['tipo'] == 'magistrale a ciclo unico'){
+                        echo '<option value="' . 4 . '">' . "quarto" . '</option>';
+                        echo '<option value="' . 5 . '">' . "quinto" . '</option>';
+                    }
+                }
+            } catch (PDOException $e) {
+                echo "Errore: " . $e->getMessage();
+            }
+            echo '     </select>
+                    
+                    </td>
+                    <td>'.$cfu.'</td>
+                    <td>'.$docResp.'</td>
+                    <td style="text-align: center;">
+                      <button class="button-iscr" 
+                              insegnamento="'. $codiceIns .'" 
+                              cdl="' . $codiceCdL . '">inserisci nel CdL '.$nomeCdL.'</button></td>
+                    </tr> ';
+        }
+        echo '
+            </tbody>
+        </table>
+    </div>';
+    } catch (PDOException $e) {
+        echo "Errore: " . $e->getMessage();
+    }
+
+    echo "
+        <script>
+  // Funzione per effettuare la richiesta AJAX
+  function inserisciInsinCdL(insegnamento, cdl, anno) {
+    const xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function() {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          // Gestisci la risposta del server
+          const response = JSON.parse(this.responseText);
+          console.log(response);
+        if (response.success) {
+            window.location.reload();
+          }
+        } else {
+          // Gestisci eventuali errori
+          console.error('Errore nella richiesta AJAX:', this.statusText);
+         }
+      }
+    };
+
+    xhttp.open('POST', 'inseriscinelcdl.php', true);
+    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + 
+                    '&cdl=' + encodeURIComponent(cdl) +
+                    '&anno=' + encodeURIComponent(anno);
+    xhttp.send(params);
+  }
+
+  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
+  const addToPopedeuticita = document.querySelectorAll('.button-iscr');
+  addToPopedeuticita.forEach(button => {
+    button.addEventListener('click', function() {
+      const insegnamento = this.getAttribute('insegnamento');
+      const cdl = this.getAttribute('cdl');
+      var anno = this.closest('tr').querySelector('.form-control').value;
+      // Effettua la richiesta AJAX
+      inserisciInsinCdL(insegnamento, cdl, anno);
+    });
+  });
+</script>";
+
+*/
 }
 
 ?>

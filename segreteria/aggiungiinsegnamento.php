@@ -153,7 +153,7 @@
  </div>
     <script>
     function updateSecondMenutendina() {
-                console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
+                console.log("richiesta funzione1"); ////////////////////////////////////////////////////////////////////////////
                 var cdl = document.getElementById("cdl");
                 var anno = document.getElementById("anno");
 
@@ -195,11 +195,12 @@
 
         </select>
  </div>
+
     <script>
     function updateSecondMenutendina() {
                 console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
                 var cdl = document.getElementById("cdl");
-                var anno = document.getElementById("prop");
+                var prop = document.getElementById("prop");
 
                 // Ottieni il valore selezionato nel primo menù a tendina
                 var selezionecdl = cdl.value;
@@ -212,7 +213,7 @@
                         if (xhr.status === 200) {
                                console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
                             // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
-                            anno.innerHTML = xhr.responseText;
+                            prop.innerHTML = xhr.responseText;
                         } else {
                             // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
                             console.error("Errore durante la richiesta AJAX");
