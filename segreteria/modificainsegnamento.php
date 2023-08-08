@@ -104,22 +104,52 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         // definisco le variabili
 
         $nome = $_POST['nome'];
-        $tipo = $_POST['tipo'];
+        $codice = $_POST['codice'];
+        $responsabile = $_POST['responsabile'];
+        $descrizione = $_POST['descrizione'];
+        $cfu = $_POST['cfu'];
 
         echo "<script>console.log('Debug Objects: >>" . $nome . " " . $tipo . " " . $codiceInsegnamento. "' );</script>";
-
+        /////// AGGIORNO LA TABELLA INSEGNAMENTO
         try {
 
             $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-            $sql = "UPDATE corso_di_laurea SET nome = :nome,
-                                            tipo = :tipo
-                                            WHERE codice = :codice";
+            $sql = "UPDATE insegnamento SET nome = :nome,
+                                            codice = :codice,
+                                            descrizione = :descrizione,
+                                            cfu = :cfu
+                            WHERE codice = :codice";
 
             $stmt = $pdo->prepare($sql);
 
             $stmt->bindParam(':nome', $nome, PDO::PARAM_STR);
-            $stmt->bindParam(':tipo', $tipo, PDO::PARAM_STR);
-            $stmt->bindParam(':codice', $codiceInsegnamento, PDO::PARAM_STR);
+            $stmt->bindParam(':descrizione', $descrizione, PDO::PARAM_STR);
+            $stmt->bindParam(':codice', $codice, PDO::PARAM_STR);
+            $stmt->bindParam(':cfu', $cfu, PDO::PARAM_STR);
+
+            $stmt->execute();
+
+            $rowCount = $stmt->rowCount();
+            if ($rowCount > 0) {
+                echo "Update successful.";
+            } else {
+                echo "No rows updated.";
+            }
+        } catch (PDOException $e) {
+            // Handle any errors that occurred during the process
+            echo "Error: " . $e->getMessage();
+        }
+
+        /////// AGGIORNO LA TABELLA RESPONSABILE
+        try {
+
+            $sql = "UPDATE docente_responsabile SET docente = :docente
+                                            WHERE insegnamento = :codice";
+
+            $stmt = $pdo->prepare($sql);
+
+            $stmt->bindParam(':docente', $responsabile, PDO::PARAM_STR);
+            $stmt->bindParam(':codice', $codice, PDO::PARAM_STR);
 
             $stmt->execute();
 
@@ -293,8 +323,8 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                     <td>'.$row["cfu"].'</td>
                     <td style="text-align: center;">
                       <button class="button-canc" 
-                              insegnamento="'. $row["codice"] .'" 
-                              cdl="' . $codiceInsegnamento . '">rimuovi da questo CdL</button></td>
+                              insegnamento="'. $codiceInsegnamento .'" 
+                              cdl="' . $row["codice"] . '">rimuovi da questo CdL</button></td>
                     </tr> ';
         }
         echo '
@@ -398,7 +428,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
                     <td>
                     
-                    <select class=\"form-select\" id=\"anno\" name=\"anno\">';
+                    <select class=\"form-control\" id=\"anno\" name=\"anno\">';
 
                     try {
                     // Connessione al database utilizzando PDO
@@ -435,7 +465,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                     <td>'.$cfu.'</td>
                     <td>
                     
-                    <select class=\"form-select\" id=\"propedeuticita\" name=\"propedeuticita\">';
+                    <select class=\"form-control2\" id=\"propedeuticita\" name=\"propedeuticita\">';
 
             try {
                 // Connessione al database utilizzando PDO
@@ -466,8 +496,8 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                     </td>
                     <td style="text-align: center;">
                       <button class="button-iscr" 
-                              insegnamento="'. $row["codice"] .'" 
-                              cdl="' . $codiceInsegnamento . '">inserisci nel CdL</button></td>
+                              insegnamento="'. $codiceInsegnamento .'" 
+                              cdl="' . $row["codice"]  . '">inserisci nel CdL</button></td>
                     </tr>';
         }
         echo '
@@ -479,9 +509,11 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
     }
 
     echo "
+
         <script>
+ document.addEventListener('DOMContentLoaded', function() {
   // Funzione per effettuare la richiesta AJAX
-  function inserisciInsinCdL(insegnamento, cdl) {
+  function inserisciInsinCdL(insegnamento, cdl, anno, propedeuticita) {
     const xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function() {
@@ -502,7 +534,10 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
     xhttp.open('POST', 'inseriscinelcdl.php', true);
     xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + '&cdl=' + encodeURIComponent(cdl);
+    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + 
+                    '&cdl=' + encodeURIComponent(cdl) +
+                    '&anno=' + encodeURIComponent(anno) +
+                    '&propedeuticita=' + encodeURIComponent(propedeuticita);
     xhttp.send(params);
   }
 
@@ -512,10 +547,17 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
     button.addEventListener('click', function() {
       const insegnamento = this.getAttribute('insegnamento');
       const cdl = this.getAttribute('cdl');
-
+      const annoold = this.closest('tr').querySelector('select#anno.form-control');
+      const anno = annoold.value;
+      const propedeuticita = this.closest('tr').querySelector('select#propedeuticita.form-control2').value;
+      
+      console.log(anno);
+      
       // Effettua la richiesta AJAX
-      inserisciInsinCdL(insegnamento, cdl);
+      inserisciInsinCdL(insegnamento, cdl, anno, propedeuticita);
     });
+  });
+  
   });
 </script>";
 
