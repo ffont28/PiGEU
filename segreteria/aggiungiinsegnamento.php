@@ -278,8 +278,8 @@
 
     //inserimento della eventuale RELAZIONE propedeuticita
     if ($prop != "no"){
-    $params = array ($prop, $codice);
-    $sql = "INSERT INTO propedeuticita VALUES ($1,$2)";
+    $params = array ($prop, $codice, $cdl);
+    $sql = "INSERT INTO propedeuticita VALUES ($1,$2,$3)";
     $result = pg_prepare($db,'insProp',$sql);
     $result = pg_execute($db,'insProp', $params);
 

@@ -92,6 +92,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
 if($_SERVER['REQUEST_METHOD']=='POST') {
     $codiceCdL = $_POST['cdl'];
+    $nomeCdL = $_POST['nome'];
 
     if ($_POST['action'] == 'MODIFICA CORSO DI LAUREA') {
         $db = open_pg_connection();
@@ -147,7 +148,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
            foreach ($results as $row) {
                $tipoinq = $row['tipo'];
-
+               $nomeCdL = $row['nome'];
                  echo "<div class=\"mb-3\">
                                 <label for=\"exampleFormControlInput1\" class=\"form-label\">Codice</label>
                       <input readonly type=\"text\" value=\"".$row['codice']."\" class=\"form-control\" id=\"cdl\" name=\"cdl\">
@@ -162,7 +163,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                        Tipo di corso di studi:
                         <select class="form-select" aria-label="Default select example" id="tipo" name="tipo">
                               <option ';
-                            if ($tipoinq == "triennale") {echo "triennale";}
+                            if ($tipoinq == "triennale") {echo " selected ";} /////////////////////// modificato qui era echo "triennale"
                                 echo 'value="triennale">triennale</option>
                               <option ';
                             if ($tipoinq == "magistrale") {echo 'selected ';}
@@ -190,7 +191,7 @@ try {
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
-    $query = "SELECT DISTINCT i.codice, i.nome, i.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+    $query = "SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
                             INNER JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
                             INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
                             INNER JOIN utente u ON d.docente = u.email
@@ -229,7 +230,7 @@ try {
                     <td style="text-align: center;">
                       <button class="button-canc" 
                               insegnamento="'. $row["codice"] .'" 
-                              cdl="' . $codiceCdL . '">rimuovi dal CdL</button></td>
+                              cdl="' . $codiceCdL . '">rimuovi dal CdL '.$nomeCdL.'</button></td>
                     </tr> ';
     }
     echo '
@@ -289,12 +290,12 @@ echo "
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 
-        $query = "SELECT DISTINCT i.codice, i.nome, i.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+        $query = "SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
                             LEFT JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
                             INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
                             INNER JOIN utente u ON d.docente = u.email
                   EXCEPT
-                            SELECT DISTINCT i.codice, i.nome, i.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
+                            SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
                             LEFT JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
                             INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
                             INNER JOIN utente u ON d.docente = u.email
@@ -324,17 +325,55 @@ echo "
 
         $counter = 1;
         foreach ($results as $row) {
+            $cfu = $row['cfu'];
+            $docResp = $row['cognome']." ".$row['nomedoc'];
+            $codiceIns = $row["codice"];
             echo '  <tr>
                     <th scope="row">'.$counter++.'</th>
                     <td>'.$row["codice"].'</td>
                     <td>'.$row["nome"].'</td>
-                    <td>'.$row["anno"].'</td>
-                    <td>'.$row["cfu"].'</td>
-                    <td>'.$row["cognome"]. " " . $row['nomedoc'].'</td>
+                    <td>  
+                    <select class="form-control" id=\"anno\" name=\"anno\">';
+
+            try {
+                // Connessione al database utilizzando PDO
+                $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                // Query con CTE
+                $query = "SELECT tipo
+                              FROM corso_di_laurea
+                              WHERE codice = :c";
+                $stmt = $conn->prepare($query);
+
+                $stmt->bindParam(':c', $codiceCdL, PDO::PARAM_STR);
+                $stmt->execute();
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $tipo = "";
+                foreach ($results as $row) {
+                    echo '<option value="' . 1 . '">' . "primo" . '</option>';
+                    echo '<option value="' . 2 . '">' . "secondo" . '</option>';
+                    if ($row['tipo'] == 'magistrale a ciclo unico' || $row['tipo'] == 'triennale' ){
+                        echo '<option value="' . 3 . '">' . "terzo" . '</option>';
+                    }
+                    if ($row['tipo'] == 'magistrale a ciclo unico'){
+                        echo '<option value="' . 4 . '">' . "quarto" . '</option>';
+                        echo '<option value="' . 5 . '">' . "quinto" . '</option>';
+                    }
+                }
+            } catch (PDOException $e) {
+                echo "Errore: " . $e->getMessage();
+            }
+            echo '     </select>
+                    
+                    </td>
+                    <td>'.$cfu.'</td>
+                    <td>'.$docResp.'</td>
                     <td style="text-align: center;">
                       <button class="button-iscr" 
-                              insegnamento="'. $row["codice"] .'" 
-                              cdl="' . $codiceCdL . '">inserisci nel CdL</button></td>
+                              insegnamento="'. $codiceIns .'" 
+                              cdl="' . $codiceCdL . '">inserisci nel CdL '.$nomeCdL.'</button></td>
                     </tr> ';
         }
         echo '
@@ -348,7 +387,7 @@ echo "
     echo "
         <script>
   // Funzione per effettuare la richiesta AJAX
-  function inserisciInsinCdL(insegnamento, cdl) {
+  function inserisciInsinCdL(insegnamento, cdl, anno) {
     const xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function() {
@@ -369,7 +408,9 @@ echo "
 
     xhttp.open('POST', 'inseriscinelcdl.php', true);
     xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + '&cdl=' + encodeURIComponent(cdl);
+    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + 
+                    '&cdl=' + encodeURIComponent(cdl) +
+                    '&anno=' + encodeURIComponent(anno);
     xhttp.send(params);
   }
 
@@ -379,9 +420,9 @@ echo "
     button.addEventListener('click', function() {
       const insegnamento = this.getAttribute('insegnamento');
       const cdl = this.getAttribute('cdl');
-
+      var anno = this.closest('tr').querySelector('.form-control').value;
       // Effettua la richiesta AJAX
-      inserisciInsinCdL(insegnamento, cdl);
+      inserisciInsinCdL(insegnamento, cdl, anno);
     });
   });
 </script>";

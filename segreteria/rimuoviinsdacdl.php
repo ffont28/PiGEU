@@ -5,6 +5,8 @@ if (isset($_POST['insegnamento']) && isset($_POST['cdl'])) {
     $insegnamento = $_POST['insegnamento'];
     $cdl = $_POST['cdl'];
 
+    echo json_encode(['success' => true, 'message' => '']);
+/*
 
     // Esegui il codice per la connessione al database PostgreSQL come hai già fatto in precedenza
     $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
@@ -26,6 +28,6 @@ if (isset($_POST['insegnamento']) && isset($_POST['cdl'])) {
         // Si è verificato un errore durante l'eliminazione
         // Puoi restituire un messaggio di errore come risposta JSON, se necessario
         echo json_encode(['success' => false, 'message' => 'Errore durante l\'eliminazione della riga']);
-    }
+    }*/
 }
 ?>
