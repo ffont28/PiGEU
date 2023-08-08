@@ -478,6 +478,7 @@ echo "
                 <tbody id="propedeuticita">
 
                 </tbody>
+            </table>
         </div>
     </div>
 <script>
@@ -547,103 +548,200 @@ echo "
     console.log("fine del MODIFICA CDL -----------------");
 </script>
         <!-------------          SEZIONE PER INSERIRE LE PROPEDEUTICITÀ        ------------------->
-    <div id="inseriscipropedeuticita">
+
 <?php
     $counter = 1;
-    echo '
-    <div>
-    
-        <table class="table">
-        <div><label for="exampleFormControlInput1" class="form-label"><h3>INSERSICI UNA NUOVA PROPEDEUTICITÀ</h3></label></div>
-        
+?>
+
+    <div id="possibiliPropedeuticitaDaInserire">
+        <table class="table" id="myTable">
+            <div><label for="exampleFormControlInput1" class="form-label"><h3>INSERSICI UNA NUOVA PROPEDEUTICITÀ</h3></label></div>
+            ricorda che un corso A può essere propedeutico a un corso B solamente se B è un corso di anno pari o superiore ad A
             <thead>
             <tr>
                 <th scope="col">#</th>
-                    <th scope="col">Codice </th>
-                    <th scope="col">Nome Insegnamento</th>
-                    <th scope="col" style="text-align: center">PROPEDEUTICO A</th>
-                    <th scope="col">Codice</th>
-                    <th scope="col">Nome Insegnamento</th>
-                    <th scope="col" style="text-align: center;">AGGIUNGI</th>
-           </tr>
-                </thead>
-                <tbody id="nuovepropedeuticita2">
-                        <th scope="row"> > </th>
-                        <td>' . $row["cod1"] . '</td>
-                        <td> <select class="form-control" id="ins1" name="ins1"> </td>
-                        <td style="text-align: center"> >>>>>>>>>> </td>
-                        <td>' . $row["nom1"] . '</td>
-                        <td> <select class="form-control" id="ins2" name="ins2"> </td>
-                        <td>' . $row["nom1"] . '</td>
-                </tbody>
-        </div>
-    </div>
-            ';
-?>
+                <th scope="col">Codice </th>
+                <th scope="col">Nome Insegnamento</th>
+                <th scope="col" style="text-align: center">PROPEDEUTICO A</th>
+                <th scope="col">Codice</th>
+                <th scope="col">Nome Insegnamento</th>
+                <th scope="col" style="text-align: center;">AGGIUNGI</th>
+            </tr>
+            </thead>
+            <tbody >
+
+
+            <th scope="row"> > </th>
+            <td id="cod1" class="updateValue">  </td>
+            <td> <select class="form-control dropdown" id="ins1" name="ins1">
+                    <?php
+                    try {
+                        // Connessione al database utilizzando PDO
+                        $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        // Esegui la query per ottenere i dati del secondo menù a tendina in base alla selezione del primo
+                        $stmt = $conn->prepare("SELECT distinct(i.nome), i.codice FROM insegnamento i
+                            INNER JOIN insegnamento_parte_di_cdl p ON p.corso_di_laurea = :valore
+                                                                        AND p.insegnamento = i.codice
+                            ");
+                        $stmt->bindParam(':valore', $codiceCdL);
+                        $stmt->execute();
+                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+                        // echo "<option selected value=\"no\">nessuna propedeuticità</option>";
+                        // Genera le opzioni per il secondo menù a tendina
+                        foreach ($results as $row) {
+                            echo '<option value="' . $row['codice'] . '">' . $row['nome'] . '</option>';
+                        }
+                    } catch (PDOException $e) {
+                        echo "Errore: " . $e->getMessage();
+                    }
+                    ?>
+            </td>
+            <td style="text-align: center"> >>>>>>>>>> </td>
+            <td id="cod2"> </td>
+                <td> <select class="form-control" id="ins2" name="ins2">
+                    </select> </td>
+
+            <td>' . $row["nom1"] . '</td>
+
+            </tbody>
+        </table>
+
+
+
     </div>
     <script>
-        function updateTabPropedInBaseACdL() {
-            console.log("richiesta funzione123"); //////////
-            var sezioneHtml = document.getElementById("nuovepropedeuticita");
-            var codiceCdL = '<?php echo $codiceCdL?>' ;
+        function updatePrimoCodice(){
+            var codice = document.getElementById("cod1");
+            var nome = document.getElementById("ins1").value;
 
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    console.log("qui nell'XMLHTTP...."); ////////////////////////////////////////////////////////////////////////////////////////
-                    if (xhr.status === 200) {
-                        console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
-                        // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
-                        sezioneHtml.innerHTML = xhr.responseText;
-                    } else {
-                        // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
-                        console.error("Errore durante la richiesta AJAX");
-                    }
-                }
-            };
+            codice.innerText = nome;
+            console.log("after change: " + document.getElementById("cod1").innerText);
 
-            // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
-            xhr.open("GET", "tabellapropedeuticita.php?value=" + codiceCdL, true);
-            xhr.send();
+            updateSecondMenutendina();
         }
 
-        // Aggiungi un ascoltatore di eventi per il menù a tendina 1
-        document.getElementById("cdl").addEventListener('change', updateTabPropedInBaseACdL);
+        document.getElementById("ins1").addEventListener('change', updatePrimoCodice);
 
-        // Inizializza il contenuto del secondo menù a tendina inizialmente
-        updateTabPropedInBaseACdL();
+        function updateSecondoCodice(){
+            var codice = document.getElementById("cod2");
+            var nome = document.getElementById("ins2").value;
 
-        // Gestione evento di pressione del bottone
-        document.addEventListener('click', function(event) {
-            if (event.target.classList.contains('button-canc')) {
-                const ins1 = event.target.getAttribute('ins1');
-                const ins2 = event.target.getAttribute('ins2');
-                const cdl = event.target.getAttribute('cdl');
+            codice.innerText = nome;
 
-                // Seconda chiamata AJAX per cancellare la riga
-                const xhttp2 = new XMLHttpRequest();
-                xhttp2.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        const response = JSON.parse(this.responseText);
-                        if (response.success) {
-                            // Richiama la funzione per aggiornare la tabella
-                            updateTabPropedInBaseACdL();
-                        }
-                    }
-                };
+        }
 
-                // Configura e invia la seconda chiamata AJAX per cancellare la riga
-                xhttp2.open('POST', 'rimuovipropedeuticita.php', true);
-                xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                const params = 'insegnamento1=' + encodeURIComponent(ins1) +
-                    '&insegnamento2=' + encodeURIComponent(ins2) +
-                    '&cdl=' + encodeURIComponent(cdl);
-                xhttp2.send(params);
+        document.getElementById("ins2").addEventListener('change', updateSecondoCodice);
+        updatePrimoCodice();
+        //updateSecondoCodice();
+
+function updateSecondMenutendina() {
+    console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
+    var cdl = '<?php echo $codiceCdL;?>';
+    var cod1 = document.getElementById("cod1").innerText;
+    var secondaparte = document.getElementById("ins2");
+
+    console.log("ciao, ho valori " + cdl +  " " + cod1 + " " + secondaparte)
+    // Ottieni il valore selezionato nel primo menù a tendina
+    //var selezionecdl = cdl.value;
+
+    // Effettua una richiesta AJAX al server per ottenere il contenuto del secondo menù a tendina
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+            console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
+            if (xhr.status === 200) {
+                console.log("CONNESSO OK per ins2Proped"); /////////////////////////////////////////////////////////////////////
+                // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
+                secondaparte.innerHTML = xhr.responseText;
+                updateSecondoCodice();
+            } else {
+                // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
+                console.error("Errore durante la richiesta AJAX");
             }
-        });
-        console.log("fine del MODIFICA CDL -----------------");
+        }
+    };
+
+    // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
+    xhr.open("GET", "ins2Propedeuticita.php?cdl=" + cdl + "&cod1=" + cod1, true);
+    xhr.send();
+}
+
+// Aggiungi un ascoltatore di eventi per il menù a tendina 1
+document.getElementById("ins1").addEventListener('change', updateSecondMenutendina);
+
+// Inizializza il contenuto del secondo menù a tendina inizialmente
+updateSecondMenutendina();
+
     </script>
 
+    <script>
+<!--        function updateTabPropedInBaseACdL() {-->
+<!--            console.log("richiesta funzioneOKKK"); //////////-->
+<!--            var sezioneHtml = document.getElementById("ins2");-->
+<!--            var ins1 = document.getElementById("cod1").innerText;-->
+<!--            var codiceCdL = '--><?php //echo $codiceCdL?>//' ;
+//
+//
+//            var xhr = new XMLHttpRequest();
+//            xhr.onreadystatechange = function() {
+//                if (xhr.readyState === XMLHttpRequest.DONE) {
+//                    console.log("qui nell'XMLHTTP...."); ////////////////////////////////////////////////////////////////////////////////////////
+//                    if (xhr.status === 200) {
+//                        console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
+//                        // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
+//                        sezioneHtml.innerHTML = xhr.responseText;
+//                    } else {
+//                        // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
+//                        console.error("Errore durante la richiesta AJAX");
+//                    }
+//                }
+//            };
+//
+//            // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
+//            xhr.open("GET", "possibiliPropedeuticitaDaInserire.php?value=" + codiceCdL, true);
+//            xhr.send();
+//        }
+//
+//        // Aggiungi un ascoltatore di eventi per il menù a tendina 1
+//        document.getElementById("cdl").addEventListener('change', updateTabPropedInBaseACdL);
+//
+//        // Inizializza il contenuto del secondo menù a tendina inizialmente
+//        updateTabPropedInBaseACdL();
+//
+//        // Gestione evento di pressione del bottone
+//        document.addEventListener('click', function(event) {
+//            if (event.target.classList.contains('button-canc')) {
+//                const ins1 = event.target.getAttribute('ins1');
+//                const ins2 = event.target.getAttribute('ins2');
+//                const cdl = event.target.getAttribute('cdl');
+//
+//                // Seconda chiamata AJAX per cancellare la riga
+//                const xhttp2 = new XMLHttpRequest();
+//                xhttp2.onreadystatechange = function() {
+//                    if (this.readyState === 4 && this.status === 200) {
+//                        const response = JSON.parse(this.responseText);
+//                        if (response.success) {
+//                            // Richiama la funzione per aggiornare la tabella
+//                            updateTabPropedInBaseACdL();
+//                        }
+//                    }
+//                };
+//
+//                // Configura e invia la seconda chiamata AJAX per cancellare la riga
+//                xhttp2.open('POST', 'rimuovipropedeuticita.php', true);
+//                xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+//                const params = 'insegnamento1=' + encodeURIComponent(ins1) +
+//                    '&insegnamento2=' + encodeURIComponent(ins2) +
+//                    '&cdl=' + encodeURIComponent(cdl);
+//                xhttp2.send(params);
+//            }
+//        });
+//        console.log("fine del MODIFICA CDL -----------------");
+//    </script>
 <?php
 }
 ?>
