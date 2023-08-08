@@ -574,31 +574,8 @@ echo "
             <th scope="row"> > </th>
             <td id="cod1" class="updateValue">  </td>
             <td> <select class="form-control dropdown" id="ins1" name="ins1">
-                    <?php
-                    try {
-                        // Connessione al database utilizzando PDO
-                        $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
-                        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                        // Esegui la query per ottenere i dati del secondo menù a tendina in base alla selezione del primo
-                        $stmt = $conn->prepare("SELECT distinct(i.nome), i.codice FROM insegnamento i
-                            INNER JOIN insegnamento_parte_di_cdl p ON p.corso_di_laurea = :valore
-                                                                        AND p.insegnamento = i.codice
-                            ");
-                        $stmt->bindParam(':valore', $codiceCdL);
-                        $stmt->execute();
-                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-                        // echo "<option selected value=\"no\">nessuna propedeuticità</option>";
-                        // Genera le opzioni per il secondo menù a tendina
-                        foreach ($results as $row) {
-                            echo '<option value="' . $row['codice'] . '">' . $row['nome'] . '</option>';
-                        }
-                    } catch (PDOException $e) {
-                        echo "Errore: " . $e->getMessage();
-                    }
-                    ?>
+                </select>
             </td>
             <td style="text-align: center"> >>>>>>>>>> </td>
             <td id="cod2"> </td>
@@ -614,13 +591,13 @@ echo "
     </div>
     <script>
         //////////////////////////////////////////// KLINI
+
         function updatePrimoMenutendina() {
             console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
             var cdl = '<?php echo $codiceCdL;?>';
-            var cod1 = document.getElementById("ins1").innerText;
-            //var secondaparte = document.getElementById("ins2");
+            var ins1 = document.getElementById("ins1");
 
-            console.log("ciao, ho valori " + cdl +  " " + cod1);
+            console.log("ciao, ho valori " + cdl +  " " + ins1);
             // Ottieni il valore selezionato nel primo menù a tendina
             //var selezionecdl = cdl.value;
 
@@ -632,8 +609,8 @@ echo "
                     if (xhr.status === 200) {
                         console.log("CONNESSO OK per ins2Proped"); /////////////////////////////////////////////////////////////////////
                         // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
-                        secondaparte.innerHTML = xhr.responseText;
-                        updateSecondoCodice();
+                        ins1.innerHTML = xhr.responseText;
+                        updatePrimoCodice();
                     } else {
                         // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
                         console.error("Errore durante la richiesta AJAX");
@@ -645,6 +622,7 @@ echo "
             xhr.open("GET", "ins1Propedeuticita.php?cdl=" + cdl, true);
             xhr.send();
         }
+        updatePrimoMenutendina();
         ////////////////////////////////////////////// KLINI
         function updatePrimoCodice(){
             var codice = document.getElementById("cod1");
@@ -725,6 +703,8 @@ updateSecondMenutendina();
                         if (response.success) {
                             // Richiama la funzione per aggiornare la tabella
                             updateTabPropedInBaseACdL();
+                            updatePrimoMenutendina();
+                            updateSecondMenutendina();
                         }
                     }
                 };
