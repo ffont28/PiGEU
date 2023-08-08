@@ -428,7 +428,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
                     <td>
                     
-                    <select class=\"form-control\" id=\"anno\" name=\"anno\">';
+                    <select class="form-control" id="anno" name="anno">';
 
                     try {
                     // Connessione al database utilizzando PDO
@@ -465,7 +465,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                     <td>'.$cfu.'</td>
                     <td>
                     
-                    <select class=\"form-control2\" id=\"propedeuticita\" name=\"propedeuticita\">';
+                    <select class="form-control2" id="propedeuticita" name="propedeuticita">';
 
             try {
                 // Connessione al database utilizzando PDO
@@ -497,7 +497,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                     <td style="text-align: center;">
                       <button class="button-iscr" 
                               insegnamento="'. $codiceInsegnamento .'" 
-                              cdl="' . $row["codice"]  . '">inserisci nel CdL</button></td>
+                              cdl="' . $codiceCdL  . '">inserisci nel CdL</button></td>
                     </tr>';
         }
         echo '
