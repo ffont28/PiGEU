@@ -15,11 +15,16 @@ if(isset($_GET['cdl']) && isset($_GET['cod1'])) {
                             WITH anno1 AS (
                             SELECT anno FROM insegnamento_parte_di_cdl
                             WHERE insegnamento = :cod1 AND corso_di_laurea = :cdl
+                            ), proibite AS (
+                            SELECT insegnamento2 FROM propedeuticita
+                            WHERE insegnamento1 = :cod1 AND corso_di_laurea = :cdl
                             )
                             SELECT distinct(i.nome), i.codice, p.anno FROM insegnamento i
                             INNER JOIN insegnamento_parte_di_cdl p ON p.corso_di_laurea = :cdl
                                                                     AND p.insegnamento = i.codice
-                            WHERE i.codice <> :cod1 AND p.anno >= ALL (SELECT anno FROM anno1)
+                            WHERE i.codice <> :cod1 
+                                  AND p.anno >= ALL (SELECT * FROM anno1)
+                                  AND i.codice <> ALL (SELECT * FROM proibite)
                             ");
         $stmt->bindParam(':cdl', $cdl);
         $stmt->bindParam(':cod1', $cod1);

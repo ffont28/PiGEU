@@ -604,8 +604,7 @@ echo "
             <td id="cod2"> </td>
                 <td> <select class="form-control" id="ins2" name="ins2">
                     </select> </td>
-
-            <td>' . $row["nom1"] . '</td>
+            <td><button class="button-iscr button-iscr2">✅</button></td>
 
             </tbody>
         </table>
@@ -614,6 +613,39 @@ echo "
 
     </div>
     <script>
+        //////////////////////////////////////////// KLINI
+        function updatePrimoMenutendina() {
+            console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
+            var cdl = '<?php echo $codiceCdL;?>';
+            var cod1 = document.getElementById("ins1").innerText;
+            //var secondaparte = document.getElementById("ins2");
+
+            console.log("ciao, ho valori " + cdl +  " " + cod1);
+            // Ottieni il valore selezionato nel primo menù a tendina
+            //var selezionecdl = cdl.value;
+
+            // Effettua una richiesta AJAX al server per ottenere il contenuto del secondo menù a tendina
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
+                    if (xhr.status === 200) {
+                        console.log("CONNESSO OK per ins2Proped"); /////////////////////////////////////////////////////////////////////
+                        // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
+                        secondaparte.innerHTML = xhr.responseText;
+                        updateSecondoCodice();
+                    } else {
+                        // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
+                        console.error("Errore durante la richiesta AJAX");
+                    }
+                }
+            };
+
+            // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
+            xhr.open("GET", "ins1Propedeuticita.php?cdl=" + cdl, true);
+            xhr.send();
+        }
+        ////////////////////////////////////////////// KLINI
         function updatePrimoCodice(){
             var codice = document.getElementById("cod1");
             var nome = document.getElementById("ins1").value;
@@ -675,6 +707,38 @@ document.getElementById("ins1").addEventListener('change', updateSecondMenutendi
 
 // Inizializza il contenuto del secondo menù a tendina inizialmente
 updateSecondMenutendina();
+
+        document.addEventListener('click', function(event) {
+            const target = event.target;
+            if (event.target.classList.contains('button-iscr2')) {
+                const cod1 = document.getElementById('cod1').innerHTML;
+                const cod2 = document.getElementById('cod2').innerHTML;
+                // const ins1 = event.target.getAttribute('ins1');
+                // const ins2 = event.target.getAttribute('ins2');
+                const cdl = '<?php echo $codiceCdL;?>';
+                console.log("evento scatenato con " + cod1 + " " + cod2 + " " + cdl);
+                // Seconda chiamata AJAX per cancellare la riga
+                const xhttp2 = new XMLHttpRequest();
+                xhttp2.onreadystatechange = function() {
+                    if (this.readyState === 4 && this.status === 200) {
+                        const response = JSON.parse(this.responseText);
+                        if (response.success) {
+                            // Richiama la funzione per aggiornare la tabella
+                            updateTabPropedInBaseACdL();
+                        }
+                    }
+                };
+
+                // Configura e invia la seconda chiamata AJAX per cancellare la riga
+                xhttp2.open('POST', 'inseriscipropedeuticita.php', true);
+                xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                const params = 'insegnamento1=' + encodeURIComponent(cod1) +
+                    '&insegnamento2=' + encodeURIComponent(cod2) +
+                    '&cdl=' + encodeURIComponent(cdl);
+                xhttp2.send(params);
+            }
+        });
+
 
     </script>
 
