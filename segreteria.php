@@ -13,7 +13,8 @@
 
 <link rel="stylesheet" href="../css/cssSegreteria.css">
 <link rel="stylesheet" href="../css/from-re.css">
-
+      <link rel="stylesheet" href="/css/calendarioesami.css">
+      <link rel="stylesheet" href="/css/general.css">
 
     <meta charset="utf-8">
 
@@ -40,11 +41,15 @@
       <a class="nav-link" href="segreteria/aggiungiinsegnamento.php">Inserisci Insegnamento</a>
     </li>
     <li class="nav-item">
+      <a class="nav-link" href="segreteria/modificainsegnamento.php" aria-disabled="true">Modifica Insegnamento</a>
+    </li>
+    <li class="nav-item">
       <a class="nav-link" href="segreteria/aggiungicdl.php">Inserisci corso di laurea</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="segreteria/modificacdl.php" aria-disabled="true">Modifica Corso di Laurea</a>
     </li>
+
   </ul>
 
 

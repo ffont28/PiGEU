@@ -75,6 +75,7 @@
                                                       )
                                                       SELECT u.nome, u.cognome, u.email FROM utente u
                                                       INNER JOIN selezione s ON u.email = s.utente
+                                                      ORDER BY cognome
                            ";
 
                            // Esecuzione della query e recupero dei risultati
@@ -153,7 +154,7 @@
  </div>
     <script>
     function updateSecondMenutendina() {
-                console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
+                console.log("richiesta funzione1"); ////////////////////////////////////////////////////////////////////////////
                 var cdl = document.getElementById("cdl");
                 var anno = document.getElementById("anno");
 
@@ -195,11 +196,12 @@
 
         </select>
  </div>
+
     <script>
     function updateSecondMenutendina() {
                 console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
                 var cdl = document.getElementById("cdl");
-                var anno = document.getElementById("prop");
+                var prop = document.getElementById("prop");
 
                 // Ottieni il valore selezionato nel primo menù a tendina
                 var selezionecdl = cdl.value;
@@ -212,7 +214,7 @@
                         if (xhr.status === 200) {
                                console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
                             // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
-                            anno.innerHTML = xhr.responseText;
+                            prop.innerHTML = xhr.responseText;
                         } else {
                             // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
                             console.error("Errore durante la richiesta AJAX");
@@ -259,8 +261,8 @@
 
 
     // inserimento dell'insegnamento nella tabella insegnamento
-    $params = array ($codice, $nome , $anno, $descrizione, $cfu);
-    $sql = "INSERT INTO insegnamento VALUES ($1,$2,$3,$4,$5)";
+    $params = array ($codice, $nome , $descrizione, $cfu);
+    $sql = "INSERT INTO insegnamento VALUES ($1,$2,$3,$4)";
     $result = pg_prepare($db,'insIns',$sql);
     $result = pg_execute($db,'insIns', $params);
 
@@ -271,15 +273,15 @@
     $result = pg_execute($db,'insResp', $params);
 
     //inserimento della RELAZIONE insegnamento -> corso di laurea
-    $params = array ($codice, $cdl);
-    $sql = "INSERT INTO insegnamento_parte_di_cdl VALUES ($1,$2)";
+    $params = array ($codice, $cdl, $anno);
+    $sql = "INSERT INTO insegnamento_parte_di_cdl VALUES ($1,$2,$3)";
     $result = pg_prepare($db,'insParte',$sql);
     $result = pg_execute($db,'insParte', $params);
 
     //inserimento della eventuale RELAZIONE propedeuticita
     if ($prop != "no"){
-    $params = array ($prop, $codice);
-    $sql = "INSERT INTO propedeuticita VALUES ($1,$2)";
+    $params = array ($prop, $codice, $cdl);
+    $sql = "INSERT INTO propedeuticita VALUES ($1,$2,$3)";
     $result = pg_prepare($db,'insProp',$sql);
     $result = pg_execute($db,'insProp', $params);
 
