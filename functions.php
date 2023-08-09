@@ -72,8 +72,12 @@ if ($link == "/segreteria/rimuoviutente.php") {$gu_active = $active; $ru_disab =
           </ul>
 </li>
 <li class="nav-item">
+  <a class="nav-link disabled" aria-current="page" href="main.php">👤 '.$_SESSION['cognome'].'  '.$_SESSION['nome'].'</a>
+</li>
+<li class="nav-item dropdown">
   <div class="ml-auto logout-button">
-              <a href="logout.php" class="btn btn-danger">Logout</a>
+  <a class="nav-link rounded-pill" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true" 
+  href="logout.php" class="btn btn-danger"><strong>🚪 LOGOUT</strong></a>
   </div>
 </li>
       </ul>
