@@ -3,6 +3,7 @@ include('../functions.php');
 include('../conf.php');
 
 if(isset($_POST['search'])) {
+    echo '<div style="margin-bottom: 20px"></div>';
     $search = $_POST['search'];
         try {
 
@@ -25,7 +26,7 @@ if(isset($_POST['search'])) {
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-           echo '<div><label for="exampleFormControlInput1" class="form-label"><h3>UTENTI TROVATI:</h3></label></div>
+           echo '
             <table class="table">
             <thead>
             <tr>

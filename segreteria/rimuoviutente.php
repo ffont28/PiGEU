@@ -21,12 +21,12 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 <h1>RIMOZIONE UTENTE</h1>
 
 <div>
+    <div>
     <label for="exampleFormControlInput1" class="form-label">Ricerca un utente da rimuovere:</label>
-    <form id="ricercaInsegnamento" action="" method="POST">
+    </div>
         <label for="cdl" >Utente:</label>
-        <input type="insertText" id="daricercare" placeholder="inserisci l'ID utente che si vuole rimuovere" name="utente">
-        <button type="submit" class="button1 green" value="CARICA INFORMAZIONI" id="search" >🔍 RICERCA</button>
-    </form>
+        <input type="insertText" id="daricercare" placeholder="🔍 RICERCA per NOME, o COGNOME, o INDIRIZZO EMAIL ISTITUZIONALE..." name="utente">
+
 </div>
                     <div id="popup" class="popup">
                         <div class="popup-content">
@@ -70,124 +70,70 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
         xhr.send(params);
     }
 
-    // Aggiungi un ascoltatore di eventi per il pulsante di ricerca
-    document.getElementById("search").addEventListener('click', function(event) {
-        event.preventDefault(); // Impedisce il comportamento predefinito del pulsante
-        updateUtentiTrovati();
-    });
 
     // Inizializza il contenuto del secondo menù a tendina inizialmente
     //updateUtentiTrovati();
-    document.addEventListener('click', function(event) {
-        if (event.target.classList.contains('button-canc')) {
-            const utente = event.target.getAttribute('utente');
-            const popup = document.getElementById('popup');
-            const confirmBtn = document.getElementById('confirmBtn');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const popupText = document.getElementById('popup-text');
-            const nome = event.target.getAttribute('nome');
-            const cognome = event.target.getAttribute('cognome');
-            console.log(nome + " " + cognome);
-            popupText.textContent = `confermi la rimozione definitiva per ${nome} ${cognome}?`;
-            // Mostra il popup con animazione
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('daricercare');
+        const popup = document.getElementById('popup');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const popupText = document.getElementById('popup-text');
+        let utenteToDelete = '';
+
+        // Funzione per mostrare il popup
+        function showPopup(nome, cognome, utente) {
+            utenteToDelete = utente;
+            popupText.textContent = `Confermi la rimozione definitiva per ${nome} ${cognome}?`;
             popup.classList.add('active');
-
-            // Gestisci la conferma
-            confirmBtn.addEventListener('click', function() {
-                // Nascondi il popup con animazione
-                popup.classList.remove('active');
-
-                // Esegui la cancellazione tramite la chiamata AJAX
-                const xhttp2 = new XMLHttpRequest();
-                xhttp2.onreadystatechange = function() {
-                    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-                        const response = JSON.parse(this.responseText);
-                        if (response.success) {
-                            // Richiama la funzione per aggiornare la tabella
-                            updateUtentiTrovati();
-                        }
-                    }
-                };
-
-                xhttp2.open('POST', 'eliminadefinitivamenteutente.php', true);
-                xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                const params = 'utente=' + encodeURIComponent(utente);
-                xhttp2.send(params);
-            });
-
-            // Gestisci l'annullamento
-            cancelBtn.addEventListener('click', function() {
-                // Nascondi il popup con animazione
-                popup.classList.remove('active');
-            });
         }
+
+        // Funzione per nascondere il popup
+        function hidePopup() {
+            popup.classList.remove('active');
+        }
+
+        // Listener per l'evento input sull'input di ricerca
+        searchInput.addEventListener('input', function() {
+            const searchValue = searchInput.value;
+            // Esegui la chiamata AJAX con il valore di ricerca
+            // e aggiorna la tabella con i risultati ottenuti
+            updateUtentiTrovati(searchValue);
+        });
+
+        // Listener per il click sul pulsante di conferma nel popup
+        confirmBtn.addEventListener('click', function() {
+            // Esegui la cancellazione tramite la chiamata AJAX
+            const xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function() {
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    const response = JSON.parse(this.responseText);
+                    if (response.success) {
+                        // Richiama la funzione per aggiornare la tabella
+                        updateUtentiTrovati(searchInput.value);
+                    }
+                }
+            };
+
+            xhttp2.open('POST', 'eliminadefinitivamenteutente.php', true);
+            xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            const params = 'utente=' + encodeURIComponent(utenteToDelete);
+            xhttp2.send(params);
+
+            // Nascondi il popup
+            hidePopup();
+        });
+
+        // Listener per il click sul pulsante di annullamento nel popup
+        cancelBtn.addEventListener('click', function() {
+            // Nascondi il popup
+            hidePopup();
+        });
     });
 
 
-    // // Gestione evento di pressione del bottone
-    // document.addEventListener('click', function(event) {
-    //     if (event.target.classList.contains('button-canc')) {
-    //         if (confirm('Sei sicuro?')) {
-    //             const utente = event.target.getAttribute('utente');
-    //
-    //             // Seconda chiamata AJAX per cancellare la riga
-    //             const xhttp2 = new XMLHttpRequest();
-    //             xhttp2.onreadystatechange = function () {
-    //                 if (this.readyState === 4 && this.status === 200) {
-    //                     const response = JSON.parse(this.responseText);
-    //                     if (response.success) {
-    //                         // Richiama la funzione per aggiornare la tabella
-    //                         updateUtentiTrovati();
-    //                     }
-    //                 }
-    //             };
-    //
-    //             // Configura e invia la seconda chiamata AJAX per cancellare la riga
-    //             xhttp2.open('POST', 'eliminadefinitivamenteutente.php', true);
-    //             xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    //             const params = 'utente=' + encodeURIComponent(utente);
-    //             xhttp2.send(params);
-    //         }
-    //     }
-    // });
-
+    updateUtentiTrovati();
 </script>
-
-
-
- <script>
-//
-// function rimozioneUtente(utente) {
-//    const xhttp = new XMLHttpRequest();
-//
-//    xhttp.onreadystatechange = function() {
-//      if (this.readyState === 4) {
-//        if (this.status === 200) {
-//          const response = JSON.parse(this.responseText);
-//          console.log(response);
-//        if (response.success) {
-//            window.location.reload();
-//          }
-//        } else {
-//          console.error('Errore nella richiesta AJAX:', this.statusText);
-//         }
-//      }
-//    };
-//
-//    xhttp.open('POST', 'rimuoviinsdacdl.php', true);
-//    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-//    const params = 'utente=' + encodeURIComponent(utente);
-//    xhttp.send(params);
-//  }
-//
-//  const removeUserButtons = document.querySelectorAll('.button-canc');
-//  removeUserButtons.forEach(button => {
-//    button.addEventListener('click', function() {
-//      const utente = this.getAttribute('utente');
-//      rimozioneUtente(utente);
-//    });
-//  });
-//</script>
 
 
 
