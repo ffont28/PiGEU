@@ -376,7 +376,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                 <th scope="col">Anno</th>
                 <th scope="col">CFU</th>
                 <th scope="col">Propedeuticità</th>
-                <th scope="col" style="text-align: center;">RIMUOVI</th>
+                <th scope="col" style="text-align: center;">AGGIUNGI</th>
             </tr>
             </thead>
             <tbody>';

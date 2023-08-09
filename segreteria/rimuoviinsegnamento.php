@@ -28,18 +28,18 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
         <button type="submit" class="button1 green" value="CARICA INFORMAZIONI" id="search" >🔍 RICERCA</button>
     </form>
 </div>
-                    <div id="popup" class="popup">
-                        <div class="popup-content">
-                            <h2>⚠️ ATTENZIONE</h2>
-                            <p id="popup-text"></p>
-                            <button id="confirmBtn" class="btn-confirm rounded-pill">Conferma</button>
-                            <button id="cancelBtn" class="btn-cancel rounded-pill">Annulla</button>
-                        </div>
-                    </div>
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <h2>⚠️ ATTENZIONE</h2>
+        <p id="popup-text"></p>
+        <button id="confirmBtn" class="btn-confirm rounded-pill">Conferma</button>
+        <button id="cancelBtn" class="btn-cancel rounded-pill">Annulla</button>
+    </div>
+</div>
 
-        <div id="tabellautenti">
+<div id="tabellautenti">
 
-        </div>
+</div>
 
 
 <script>
@@ -155,39 +155,39 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
 
 
- <script>
-//
-// function rimozioneUtente(utente) {
-//    const xhttp = new XMLHttpRequest();
-//
-//    xhttp.onreadystatechange = function() {
-//      if (this.readyState === 4) {
-//        if (this.status === 200) {
-//          const response = JSON.parse(this.responseText);
-//          console.log(response);
-//        if (response.success) {
-//            window.location.reload();
-//          }
-//        } else {
-//          console.error('Errore nella richiesta AJAX:', this.statusText);
-//         }
-//      }
-//    };
-//
-//    xhttp.open('POST', 'rimuoviinsdacdl.php', true);
-//    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-//    const params = 'utente=' + encodeURIComponent(utente);
-//    xhttp.send(params);
-//  }
-//
-//  const removeUserButtons = document.querySelectorAll('.button-canc');
-//  removeUserButtons.forEach(button => {
-//    button.addEventListener('click', function() {
-//      const utente = this.getAttribute('utente');
-//      rimozioneUtente(utente);
-//    });
-//  });
-//</script>
+<script>
+    //
+    // function rimozioneUtente(utente) {
+    //    const xhttp = new XMLHttpRequest();
+    //
+    //    xhttp.onreadystatechange = function() {
+    //      if (this.readyState === 4) {
+    //        if (this.status === 200) {
+    //          const response = JSON.parse(this.responseText);
+    //          console.log(response);
+    //        if (response.success) {
+    //            window.location.reload();
+    //          }
+    //        } else {
+    //          console.error('Errore nella richiesta AJAX:', this.statusText);
+    //         }
+    //      }
+    //    };
+    //
+    //    xhttp.open('POST', 'rimuoviinsdacdl.php', true);
+    //    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    //    const params = 'utente=' + encodeURIComponent(utente);
+    //    xhttp.send(params);
+    //  }
+    //
+    //  const removeUserButtons = document.querySelectorAll('.button-canc');
+    //  removeUserButtons.forEach(button => {
+    //    button.addEventListener('click', function() {
+    //      const utente = this.getAttribute('utente');
+    //      rimozioneUtente(utente);
+    //    });
+    //  });
+    //</script>
 
 
 
