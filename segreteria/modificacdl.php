@@ -577,7 +577,7 @@ echo "
 
                 </select>
             </td>
-            <td style="text-align: center"> >>>>>>>>>> </td>
+            <td style="text-align: center"> >>>>> </td>
             <td id="cod2"> </td>
                 <td> <select class="form-control" id="ins2" name="ins2">
                     </select> </td>

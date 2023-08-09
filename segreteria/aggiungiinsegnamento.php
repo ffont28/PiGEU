@@ -75,6 +75,7 @@
                                                       )
                                                       SELECT u.nome, u.cognome, u.email FROM utente u
                                                       INNER JOIN selezione s ON u.email = s.utente
+                                                      ORDER BY cognome
                            ";
 
                            // Esecuzione della query e recupero dei risultati
@@ -260,8 +261,8 @@
 
 
     // inserimento dell'insegnamento nella tabella insegnamento
-    $params = array ($codice, $nome , $anno, $descrizione, $cfu);
-    $sql = "INSERT INTO insegnamento VALUES ($1,$2,$3,$4,$5)";
+    $params = array ($codice, $nome , $descrizione, $cfu);
+    $sql = "INSERT INTO insegnamento VALUES ($1,$2,$3,$4)";
     $result = pg_prepare($db,'insIns',$sql);
     $result = pg_execute($db,'insIns', $params);
 
@@ -272,8 +273,8 @@
     $result = pg_execute($db,'insResp', $params);
 
     //inserimento della RELAZIONE insegnamento -> corso di laurea
-    $params = array ($codice, $cdl);
-    $sql = "INSERT INTO insegnamento_parte_di_cdl VALUES ($1,$2)";
+    $params = array ($codice, $cdl, $anno);
+    $sql = "INSERT INTO insegnamento_parte_di_cdl VALUES ($1,$2,$3)";
     $result = pg_prepare($db,'insParte',$sql);
     $result = pg_execute($db,'insParte', $params);
 

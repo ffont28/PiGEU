@@ -159,15 +159,30 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
                        Tipo di contratto che ha il docente:
                         <select class="form-select" aria-label="Default select example" id="tipo" name="tipodocente">
                               <option ';
-                            if ($tipoinq == "a contratto") {echo "selected ";}
-                                echo 'value="a contratto">A contratto</option>
-                              <option ';
-                            if ($tipoinq == "ricercatore") {echo 'selected ';}
-                                echo 'value="ricercatore">Ricercatore</option>
+
+
+                            if ($tipoinq == "ordinario") {echo "selected ";}
+                                echo 'value="ordinario">Ordinario</option>
                               <option ';
                             if ($tipoinq == "associato") {echo 'selected ';}
                                 echo 'value="associato">Associato</option>
+                              <option ';
+                           if ($tipoinq == "a contratto") {echo 'selected ';}
+                           echo 'value="a contratto">A contratto</option>
+                                      <option ';
+                           if ($tipoinq == "ricercatore") {echo 'selected ';}
+                           echo 'value="ricercatore">Ricercatore</option>
+                                      <option ';
+                           if ($tipoinq == "ricercatore confermato") {echo 'selected ';}
+                           echo 'value="ricercatore confermato">Ricercatore confermato</option>
+                                      <option ';
+                           if ($tipoinq == "emerito") {echo 'selected ';}
+                           echo 'value="emerito">Emerito</option>
+                                      <option ';
+                            if ($tipoinq == "straordinario") {echo 'selected ';}
+                                echo 'value="straordinario">Straordinario</option>
                             </select>
+                            
                     </div>';
                }
                $query2 = "SELECT * FROM studente WHERE utente = :email";
