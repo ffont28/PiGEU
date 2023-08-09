@@ -1,6 +1,92 @@
 <?php
 session_start();
 include('conf.php');
+
+function importVari(){
+    echo '  <!-- import di Bootstrap-->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+            
+            <!-- Includi jQuery dalla rete tramite un link CDN -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            
+            <link rel="stylesheet" href="/css/cssSegreteria.css">
+            <link rel="stylesheet" href="/css/from-re.css">
+            <link rel="stylesheet" href="/css/calendarioesami.css">
+            <link rel="stylesheet" href="/css/general.css">
+            <script src="../js/segreteria.js"></script>
+            <script src="../js/general.js"></script>
+            
+             <meta charset="utf-8">';
+}
+function setNavbarSegreteria($link){
+$active = "active"; $disabled = "disabled";
+$h_active = $gu_active = $gi_active = $gc_active = "";
+$h_disab = $au_disab = $ai_disab = $ac_disab = $mu_disab = $mi_disab = $mc_disab = $ru_disab = $ri_disab = $rc_disab ="";
+if ($link == "/segreteria/main.php") {$h_active = $active; $h_disab = $disabled;}
+if ($link == "/segreteria/aggiungiutente.php") {$gu_active = $active; $au_disab = $disabled;}
+if ($link == "/segreteria/gestisciutente.php") {$gu_active = $active; $mu_disab = $disabled;}
+if ($link == "/segreteria/rimuoviutente.php") {$gu_active = $active; $ru_disab = $disabled;}
+//echo $link;
+    echo '    <!-- INIZIO NAVBAR -->
+<div class="container">
+      <ul class="nav nav-tabs">
+
+<li class="nav-item">
+  <a class="nav-link '.$h_active.' '.$h_disab.'" aria-current="page" href="main.php"><strong>🏠 HOME</strong></a>
+</li>
+<li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle '.$gu_active.'" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+          <strong>🧑‍🔧 GESTIONE UTENZE</strong>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown" data-bs-popper="none">
+            <li><a class="dropdown-item '.$au_disab.'" href="aggiungiutente.php">Inserimento Utente</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item '.$mu_disab.'" href="gestisciutente.php">Modifica Utente</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item '.$ru_disab.'" href="rimuoviutente.php">Rimuozione Utente</a></li>
+          </ul>
+</li>
+<li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle '.$gi_active.'" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+          <strong>🧑‍🏫 GESTIONE INSEGNAMENTI</strong>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown" data-bs-popper="none">
+            <li><a class="dropdown-item '.$ai_disab.'" href="aggiungiinsegnamento.php">Inserimento Insegnamento</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item '.$mi_disab.'" href="modificainsegnamento.php">Modifica Insegnamento</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item '.$ri_disab.'" href="rimuoviinsegnamento.php">Rimozione Insegnamento</a></li>
+          </ul>
+</li>
+<li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle '.$gc_active.'" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+          <strong>🎓 GESTIONE CORSI DI LAUREA</strong>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown" data-bs-popper="none">
+            <li><a class="dropdown-item '.$ac_disab.'" href="aggiungicdl.php">Inserimento Corso di Laurea</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item '.$mc_disab.'" href="modificacdl.php">Modifica Corso di Laurea</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item '.$rc_disab.'" href="rimuovicdl.php">RimozioneCorso di Laurea</a></li>
+          </ul>
+</li>
+<li class="nav-item">
+  <a class="nav-link disabled" aria-current="page" href="main.php">👤 '.$_SESSION['cognome'].'  '.$_SESSION['nome'].'</a>
+</li>
+<li class="nav-item dropdown">
+  <div class="ml-auto logout-button">
+  <a class="nav-link rounded-pill" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true" 
+  href="logout.php" class="btn btn-danger"><strong>🚪 LOGOUT</strong></a>
+  </div>
+</li>
+      </ul>
+
+      </div>
+      <!-- FINE NAVBAR -->';
+
+}
+
 function open_pg_connection(){
     include_once('conf.php');
     $connection= "host=".myhost." dbname=".mydbname." user=".myuser." password=".mypassword;
@@ -36,7 +122,7 @@ function check_login($user, $password){
         $result = pg_query_params($db, $sql, $param);
         if (pg_num_rows($result) > 0) {
             $_SESSION["tipo"] = "segreteria";
-            header("Location: segreteria.php");
+            header("Location: segreteria/main.php");
             exit();
         }
         //caso in cui è DOCENTE

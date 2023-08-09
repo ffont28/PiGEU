@@ -23,3 +23,37 @@
 .nav-tabs .nav-item .nav-link:hover {
     color: #007bff; /* Cambia colore del testo al passaggio del mouse */
 }
+
+.container {
+    width: 100%;
+    padding-right: 5px;
+    padding-left: 5px;
+    margin-right: auto;
+    margin-left: auto; }
+@media (min-width: 576px) {
+    .container {
+        max-width: 540px; } }
+@media (min-width: 600px) {
+    .container {
+        max-width: 598px; } }
+@media (min-width: 690px) {
+    .container {
+        max-width: 680px; } }
+@media (min-width: 768px) {
+    .container {
+        max-width: 720px; } }
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px; } }
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px; } }
+@media (min-width: 1300px) {
+    .container {
+        max-width: 1300px; } }
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1400px; } }
+@media (min-width: 1600px) {
+    .container {
+        max-width: 1598px; } }

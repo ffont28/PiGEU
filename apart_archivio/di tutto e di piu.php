@@ -27,7 +27,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 <!-- INIZIO NAVBAR -->
 <ul class="nav nav-tabs">
     <li class="nav-item">
-        <a class="nav-link" aria-current="page" href="../segreteria.php">Homepage</a>
+        <a class="nav-link" aria-current="page" href="../segreteria/main.php">Homepage</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="aggiungiutente.php">Aggiungi Utenza</a>

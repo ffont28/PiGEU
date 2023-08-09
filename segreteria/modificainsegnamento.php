@@ -7,18 +7,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 <!doctype html>
 <html lang="it" data-bs-theme="auto">
 <head>
-    <!-- import di Bootstrap-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" href="../css/from-re.css">
-    <link rel="stylesheet" href="../css/cssSegreteria.css">
-    <link rel="stylesheet" href="../css/calendarioesami.css">
-    <link rel="stylesheet" href="../css/general.css">
-    <script src="../js/general.js"></script>
-    <!--   <script src="../js/calendarioesami.js"></script> -->
-
-    <meta charset="utf-8">
+    <?php importVari();?>
     <title>Modifica Insegnamento · PiGEU</title>
 </head>
 
@@ -26,32 +15,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 <body>
 
 <!-- INIZIO NAVBAR -->
-<ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a class="nav-link" aria-current="page" href="../segreteria.php">Homepage</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="aggiungiutente.php">Aggiungi Utenza</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="gestisciutente.php">Gestisci Utenza</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="rimuoviutente.php">Rimuovi Utenza</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="aggiungiinsegnamento.php">Inserisci Insegnamento</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="#" aria-disabled="true">Modifica Insegnamento</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="aggiungicdl.php">Inserisci corso di laurea</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="modificacdl.php" aria-disabled="true">Modifica Corso di Laurea</a>
-    </li>
-</ul>
+<?php setNavbarSegreteria($_SERVER['REQUEST_URI']);?>
 <!-- FINE NAVBAR -->
 
 <h1>MODIFICA UN INSEGNAMENTO</h1>
