@@ -63,7 +63,7 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
     try {
         // Connessione al database utilizzando PDO
-        echo '<script>console.log("sono qui nel try")</script>'; //////////////////////////////////////////////////////////////
+       // echo '<script>console.log("sono qui nel try")</script>'; //////////////////////////////////////////////////////////////
 
         $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
 
@@ -86,7 +86,7 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
            foreach ($results as $row) {
                $corsoinq = $row['corso_di_laurea'];
                $tipoinq = $row['tipo'];
-
+               $email = $row['email'];
                echo '<script>console.log(\'>>'.$corsoinq." & ".$tipoinq.'<<\')</script>';
                  echo "<div class=\"mb-3\">
                                 <label for=\"exampleFormControlInput1\" class=\"form-label\">Nome</label>
@@ -159,20 +159,43 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
                        Tipo di contratto che ha il docente:
                         <select class="form-select" aria-label="Default select example" id="tipo" name="tipodocente">
                               <option ';
-                            if ($tipoinq == "a contratto") {echo "selected ";}
-                                echo 'value="a contratto">A contratto</option>
-                              <option ';
-                            if ($tipoinq == "ricercatore") {echo 'selected ';}
-                                echo 'value="ricercatore">Ricercatore</option>
+
+
+                            if ($tipoinq == "ordinario") {echo "selected ";}
+                                echo 'value="ordinario">Ordinario</option>
                               <option ';
                             if ($tipoinq == "associato") {echo 'selected ';}
                                 echo 'value="associato">Associato</option>
+                              <option ';
+                           if ($tipoinq == "a contratto") {echo 'selected ';}
+                           echo 'value="a contratto">A contratto</option>
+                                      <option ';
+                           if ($tipoinq == "ricercatore") {echo 'selected ';}
+                           echo 'value="ricercatore">Ricercatore</option>
+                                      <option ';
+                           if ($tipoinq == "ricercatore confermato") {echo 'selected ';}
+                           echo 'value="ricercatore confermato">Ricercatore confermato</option>
+                                      <option ';
+                           if ($tipoinq == "emerito") {echo 'selected ';}
+                           echo 'value="emerito">Emerito</option>
+                                      <option ';
+                            if ($tipoinq == "straordinario") {echo 'selected ';}
+                                echo 'value="straordinario">Straordinario</option>
                             </select>
+                            
                     </div>';
                }
+               $query2 = "SELECT * FROM studente WHERE utente = :email";
+               $stmt2 = $conn->prepare($query2);
+               $stmt2->bindParam(':email', $email);
+               $stmt2->execute();
+              //  echo "------->>>".$email;
+               $isStudente = $stmt2->rowCount() > 0;
 
-               echo " <input type=\"submit\" class=\"button1 red\" value=\"SPOSTA UTENTE IN STORICO\" name='action' />
-                      <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA ANAGRAFICA UTENTE\" name='action'/>
+               if($isStudente){
+                   echo " <input type=\"submit\" class=\"button1 red\" value=\"SPOSTA STUDENTE IN STORICO\" name='action' />";
+               }
+               echo " <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA ANAGRAFICA UTENTE\" name='action'/>
                         </div>
                     </form>
                     ";

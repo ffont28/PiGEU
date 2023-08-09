@@ -1,5 +1,6 @@
 <?php
 session_start();
+include('conf.php');
 function open_pg_connection(){
     include_once('conf.php');
     $connection= "host=".myhost." dbname=".mydbname." user=".myuser." password=".mypassword;
@@ -21,6 +22,15 @@ function check_login($user, $password){
 
     if (pg_num_rows($result) > 0) {
         $param = array ($user);
+
+        //prelevo il NOME e il COGNOME dell'utente
+        $sql = "SELECT nome, cognome FROM utente WHERE email = $1";
+        $result = pg_query_params($db, $sql, $param);
+        if ($row = pg_fetch_assoc($result)) {
+            $_SESSION['nome'] = $row['nome'];
+            $_SESSION['cognome'] = $row['cognome'];
+        }
+
         //caso in cui è SEGRETERIA
         $sql = "SELECT * FROM segreteria WHERE utente = $1";
         $result = pg_query_params($db, $sql, $param);
@@ -44,13 +54,7 @@ function check_login($user, $password){
             header("Location: studente/main.php");
         }
 
-        //prelevo il NOME e il COGNOME dell'utente
-        $sql = "SELECT nome, cognome FROM utente WHERE email = $1";
-        $result = pg_query_params($db, $sql, $param);
-        if ($row = pg_fetch_assoc($result)) {
-            $_SESSION['nome'] = $row['nome'];
-            $_SESSION['cognome'] = $row['cognome'];
-        }
+
 
     } else {
         header("Location: 404.php");
@@ -127,6 +131,27 @@ function docentiCandidatiResponsabili(){
 function logout(){
     $_SESSION["username"] = " ";
     $_SESSION["password"] = " ";
+}
+
+function controller($tipo, $username, $password){
+    if(!isset($username)){
+        header("Location: ../index.php");
+    }
+
+    $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $query = "SELECT * FROM ". $tipo ." t INNER JOIN credenziali c ON t.utente = c.username
+               WHERE t.utente = :u AND c.password = :p";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':u', $username);
+    $stmt->bindParam(':p', $password);
+    $stmt->execute();
+
+    if ($stmt->rowCount() == 0){
+        echo "utente non autorizzato con le credenziali di " . $_SESSION['username']. " | " . $_SESSION['password'];
+        die();
+    }
 }
 
 ?>

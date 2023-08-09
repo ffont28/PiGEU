@@ -1,3 +1,9 @@
+<?php
+    session_start();
+    include('functions.php');
+    include('conf.php');
+    controller("segreteria", $_SESSION['username'], $_SESSION['password']);
+?>
 <!doctype html>
 <html lang="IT" data-bs-theme="auto">
   <head>
@@ -7,7 +13,8 @@
 
 <link rel="stylesheet" href="../css/cssSegreteria.css">
 <link rel="stylesheet" href="../css/from-re.css">
-
+      <link rel="stylesheet" href="/css/calendarioesami.css">
+      <link rel="stylesheet" href="/css/general.css">
 
     <meta charset="utf-8">
 
@@ -34,11 +41,15 @@
       <a class="nav-link" href="segreteria/aggiungiinsegnamento.php">Inserisci Insegnamento</a>
     </li>
     <li class="nav-item">
+      <a class="nav-link" href="segreteria/modificainsegnamento.php" aria-disabled="true">Modifica Insegnamento</a>
+    </li>
+    <li class="nav-item">
       <a class="nav-link" href="segreteria/aggiungicdl.php">Inserisci corso di laurea</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Modifica Corso di Laurea</a>
+      <a class="nav-link" href="segreteria/modificacdl.php" aria-disabled="true">Modifica Corso di Laurea</a>
     </li>
+
   </ul>
 
 
@@ -49,7 +60,7 @@
     session_start();
     ?>
 
-    <h1>Benvenuto <?php echo $_SESSION['username']." ".$_SESSION['nome'] ?></h1>
+    <h1>Benvenuto <?php echo $_SESSION['nome']." ".$_SESSION['cognome'] ?></h1>
 
 <form action="../index.php" method="post">
         <input type="submit" name="logout" class="button1 black" value="logout" />

@@ -22,11 +22,19 @@ BEGIN
   SELECT utente, matricola, corso_di_laurea
   FROM studente WHERE utente = $1;
 
-  -- cancello i dati dalla tabella stutente dopo averli spostati in stutente_storico
-  DELETE FROM studente WHERE utente = $1;
+  -- INSERT carriera --> carriera_storico
+  INSERT INTO carriera_storico (studente, insegnamento, valutazione, data)
+  SELECT studente, insegnamento, valutazione, data
+  FROM carriera WHERE studente = $1;
 
   -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
   DELETE FROM utente where email = $1;
+
+  -- le seguenti operazioni sono fatte già in CASCADE
+        -- cancello i dati dalla tabella studente dopo averli spostati in stutente_storico
+        -- DELETE FROM studente WHERE utente = $1;
+        -- cancello i dati dalla tabella carriera dopo averli spostati in carriera_storico
+        -- DELETE FROM carriera WHERE email = $1;
 
   RETURN status;
 -- Gestione delle eccezioni
