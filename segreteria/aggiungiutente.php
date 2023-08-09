@@ -136,7 +136,6 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
   //  echo "sono qui con dominio ".$_COOKIE['dominio']."  .....  ";
   //  echo $_POST['username'].$_POST['dominionascosto']." ".$_POST['nome']." ".$_POST['cognome']." ".$_POST['indirizzo']." ".$_POST['citta']." ".$_POST['codicefiscale']." ".$_POST['emailpersonale'];
 
-    include('../functions.php');
     $db = open_pg_connection();
    // echo "sono qui";
 

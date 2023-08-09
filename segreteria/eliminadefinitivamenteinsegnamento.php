@@ -1,16 +1,16 @@
 <?php
 include('../functions.php');
 include('../conf.php');
-if (isset($_POST['utente'])) {
-    $utente = $_POST['utente'];
+if (isset($_POST['codice'])) {
+    $codice = $_POST['codice'];
     try {
         // Connessione al database utilizzando PDO
         $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Esegui la query per cancellare la propedeuticità dal database
-        $stmt = $conn->prepare("DELETE FROM utente WHERE email = :utente");
-        $stmt->bindParam(':utente', $utente);
+        $stmt = $conn->prepare("DELETE FROM insegnamento WHERE codice = :codice");
+        $stmt->bindParam(':codice', $codice);
         $stmt->execute();
 
         // Invia una risposta JSON di successo al client

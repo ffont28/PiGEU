@@ -27,6 +27,7 @@ if(isset($_POST['search'])) {
 
 
            echo '
+            <div class="table-container">
             <table class="table">
             <thead>
             <tr>
@@ -87,7 +88,8 @@ if(isset($_POST['search'])) {
             }
             echo '
             </tbody>
-        </table >';
+        </table>
+        </div>';
             } catch
         (PDOException $e) {
             echo "Errore: " . $e->getMessage();

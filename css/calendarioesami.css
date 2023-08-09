@@ -20,7 +20,7 @@ input[type="time"] {
 }
 
 select[type="insegnamento"], input[type="insertText"]{
-    width: 350px;
+    width: 400px;
 }
 
 select[type="data"]{
