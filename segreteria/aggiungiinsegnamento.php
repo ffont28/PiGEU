@@ -16,7 +16,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
   INSERIMENTO DI UN NUOVO INSEGNAMENTO
 
-<form method="post" >
+<form method="post" action="#" >
     <div class="center">
         <div class="mb-3">
           <label for="exampleFormControlInput1" class="form-label">Nome dell'insegnamento</label>
@@ -131,7 +131,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
         </select>
  </div>
     <script>
-    function updateSecondMenutendina() {
+    function updateSecondMenutendina1() {
                 console.log("richiesta funzione1"); ////////////////////////////////////////////////////////////////////////////
                 var cdl = document.getElementById("cdl");
                 var anno = document.getElementById("anno");
@@ -145,7 +145,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                     console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
                         if (xhr.status === 200) {
-                               console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
+                               console.log("CONNESSO OK QUERY ANNO LAUREA"); /////////////////////////////////////////////////////////////////////
                             // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
                             anno.innerHTML = xhr.responseText;
                         } else {
@@ -161,10 +161,10 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
             }
 
             // Aggiungi un ascoltatore di eventi per il menù a tendina 1
-            document.getElementById("cdl").addEventListener('change', updateSecondMenutendina);
+            document.getElementById("cdl").addEventListener('change', updateSecondMenutendina1);
 
             // Inizializza il contenuto del secondo menù a tendina inizialmente
-            updateSecondMenutendina();
+            updateSecondMenutendina1();
     </script>
 
 
@@ -190,7 +190,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                     console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
                         if (xhr.status === 200) {
-                               console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
+                               console.log("CONNESSO OK PROP"); /////////////////////////////////////////////////////////////////////
                             // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
                             prop.innerHTML = xhr.responseText;
                         } else {
@@ -221,12 +221,12 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
 
 <?php
- if($_SERVER['REQUEST_METHOD']=='POST'){
 
-    include('../functions.php');
+if($_SERVER['REQUEST_METHOD']=='POST') {
+
     $db = open_pg_connection();
 
-    // definisco le variabili
+    //    definisco le variabili
     $codice = $_POST['codice'];
     $nome = $_POST['nome'];
     $anno = $_POST['anno'];
@@ -236,6 +236,16 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     $cdl = $_POST['cdl'];
     $prop = $_POST['prop'];
 
+
+//
+//    $codice = "23";
+//    $nome = "VENTITRE";
+//    $anno = 3;
+//    $descrizione = " ";
+//    $cfu = '3';
+//    $responsabile = "stefano.aguzzoli@unimi.it";
+//    $cdl = "F1X";
+//    $prop = "no";
 
 
     // inserimento dell'insegnamento nella tabella insegnamento

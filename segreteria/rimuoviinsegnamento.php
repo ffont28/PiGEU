@@ -8,8 +8,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 <html lang="it" data-bs-theme="auto">
 <head>
     <?php importVari();?>
-
-    <title>Rimuovi utente · PiGEU</title>
+    <title>Rimuovi insegnamento · PiGEU</title>
 </head>
 
 
@@ -19,31 +18,32 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 <?php setNavbarSegreteria($_SERVER['REQUEST_URI']);?>
 <!-- FINE NAVBAR -->
 
-<h1>RIMOZIONE UTENTE</h1>
+<h1>RIMOZIONE INSEGNAMENTO</h1>
 
 <div>
     <div>
-    <label for="exampleFormControlInput1" class="form-label">Ricerca un utente da rimuovere:</label>
+        <label for="exampleFormControlInput1" class="form-label">Ricerca un insegnamento da rimuovere:</label>
     </div>
-        <label for="cdl" >Utente:</label>
-        <input type="insertText" id="daricercare" placeholder="🔍 RICERCA per NOME, o COGNOME, o EMAIL ISTITUZIONALE..." name="utente">
+    <label for="cdl" >Utente:</label>
+    <input type="insertText" id="daricercare" placeholder="🔍 RICERCA per NOME, CODICE o RESPONSABILE..." name="utente">
 
 </div>
-                    <div id="popup" class="popup">
-                        <div class="popup-content">
-                            <h2>⚠️ ATTENZIONE</h2>
-                            <p id="popup-text"></p>
-                            <button id="confirmBtn" class="btn-confirm rounded-pill">Conferma</button>
-                            <button id="cancelBtn" class="btn-cancel rounded-pill">Annulla</button>
-                        </div>
-                    </div>
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <h2>⚠️ ATTENZIONE</h2>
+        <p id="popup-text"></p>
+        <button id="confirmBtn" class="btn-confirm rounded-pill">Conferma</button>
+        <button id="cancelBtn" class="btn-cancel rounded-pill">Annulla</button>
+    </div>
+</div>
 
-        <div id="tabellautenti">
+<div id="tabellautenti">
 
-        </div>
+</div>
+
 
 <script>
-    function updateUtentiTrovati() {
+    function updateCorsiTrovati() {
         console.log("richiesta funzione123"); //////////
         var sezioneHtml = document.getElementById("tabellautenti");
         var search = document.getElementById("daricercare").value ;
@@ -64,25 +64,27 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
         };
 
         // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
-        xhr.open("POST", "tabellautentiperrimozione.php", true);
+        xhr.open("POST", "tabellainsegnamentiperrimozione.php", true);
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
         const params = 'search=' + encodeURIComponent(search);
         xhr.send(params);
     }
 
 
+  //  Inizializza il contenuto del secondo menù a tendina inizialmente
+    updateCorsiTrovati();
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('daricercare');
         const popup = document.getElementById('popup');
         const confirmBtn = document.getElementById('confirmBtn');
         const cancelBtn = document.getElementById('cancelBtn');
         const popupText = document.getElementById('popup-text');
-        let utenteToDelete = '';
+        let codiceToDelete = '';
 
         // Funzione per mostrare il popup
-        function showPopup(nome, cognome, utente) {
-            utenteToDelete = utente;
-            popupText.textContent = `Confermi la rimozione definitiva per ${nome} ${cognome}?`;
+        function showPopup(insegnamento, codice) {
+            codiceToDelete = codice;
+            popupText.textContent = `Confermi la rimozione definitiva per ${insegnamento}?`;
             popup.classList.add('active');
         }
 
@@ -96,7 +98,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
             const searchValue = searchInput.value;
             // Esegui la chiamata AJAX con il valore di ricerca
             // e aggiorna la tabella con i risultati ottenuti
-            updateUtentiTrovati(searchValue);
+            updateCorsiTrovati(searchValue);
         });
 
         // Listener per il click sul pulsante di conferma nel popup
@@ -108,14 +110,14 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
                     const response = JSON.parse(this.responseText);
                     if (response.success) {
                         // Richiama la funzione per aggiornare la tabella
-                        updateUtentiTrovati(searchInput.value);
+                        updateCorsiTrovati(searchInput.value);
                     }
                 }
             };
 
-            xhttp2.open('POST', 'eliminadefinitivamenteutente.php', true);
+            xhttp2.open('POST', 'eliminadefinitivamenteinsegnamento.php', true);
             xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-            const params = 'utente=' + encodeURIComponent(utenteToDelete);
+            const params = 'codice=' + encodeURIComponent(codiceToDelete);
             xhttp2.send(params);
 
             // Nascondi il popup
@@ -131,14 +133,15 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
     document.addEventListener('click', function(event) {
         if (event.target.classList.contains('button-canc')) {
-            const utente = event.target.getAttribute('utente');
+            const codice = event.target.getAttribute('codice');
+            const insegnamento = event.target.getAttribute('ins');
             const popup = document.getElementById('popup');
             const confirmBtn = document.getElementById('confirmBtn');
             const cancelBtn = document.getElementById('cancelBtn');
             const popupText = document.getElementById('popup-text');
-
+            console.log(codice);
             // Aggiorna il testo del popup in base ai dati
-            popupText.textContent = `Sei sicuro di voler cancellare l'utente "${utente}"?`;
+            popupText.textContent = `Sei sicuro di voler cancellare l'insegnamento ${insegnamento}?`;
 
             // Mostra il popup con animazione
             popup.classList.add('active');
@@ -155,14 +158,14 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
                         const response = JSON.parse(this.responseText);
                         if (response.success) {
                             // Richiama la funzione per aggiornare la tabella
-                            updateUtentiTrovati();
+                            updateCorsiTrovati();
                         }
                     }
                 };
 
-                xhttp2.open('POST', 'eliminadefinitivamenteutente.php', true);
+                xhttp2.open('POST', 'eliminadefinitivamenteinsegnamento.php', true);
                 xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-                const params = 'utente=' + encodeURIComponent(utente);
+                const params = 'codice=' + encodeURIComponent(codice);
                 xhttp2.send(params);
             });
 
@@ -175,15 +178,11 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     });
 
 
-
-    updateUtentiTrovati();
+    updateCorsiTrovati();
 </script>
-
 
 
 
 </body>
 
 </html>
-
-

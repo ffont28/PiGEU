@@ -46,7 +46,6 @@ Tipo di CdL
 <?php
  if($_SERVER['REQUEST_METHOD']=='POST'){
 
-    include('../functions.php');
     $db = open_pg_connection();
 
     // definisco le variabili

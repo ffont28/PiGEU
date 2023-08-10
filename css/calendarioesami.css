@@ -12,15 +12,15 @@ label {
 }
 
 /* Stile per gli input date e time */
-input[type="date"], select[type="insegnamento"],
+input[type="date"], select[type="insegnamento"], input[type="insertText"],
 input[type="time"] {
     padding: 8px; /* Spaziatura interna dell'input */
     border: 1px solid #ccc; /* Bordo grigio per l'input */
     border-radius: 4px; /* Rendi i bordi arrotondati */
 }
 
-select[type="insegnamento"]{
-    width: 350px;
+select[type="insegnamento"], input[type="insertText"]{
+    width: 400px;
 }
 
 select[type="data"]{
@@ -31,7 +31,7 @@ select[type="data"]{
 }
 
 /* Stile per il pulsante di invio */
-input[type="submit"] {
+input[type="submit"], button[type="submit"] {
     padding: 10px 20px; /* Spaziatura interna del pulsante */
     background-color: #4CAF50; /* Colore di sfondo verde */
     color: white; /* Colore del testo bianco */
