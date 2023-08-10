@@ -28,8 +28,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 </form>
 
 <?php
-     include('../conf.php');
-     include('../functions.php');
+
      $ricercato="";
 
 echo '<script>console.log("sono qui")</script>'; //////////////////////////////////////////////////////////////
@@ -40,8 +39,6 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
     if (!empty($_GET["search"])){
     $ricercato = $_GET['search'];
-
-
 
     try {
         // Connessione al database utilizzando PDO
@@ -237,8 +234,10 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
 <?php
  if($_SERVER['REQUEST_METHOD']=='POST'){
+echo "ahiahiahi231";
         $targ = $_POST['hricercato'];
-        if ($_POST['action'] == 'SPOSTA UTENTE IN STORICO'){
+        if ($_POST['action'] == 'SPOSTA STUDENTE IN STORICO'){
+            echo "sPOST";
             echo "<script>console.log('Debug Objects: " . $targ . " sono qui2 ' );</script>";
 
             $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
@@ -247,7 +246,7 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
             $stmt->bindParam(':targ', $targ, PDO::PARAM_STR);
             $stmt->execute();
         }
-
+     echo "fuoriPOST";
         if ($_POST['action'] == 'MODIFICA ANAGRAFICA UTENTE') {
 
 

@@ -101,3 +101,82 @@
     background-color: #f44336;
     color: white;
 }
+
+.photo-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr; /* Divide la griglia in due colonne, l'immagine occupa una e il testo l'altra */
+    grid-gap: 20px; /* Spazio tra le colonne */
+    align-items: center; /* Allinea verticalmente al centro */
+    border: 2px solid #ccc;
+    padding: 13px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+}
+
+.photo-container-my {
+    font-size: 14pt;
+    display: grid;
+ /*   grid-template-columns: 1fr 2fr 1fr; /* Divide la griglia in due colonne, l'immagine occupa una e il testo l'altra */
+    grid-gap: 0px; /* Spazio tra le colonne */
+    align-items: center; /* Allinea verticalmente al centro */
+    border: 2px solid #ccc;
+    padding: 13px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+.photo {
+    width: 200px; /* Larghezza fissa desiderata */
+    height: 250px; /* Altezza fissa desiderata */
+    object-fit: cover; /* Per riempire l'area dell'immagine mantenendo l'aspetto */
+}
+
+.text {
+    font-size: 16px;
+}
+
+.custom-file-input {
+    display: none; /* Nasconde l'input file di default */
+}
+
+.custom-file-label {
+    display: inline-block;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff;
+    border: 2px solid #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.reset-password {
+    margin-top: 23px;
+    display: inline-block;
+    padding: 8px 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #e82d2d;
+    border: 2px solid #020405;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.background-green {
+    background-color: #4CAF50;
+}
+
+.background-red {
+    background-color: #ff0202;
+}
+
+.background-blue{
+    background-color: #024aff;
+}
+
+.background-purple{
+    background-color: #8a35e5;
+}
