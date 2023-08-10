@@ -115,7 +115,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
                 }
             };
 
-            xhttp2.open('POST', 'eliminadefinitivamentinsegnamento.php', true);
+            xhttp2.open('POST', 'eliminadefinitivamenteinsegnamento.php', true);
             xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             const params = 'codice=' + encodeURIComponent(codiceToDelete);
             xhttp2.send(params);
