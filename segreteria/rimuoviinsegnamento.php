@@ -71,65 +71,66 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     }
 
 
-    // Inizializza il contenuto del secondo menù a tendina inizialmente
-    //updateCorsiTrovati();
-    // document.addEventListener('DOMContentLoaded', function() {
-    //     const searchInput = document.getElementById('daricercare');
-    //     const popup = document.getElementById('popup');
-    //     const confirmBtn = document.getElementById('confirmBtn');
-    //     const cancelBtn = document.getElementById('cancelBtn');
-    //     const popupText = document.getElementById('popup-text');
-    //     let codiceToDelete = '';
-    //
-    //     // Funzione per mostrare il popup
-    //     function showPopup(insegnamento, codice) {
-    //         codiceToDelete = codice;
-    //         popupText.textContent = `Confermi la rimozione definitiva per ${insegnamento}?`;
-    //         popup.classList.add('active');
-    //     }
-    //
-    //     // Funzione per nascondere il popup
-    //     function hidePopup() {
-    //         popup.classList.remove('active');
-    //     }
-    //
-    //     // Listener per l'evento input sull'input di ricerca
-    //     searchInput.addEventListener('input', function() {
-    //         const searchValue = searchInput.value;
-    //         // Esegui la chiamata AJAX con il valore di ricerca
-    //         // e aggiorna la tabella con i risultati ottenuti
-    //         updateCorsiTrovati(searchValue);
-    //     });
-    //
-    //     // Listener per il click sul pulsante di conferma nel popup
-    //     confirmBtn.addEventListener('click', function() {
-    //         // Esegui la cancellazione tramite la chiamata AJAX
-    //         const xhttp2 = new XMLHttpRequest();
-    //         xhttp2.onreadystatechange = function() {
-    //             if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-    //                 const response = JSON.parse(this.responseText);
-    //                 if (response.success) {
-    //                     // Richiama la funzione per aggiornare la tabella
-    //                     updateCorsiTrovati(searchInput.value);
-    //                 }
-    //             }
-    //         };
-    //
-    //         xhttp2.open('POST', 'eliminadefinitivamentinsegnamento.php', true);
-    //         xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    //         const params = 'codice=' + encodeURIComponent(codiceToDelete);
-    //         xhttp2.send(params);
-    //
-    //         // Nascondi il popup
-    //         hidePopup();
-    //     });
-    //
-    //     // Listener per il click sul pulsante di annullamento nel popup
-    //     cancelBtn.addEventListener('click', function() {
-    //         // Nascondi il popup
-    //         hidePopup();
-    //     });
-    // });
+  //  Inizializza il contenuto del secondo menù a tendina inizialmente
+    updateCorsiTrovati();
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('daricercare');
+        const popup = document.getElementById('popup');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const popupText = document.getElementById('popup-text');
+        let codiceToDelete = '';
+
+        // Funzione per mostrare il popup
+        function showPopup(insegnamento, codice) {
+            codiceToDelete = codice;
+            popupText.textContent = `Confermi la rimozione definitiva per ${insegnamento}?`;
+            popup.classList.add('active');
+        }
+
+        // Funzione per nascondere il popup
+        function hidePopup() {
+            popup.classList.remove('active');
+        }
+
+        // Listener per l'evento input sull'input di ricerca
+        searchInput.addEventListener('input', function() {
+            const searchValue = searchInput.value;
+            // Esegui la chiamata AJAX con il valore di ricerca
+            // e aggiorna la tabella con i risultati ottenuti
+            updateCorsiTrovati(searchValue);
+        });
+
+        // Listener per il click sul pulsante di conferma nel popup
+        confirmBtn.addEventListener('click', function() {
+            // Esegui la cancellazione tramite la chiamata AJAX
+            const xhttp2 = new XMLHttpRequest();
+            xhttp2.onreadystatechange = function() {
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    const response = JSON.parse(this.responseText);
+                    if (response.success) {
+                        // Richiama la funzione per aggiornare la tabella
+                        updateCorsiTrovati(searchInput.value);
+                    }
+                }
+            };
+
+            xhttp2.open('POST', 'eliminadefinitivamentinsegnamento.php', true);
+            xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            const params = 'codice=' + encodeURIComponent(codiceToDelete);
+            xhttp2.send(params);
+
+            // Nascondi il popup
+            hidePopup();
+        });
+
+        // Listener per il click sul pulsante di annullamento nel popup
+        cancelBtn.addEventListener('click', function() {
+            // Nascondi il popup
+            hidePopup();
+        });
+    });
+
     document.addEventListener('click', function(event) {
         if (event.target.classList.contains('button-canc')) {
             const codice = event.target.getAttribute('codice');
