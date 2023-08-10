@@ -75,10 +75,10 @@ if ($link == "/segreteria/rimuoviutente.php") {$gu_active = $active; $ru_disab =
   <a class="nav-link disabled" aria-current="page" href="main.php">👤 '.$_SESSION['cognome'].'  '.$_SESSION['nome'].'</a>
 </li>
 <li class="nav-item dropdown">
-  <div class="ml-auto logout-button">
-  <a class="nav-link rounded-pill" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true" 
-  href="logout.php" class="btn btn-danger"><strong>🚪 LOGOUT</strong></a>
-  </div>
+<div class="ml-auto logout-button">
+    <a class="nav-link rounded-pill btn btn-danger" id="navbarDropdown" role="button" 
+       href="../logout.php"><strong>🚪 LOGOUT</strong></a>
+</div>
 </li>
       </ul>
 
@@ -235,9 +235,14 @@ function controller($tipo, $username, $password){
     $stmt->execute();
 
     if ($stmt->rowCount() == 0){
+        header("Location: logout.php");
         echo "utente non autorizzato con le credenziali di " . $_SESSION['username']. " | " . $_SESSION['password'];
         die();
     }
+}
+
+function ricavaDatiUtente(){
+
 }
 
 ?>

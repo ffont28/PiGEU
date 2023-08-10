@@ -33,7 +33,7 @@ select[type="data"]{
 /* Stile per il pulsante di invio */
 input[type="submit"], button[type="submit"] {
     padding: 10px 20px; /* Spaziatura interna del pulsante */
-    background-color: #4CAF50; /* Colore di sfondo verde */
+/*    background-color: #4CAF50; /* Colore di sfondo verde */
     color: white; /* Colore del testo bianco */
     border: none; /* Rimuovi il bordo */
     border-radius: 4px; /* Rendi i bordi arrotondati */
@@ -81,3 +81,12 @@ input[type="submit"]:hover {
     border-radius: 4px;
     cursor: not-allowed;
 }
+
+input[type="mine"], button[type="mine"] {
+    padding: 10px 20px; /* Spaziatura interna del pulsante */
+    color: white; /* Colore del testo bianco */
+    border: none; /* Rimuovi il bordo */
+    border-radius: 4px; /* Rendi i bordi arrotondati */
+    cursor: pointer; /* Mostra una mano quando si passa sopra il pulsante */
+}
+
