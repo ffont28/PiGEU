@@ -234,10 +234,10 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
 <?php
  if($_SERVER['REQUEST_METHOD']=='POST'){
-echo "ahiahiahi231";
+
         $targ = $_POST['hricercato'];
         if ($_POST['action'] == 'SPOSTA STUDENTE IN STORICO'){
-            echo "sPOST";
+
             echo "<script>console.log('Debug Objects: " . $targ . " sono qui2 ' );</script>";
 
             $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
@@ -246,7 +246,7 @@ echo "ahiahiahi231";
             $stmt->bindParam(':targ', $targ, PDO::PARAM_STR);
             $stmt->execute();
         }
-     echo "fuoriPOST";
+
         if ($_POST['action'] == 'MODIFICA ANAGRAFICA UTENTE') {
 
 

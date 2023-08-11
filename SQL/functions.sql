@@ -116,9 +116,61 @@ FROM calendario_esami c1
          INNER JOIN insegnamento_parte_di_cdl ip ON c1.insegnamento = ip.insegnamento
 --------------------------------------------
 ------------- VERSIONE CHE DOVREBBE FUNZIONARE!
+-- NO 2 ESAMI LO STESSO GIORNO SE SONO DELLO STESSO ANNO
+-- ed è caricata nel DB
 WITH esamipresenti AS (SELECT DISTINCT c1.insegnamento, ip.corso_di_laurea, ip.anno ,c1.data  FROM calendario_esami c1
                        INNER JOIN insegnamento_parte_di_cdl ip ON c1.insegnamento = ip.insegnamento),
     cdltarget AS (SELECT ip.corso_di_laurea, ip.anno FROM insegnamento_parte_di_cdl ip
                     WHERE ip.insegnamento = :target)
     SELECT * FROM esamipresenti e INNER JOIN cdltarget c ON e.corso_di_laurea = c.corso_di_laurea
     WHERE e.anno = :anno AND e.data = :data;
+
+--------------------------------------------------------------------------
+-- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [ANCHE ESAMI MAI SOSTENUTI, ANCHE DUPLICATI]
+--- va bene sia per lo studente
+CREATE OR REPLACE FUNCTION carriera_completa_tutti(S varchar) RETURNS TABLE (
+       studente varchar,
+       codins varchar,
+       nomins varchar,
+       voto varchar,
+       data varchar
+   ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT ic.studente,
+               ic.insegnamento,
+               i.nome,
+               CASE
+                   WHEN c.valutazione IS NULL THEN 'non sostenuto'
+                   ELSE c.valutazione::VARCHAR
+                   END,
+               CASE
+                   WHEN c.data IS NULL THEN 'non sostenuto'
+                   ELSE c.data::VARCHAR
+                   END
+        FROM insegnamenti_per_carriera ic
+                 LEFT JOIN carriera c ON ic.insegnamento = c.insegnamento
+                 INNER JOIN insegnamento i ON ic.insegnamento = i.codice
+        WHERE ic.studente = S;
+END;
+$$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------
+-- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
+--- va bene sia per lo studente
+CREATE OR REPLACE FUNCTION carriera_completa_esami_sostenuti(S varchar) RETURNS TABLE (
+                studente varchar,
+                codins varchar,
+                nomins varchar,
+                voto smallint,
+                data date
+            ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT ic.studente, ic.insegnamento, i.nome, c.valutazione, c.data
+        FROM insegnamenti_per_carriera ic
+                 INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
+                 INNER JOIN insegnamento i ON ic.insegnamento = i.codice
+        WHERE ic.studente = S;
+END;
+$$ LANGUAGE plpgsql;

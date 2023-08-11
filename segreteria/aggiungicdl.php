@@ -5,7 +5,7 @@ include('../conf.php');
 controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 ?>
 <!doctype html>
-<html lang="en" data-bs-theme="auto">
+<html lang="it" data-bs-theme="auto">
   <head>
     <?php importVari();?>
     <title>Inserimento nuovo utente</title>

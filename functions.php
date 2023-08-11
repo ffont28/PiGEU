@@ -87,6 +87,54 @@ if ($link == "/segreteria/rimuoviutente.php") {$gu_active = $active; $ru_disab =
 
 }
 
+function setNavbarStudente($link){
+    $active = "active"; $disabled = "disabled";
+    $h_active = $ie_active = $ca_active = $in_active = "";
+    $h_disab = $ie_disab = $ca_disab = $in_disab ="";
+    if ($link == "/studente/main.php") {$h_active = $active; $h_disab = $disabled;}
+    if ($link == "/studente/iscrizioneEsame.php") {$ie_active = $active; $ie_disab = $disabled;}
+    if ($link == "/studente/infoCdL.php") {$in_active = $active; $in_disab = $disabled;}
+    if ($link == "/studente/carriera.php") {$ca_active = $active; $ca_disab = $disabled;}
+//echo $link;
+    echo '    <!-- INIZIO NAVBAR -->
+<div class="container">
+      <ul class="nav nav-tabs">
+
+<li class="nav-item">
+  <a class="nav-link '.$h_active.' '.$h_disab.'" aria-current="page" href="main.php"><strong>🏠 HOME</strong></a>
+</li>
+<li class="nav-item">
+          <a class="nav-link '.$ie_active. ' '.$ie_disab.'" href="iscrizioneEsame.php" role="button" aria-expanded="true">
+          <strong>🧑‍🔧 ISCRIZIONE ESAMI</strong>
+          </a>
+</li>
+<li class="nav-item">
+          <a class="nav-link '.$ca_active. ' '.$ca_disab.'" href="carriera.php"  role="button" aria-expanded="true">
+          <strong>🧑‍🏫 LA TUA CARRIERA</strong>
+          </a>
+</li>
+<li class="nav-item">
+          <a class="nav-link '.$in_active. ' '.$in_disab.'" href="infoCdL.php" role="button" aria-expanded="true">
+          <strong>🎓 INFORMAZIONI SUI CORSI DI LAUREA</strong>
+          </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link disabled" aria-current="page" href="main.php">👤 '.$_SESSION['cognome'].'  '.$_SESSION['nome'].'</a>
+</li>
+<li class="nav-item dropdown">
+<div class="ml-auto logout-button">
+    <a class="nav-link rounded-pill btn btn-danger" id="navbarDropdown" role="button" 
+       href="../logout.php"><strong>🚪 LOGOUT</strong></a>
+</div>
+</li>
+      </ul>
+
+      </div>
+      <!-- FINE NAVBAR -->';
+
+}
+
+
 function open_pg_connection(){
     include_once('conf.php');
     $connection= "host=".myhost." dbname=".mydbname." user=".myuser." password=".mypassword;
@@ -224,6 +272,13 @@ function controller($tipo, $username, $password){
         header("Location: ../index.php");
     }
 
+    if ($tipo != "studente" && $tipo != "segreteria" && $tipo != "docente"){
+        error_log("TIPO UTENZA NON VALIDO");
+        echo "<script>alert('NON VALIDO');</script>";
+        header("Location: ../logout.php");
+        die();
+    }
+
     $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -235,7 +290,7 @@ function controller($tipo, $username, $password){
     $stmt->execute();
 
     if ($stmt->rowCount() == 0){
-        header("Location: logout.php");
+        header("Location: ../logout.php");
         echo "utente non autorizzato con le credenziali di " . $_SESSION['username']. " | " . $_SESSION['password'];
         die();
     }
