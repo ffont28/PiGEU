@@ -1,5 +1,6 @@
 ------------------------------------------------------------------------------
 ------ VERIFICA CHE IN UNA DATA d NON POSSANO ESSERE INSERITI DUE ESAMI DELLO STESSO ANNO
+----- sotto c'è la versione più aggiornata, questo trigger è stato DROPPED
 CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER as $$
 BEGIN
 --     PERFORM * FROM calendario_esami c
@@ -85,21 +86,22 @@ EXECUTE FUNCTION check_propedeuticita();
 
 -------------------------------------------------------------------------------
 ------ INSERISCI RIGHE NELLA TABELLA CARRIERA APPENA INSERITO UN NUOVO STUDENTE
-CREATE OR REPLACE FUNCTION inserisci_in_carriera() RETURNS TRIGGER as $$
+---------------------------------------------------------- trigger rimosso
+CREATE OR REPLACE FUNCTION inserisci_in_insegnamenti_per_carriera() RETURNS TRIGGER as $$
 BEGIN
     -- creo la carriera (con tutti i voti del CdL pari a 0) lo studente appena inserito
-    INSERT INTO carriera (studente, insegnamento, valutazione, data)
-    SELECT NEW.utente, i.insegnamento, NULL, NULL
+    INSERT INTO insegnamenti_per_carriera (studente, insegnamento, timestamp)
+    SELECT NEW.utente, i.insegnamento, CURRENT_TIMESTAMP
     FROM insegnamento_parte_di_cdl i
     WHERE i.corso_di_laurea = NEW.corso_di_laurea;
     RETURN NEW;
 END;
 $$ language 'plpgsql';
 
-CREATE OR REPLACE TRIGGER creazione_carriera
+CREATE OR REPLACE TRIGGER creazione_insegnamenti_per_carriera
     AFTER INSERT ON studente
     FOR EACH ROW
-EXECUTE FUNCTION inserisci_in_carriera();
+EXECUTE FUNCTION inserisci_in_insegnamenti_per_carriera();
 
 -------------------------------------------------------------------------------
 --- ANDRÀ AGGGIUNTO TRIGGER SUL CONTROLLO CHE UN VOTO INSERITO (MEMORIZZATO COME INTEGER) SIA COMPRESO TRA 0 E 30
@@ -157,3 +159,26 @@ CREATE OR REPLACE TRIGGER no_esami_senza_propedeuticita
     BEFORE UPDATE ON carriera
     FOR EACH ROW
 EXECUTE FUNCTION check_voto_valido();
+--------------------------------------------------------------------
+-- VERIFICA CHE NEL MOMENTO DELLA REGISTRAZIONE DEL VOTO IN CARRIERA, QUEL VOTO SIA DI UN
+-- INSEGNAMENTO CHE APPARTIENE AL CDL A CUI LO STUDENTE È ISCRITTO
+CREATE OR REPLACE FUNCTION check_registrazione_carriera() RETURNS TRIGGER as $$
+BEGIN
+    PERFORM studente, insegnamento FROM insegnamenti_per_carriera
+        WHERE insegnamento = NEW.insegnamento AND studente = NEW.studente;
+    IF FOUND THEN
+        -- si vuole verbalizzare un voto di insegnamento presente nel calendario insegnamenti a cui appartiene studente
+        RETURN NEW;
+    ELSE
+        -- l'esame che si vuole inserire in calendario_esami NON è presente nel cdL
+        RAISE NOTICE 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui è iscritto lo studente';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui è iscritto lo studente');
+        RETURN NULL;
+    END IF;
+END;
+$$ language 'plpgsql';
+
+CREATE OR REPLACE TRIGGER registrazione_in_carriera
+    BEFORE INSERT OR UPDATE ON carriera -- metto anche UPDATE PERCHÈ SE L'ins VIENE RIMOSSO, IL VOTO NON PUÒ ESSERE TOCCATO
+    FOR EACH ROW
+EXECUTE FUNCTION check_registrazione_carriera();
