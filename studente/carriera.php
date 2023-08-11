@@ -21,20 +21,23 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
 
 <div class="photo-container" style="margin: 30px">
     <div>
-        Corso di Laurea:
-        <?php
+
+<?php
         try {
             $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-            $query = "SELECT c.nome, c.tipo FROM studente s
+            $query = "SELECT c.nome nomecdl , c.tipo, s.matricola, u.nome, u.cognome FROM studente s
+                      INNER JOIN utente u ON s.utente = u.email
                       INNER JOIN corso_di_laurea c ON s.corso_di_laurea = c.codice
                       WHERE s.utente = :studente";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':studente', $_SESSION['username']);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($result) {
-                echo $result['nome']."<br>"; ?>
-        Tipo di laurea:
+            if ($result) {?>
+
+                <a>CdL:<?php echo $result['nomecdl']."<br>"; ?></a>
+         tipo:
+
                 <?php
                 echo $result['tipo'];
             } else {
