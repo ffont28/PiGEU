@@ -125,6 +125,17 @@
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
 }
 
+.career-structure {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Divide la griglia in due colonne, l'immagine occupa una e il testo l'altra */
+    grid-gap: 20px; /* Spazio tra le colonne */
+    align-items: center; /* Allinea verticalmente al centro */
+    border: 2px solid #ccc;
+    padding: 13px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+}
+
 
 .photo {
     width: 200px; /* Larghezza fissa desiderata */
