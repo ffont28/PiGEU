@@ -155,9 +155,9 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                           INNER JOIN calendario_esami c ON c.insegnamento = :insegnamento
                                                         AND c.data = :data
                           INNER JOIN iscrizione i ON i.studente = u.email
-                          INNER JOIN carriera ca ON ca.data <> :data 
-                                                 AND ca.studente = u.email
-                                                 AND ca.insegnamento = c.insegnamento
+                         -- INNER JOIN carriera ca ON ca.data <> :data 
+                         --                        AND ca.studente = u.email
+                         --                        AND ca.insegnamento = c.insegnamento
                           ";
 
                 $stmt = $conn->prepare($query);

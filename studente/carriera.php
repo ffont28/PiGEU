@@ -118,7 +118,9 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
 
         <div class="photo-container-my">
             Scarica la tua carriera in formato PDF
-            <form action="#" method="post" enctype="multipart/form-data">
+            <form action="../generaPDF2.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="action" value="carriera_valida">
+                <input type="hidden" name="utente" value="<?php echo $_SESSION['username']?>">
                 <button type="submit" name="submit" class="btn btn-primary mt-3 background-green">DOWNLOAD</button>
             </form>
         </div>
