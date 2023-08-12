@@ -22,7 +22,7 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
     $stmt->bindParam(':studente', $studente);
 
     $stmt->execute();
-    if ($stmt->rowCount() == 0) {
+    if ($stmt->rowCount() == 0 && $_POST['action'] == 'carriera_valida') {
         ?>
         <div class="alert alert-warning" role="alert">
             Nessun insegnamento trovato in carriera per <?php echo $studente ?>

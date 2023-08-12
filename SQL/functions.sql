@@ -29,7 +29,7 @@ BEGIN
 
   -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
   DELETE FROM utente where email = $1;
-
+  DELETE FROM carriera where studente = $1;
   -- le seguenti operazioni sono fatte già in CASCADE
         -- cancello i dati dalla tabella studente dopo averli spostati in stutente_storico
         -- DELETE FROM studente WHERE utente = $1;
