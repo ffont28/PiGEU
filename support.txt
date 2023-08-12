@@ -1,0 +1,13 @@
+Architettura degli elaboratori i;55.23.1;Borghese Nunzio Alberto;non sostenuto;non sostenuto
+Statistica e analisi dei dati;97.23.1;Malchiodi Dario;non sostenuto;non sostenuto
+Basi di dati;51.23.1;Montanelli Stefano;non sostenuto;non sostenuto
+Matematica del Continuo;59.23.1;Cavaterra Cecilia;non sostenuto;non sostenuto
+Architettura degli elaboratori ii;77.23.1;Borghese Nunzio Alberto;non sostenuto;non sostenuto
+Linguaggi Formali e Automi;116.23.1;Palano Beatrice Santa;non sostenuto;non sostenuto
+Programmazione;56.23.1;Boldi Paolo;non sostenuto;non sostenuto
+Logica matematica;115.23.1;Aguzzoli Stefano;non sostenuto;non sostenuto
+Matematica del Discreto;88.23.1;Oestvaer Paul Arne;non sostenuto;non sostenuto
+Algoritmi e strutture dati;52.23.1;Pighizzini Giovanni;non sostenuto;non sostenuto
+Programmazione ii;125.23.1;Santini Massimo;non sostenuto;non sostenuto
+Sistemi operativi;98.23.1;Piuri Vincenzo;non sostenuto;non sostenuto
+Insegnamento ;TEST;Aguzzoli Stefano;non sostenuto;non sostenuto

@@ -1,38 +1,20 @@
-<?php session_start(); ?>
+<?php
+session_start();
+include('../functions.php');
+include('../conf.php');
+controller("docente", $_SESSION['username'], $_SESSION['password']);
+?>
 <!doctype html>
 <html lang="it" data-bs-theme="auto">
 <head>
-    <!-- import di Bootstrap-->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" href="../css/from-re.css">
-    <link rel="stylesheet" href="../css/cssSegreteria.css">
-    <link rel="stylesheet" href="../css/calendarioesami.css">
-    <script src="../js/general.js"></script>
-    <!--   <script src="../js/calendarioesami.js"></script> -->
-
-    <meta charset="utf-8">
+    <?php importVari();?>
     <title>Verbalizzazione · PiGEU</title>
 </head>
 
 
 <body>
 <!-- INIZIO NAVBAR -->
-<ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a class="nav-link " aria-current="page" href="main.php">Homepage</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="../modificaPassword.php">Modifica la tua password</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="calendarioEsami.php">Gestisci Calendario Esami</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="verbalizzazione.php">Verbalizza esiti</a>
-    </li>
-</ul>
+<?php setNavbarDocente($_SERVER['REQUEST_URI']);?>
 <!-- FINE NAVBAR -->
 
 <h1> PAGINA DI VERBALIZZAZIONE ESITI</h1>
@@ -155,9 +137,9 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                           INNER JOIN calendario_esami c ON c.insegnamento = :insegnamento
                                                         AND c.data = :data
                           INNER JOIN iscrizione i ON i.studente = u.email
-                          INNER JOIN carriera ca ON ca.data <> :data 
-                                                 AND ca.studente = u.email
-                                                 AND ca.insegnamento = c.insegnamento
+                         -- INNER JOIN carriera ca ON ca.data <> :data 
+                         --                        AND ca.studente = u.email
+                         --                        AND ca.insegnamento = c.insegnamento
                           ";
 
                 $stmt = $conn->prepare($query);

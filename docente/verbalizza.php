@@ -15,8 +15,7 @@ if (isset($_POST['insegnamento'])
     $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     // Query per eliminare la riga dal database
-    $sql = "UPDATE carriera SET valutazione = :v, data = :d 
-            WHERE studente = :s AND insegnamento = :i ";
+    $sql = "INSERT INTO carriera (studente, insegnamento, valutazione, data)  VALUES (:s, :i, :v, :d)";
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':s', $studente, PDO::PARAM_STR);
     $stmt->bindParam(':i', $insegnamento, PDO::PARAM_STR);

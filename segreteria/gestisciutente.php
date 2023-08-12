@@ -1,37 +1,19 @@
+<?php
+session_start();
+include('../functions.php');
+include('../conf.php');
+controller("segreteria", $_SESSION['username'], $_SESSION['password']);
+?>
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
   <head>
-<!-- import di Bootstrap-->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-
-
-<script src="../js/gestisciutente.js"></script>
-<script src="../js/segreteria.js"></script>
-<link rel="stylesheet" href="../css/cssSegreteria.css">
-<link rel="stylesheet" href="../css/from-re.css">
-
-    <meta charset="utf-8">
-
+      <?php importVari();?>
     <title>Gestione utente</title>
 
   </head>
   <body>
-  <!-- INIZIO NAVBAR  -->
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link" aria-current="page" href="../segreteria.php">Homepage</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link active" href="/segreteria/aggiungiutente.php">Aggiungi Utenza</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Inserisci corso di laurea</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Modifica Corso di Laurea</a>
-    </li>
-  </ul>
+  <!-- INIZIO NAVBAR -->
+  <?php setNavbarSegreteria($_SERVER['REQUEST_URI']);?>
   <!-- FINE NAVBAR -->
   <h1>PAGINA DI GESTIONE UTENZA</h1>
 
@@ -46,8 +28,7 @@
 </form>
 
 <?php
-     include('../conf.php');
-     include('../functions.php');
+
      $ricercato="";
 
 echo '<script>console.log("sono qui")</script>'; //////////////////////////////////////////////////////////////
@@ -58,8 +39,6 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
     if (!empty($_GET["search"])){
     $ricercato = $_GET['search'];
-
-
 
     try {
         // Connessione al database utilizzando PDO
@@ -255,8 +234,10 @@ echo '<script>console.log("sono qui")</script>'; ///////////////////////////////
 
 <?php
  if($_SERVER['REQUEST_METHOD']=='POST'){
+
         $targ = $_POST['hricercato'];
-        if ($_POST['action'] == 'SPOSTA UTENTE IN STORICO'){
+        if ($_POST['action'] == 'SPOSTA STUDENTE IN STORICO'){
+
             echo "<script>console.log('Debug Objects: " . $targ . " sono qui2 ' );</script>";
 
             $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);

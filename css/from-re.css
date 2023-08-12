@@ -326,3 +326,7 @@ td, th {
 tr:nth-child(even) {
   background-color: #dddddd;
 }
+
+.table-container {
+  margin: 0 23px; /* Margine di 23px da entrambi i lati */
+}

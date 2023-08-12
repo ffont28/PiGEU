@@ -1,44 +1,22 @@
+<?php
+session_start();
+include('../functions.php');
+include('../conf.php');
+controller("segreteria", $_SESSION['username'], $_SESSION['password']);
+?>
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
   <head>
-<!-- import di Bootstrap-->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-
-
-<script src="../js/segreteria.js"></script>
-<link rel="stylesheet" href="../css/cssSegreteria.css">
-<link rel="stylesheet" href="../css/from-re.css">
-
-    <meta charset="utf-8">
-
-    <title>Inserimento nuovo insegnamento</title>
-
-
+      <?php importVari();?>
+      <title>Inserimento nuovo insegnamento</title>
   </head>
   <body>
-  <!-- INIZIO NAVBAR  -->
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link" aria-current="page" href="../segreteria.php">Homepage</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/segreteria/aggiungiutente.php">Inserisci Utenza</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link active" href="segreteria/aggiungiinsegnamento.php">Inserisci Insegnamento</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="aggiungicdl.php">Inserisci corso di laurea</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link disabled" aria-disabled="true">Modifica Corso di Laurea</a>
-    </li>
-  </ul>
-  <!-- FINE NAVBAR -->
+
+  <?php setNavbarSegreteria($_SERVER['REQUEST_URI']);?>
+
   INSERIMENTO DI UN NUOVO INSEGNAMENTO
 
-<form method="post" >
+<form method="post" action="#" >
     <div class="center">
         <div class="mb-3">
           <label for="exampleFormControlInput1" class="form-label">Nome dell'insegnamento</label>
@@ -153,7 +131,7 @@
         </select>
  </div>
     <script>
-    function updateSecondMenutendina() {
+    function updateSecondMenutendina1() {
                 console.log("richiesta funzione1"); ////////////////////////////////////////////////////////////////////////////
                 var cdl = document.getElementById("cdl");
                 var anno = document.getElementById("anno");
@@ -167,7 +145,7 @@
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                     console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
                         if (xhr.status === 200) {
-                               console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
+                               console.log("CONNESSO OK QUERY ANNO LAUREA"); /////////////////////////////////////////////////////////////////////
                             // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
                             anno.innerHTML = xhr.responseText;
                         } else {
@@ -183,10 +161,10 @@
             }
 
             // Aggiungi un ascoltatore di eventi per il menù a tendina 1
-            document.getElementById("cdl").addEventListener('change', updateSecondMenutendina);
+            document.getElementById("cdl").addEventListener('change', updateSecondMenutendina1);
 
             // Inizializza il contenuto del secondo menù a tendina inizialmente
-            updateSecondMenutendina();
+            updateSecondMenutendina1();
     </script>
 
 
@@ -212,7 +190,7 @@
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                     console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
                         if (xhr.status === 200) {
-                               console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
+                               console.log("CONNESSO OK PROP"); /////////////////////////////////////////////////////////////////////
                             // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
                             prop.innerHTML = xhr.responseText;
                         } else {
@@ -243,12 +221,12 @@
 
 
 <?php
- if($_SERVER['REQUEST_METHOD']=='POST'){
 
-    include('../functions.php');
+if($_SERVER['REQUEST_METHOD']=='POST') {
+
     $db = open_pg_connection();
 
-    // definisco le variabili
+    //    definisco le variabili
     $codice = $_POST['codice'];
     $nome = $_POST['nome'];
     $anno = $_POST['anno'];
@@ -258,6 +236,16 @@
     $cdl = $_POST['cdl'];
     $prop = $_POST['prop'];
 
+
+//
+//    $codice = "23";
+//    $nome = "VENTITRE";
+//    $anno = 3;
+//    $descrizione = " ";
+//    $cfu = '3';
+//    $responsabile = "stefano.aguzzoli@unimi.it";
+//    $cdl = "F1X";
+//    $prop = "no";
 
 
     // inserimento dell'insegnamento nella tabella insegnamento
