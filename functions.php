@@ -153,6 +153,47 @@ function setNavbarStudente($link){
 
 }
 
+function setNavbarDocente($link){
+    $active = "active"; $disabled = "disabled";
+    $h_active = $ce_active = $ve_active  = "";
+    $h_disab = $ce_disab = $ve_disab = "";
+    if ($link == "/docente/main.php") {$h_active = $active; $h_disab = $disabled;}
+    if ($link == "/docente/calendarioEsami.php") {$ce_active = $active; $ce_disab = $disabled;}
+    if ($link == "/docente/verbalizzazione.php") {$ve_active = $active; $ve_disab = $disabled;}
+//echo $link;
+    echo '    <!-- INIZIO NAVBAR -->
+<div class="container">
+      <ul class="nav nav-tabs">
+
+<li class="nav-item">
+  <a class="nav-link '.$h_active.' '.$h_disab.'" aria-current="page" href="main.php"><strong>🏠 HOME</strong></a>
+</li>
+<li class="nav-item">
+          <a class="nav-link '.$ce_active. ' '.$ce_disab.'" href="calendarioEsami.php" role="button" aria-expanded="true">
+          <strong>🧑‍🔧 GESTIONE CALENDARIO ESAMI</strong>
+          </a>
+</li>
+<li class="nav-item">
+          <a class="nav-link '.$ve_active. ' '.$ve_disab.'" href="verbalizzazione.php"  role="button" aria-expanded="true">
+          <strong>🧑‍🏫 VERBALIZZAZIONE APPELLI D\'ESAME</strong>
+          </a>
+</li>
+<li class="nav-item">
+  <a class="nav-link disabled" aria-current="page" href="main.php">👤 '.$_SESSION['cognome'].'  '.$_SESSION['nome'].'</a>
+</li>
+<li class="nav-item dropdown">
+<div class="ml-auto logout-button">
+    <a class="nav-link rounded-pill btn btn-danger" id="navbarDropdown" role="button" 
+       href="../logout.php"><strong>🚪 LOGOUT</strong></a>
+</div>
+</li>
+      </ul>
+
+      </div>
+      <!-- FINE NAVBAR -->';
+
+}
+
 
 function open_pg_connection(){
     include_once('conf.php');
@@ -211,7 +252,7 @@ function check_login($user, $password){
 
     } else {
         header("Location: 404.php");
-        return "ci hai provato!";
+        return "non sei né SEGRETERIA né STUDENTE né DOCENTE!";
     }
     echo "<script>console.log('Debug Objects: " . $_SESSION['nome'] . " sono qui2 ' );</script>";
 

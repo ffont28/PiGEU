@@ -14,11 +14,6 @@
 <!-- INIZIO NAVBAR -->
 <?php setNavbarStudente($_SERVER['REQUEST_URI']);?>
 <!-- FINE NAVBAR -->
-<h1>Benvenuto <?php echo $_SESSION['nome']." ".$_SESSION['cognome'] ?></h1>
-
-<form action="../index.php" method="post">
-    <input type="submit" name="logout" class="button1 black" value="logout" />
-</form>
-
+<?php include('../infoHomepage.php')?>
 </body>
 </html>

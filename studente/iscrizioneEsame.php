@@ -182,12 +182,13 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
             $stmt2->execute();
 
             $isVerbalizzato = $stmt2->rowCount() > 0; // true se l'utente è iscritto, false altrimenti
+            $dataf = $row['data'] == "non sostenuto" ? "non sostenuto" : date("d/m/Y", strtotime($row['data']));
 
             $tableHTML .= '<tr>
                     <th scope="row">' . $counter++ . '</th>
                     <td>' . $row["codice"] . '</td>
                     <td>' . $row["nome"] . '</td>
-                    <td>' . $row["data"] . '</td>
+                    <td>' . $dataf . '</td>
                     <td>' . $row["ora"] . '</td>
                     <td>';
             if ($isVerbalizzato) {
