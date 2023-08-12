@@ -128,18 +128,30 @@ WITH esamipresenti AS (SELECT DISTINCT c1.insegnamento, ip.corso_di_laurea, ip.a
 --------------------------------------------------------------------------
 -- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [ANCHE ESAMI MAI SOSTENUTI, ANCHE DUPLICATI]
 --- va bene sia per lo studente
-CREATE OR REPLACE FUNCTION carriera_completa_tutti(S varchar) RETURNS TABLE (
+CREATE OR REPLACE FUNCTION carriera_completa_tutti(TARGET varchar) RETURNS TABLE (
        studente varchar,
+       nomstu varchar,
+       cogstu varchar,
+       cdl varchar,
+       matr integer,
        codins varchar,
        nomins varchar,
+       nomdoc varchar,
+       cogdoc varchar,
        voto varchar,
        data varchar
    ) AS $$
 BEGIN
     RETURN QUERY
         SELECT ic.studente,
+               u2.nome nomstu,
+               u2.cognome cogstu,
+               cdl.nome cdl,
+               s.matricola matr,
                ic.insegnamento,
                i.nome,
+               u.nome nomedoc,
+               u.cognome cogndoc,
                CASE
                    WHEN c.valutazione IS NULL THEN 'non sostenuto'
                    ELSE c.valutazione::VARCHAR
@@ -150,27 +162,53 @@ BEGIN
                    END
         FROM insegnamenti_per_carriera ic
                  LEFT JOIN carriera c ON ic.insegnamento = c.insegnamento
+                 INNER JOIN docente_responsabile d ON d.insegnamento = ic.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente u2 ON ic.studente = u2.email
+                 INNER JOIN studente s ON ic.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
                  INNER JOIN insegnamento i ON ic.insegnamento = i.codice
-        WHERE ic.studente = S;
+        WHERE ic.studente = TARGET;
 END;
 $$ LANGUAGE plpgsql;
 
 --------------------------------------------------------------------------
 -- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
 --- va bene sia per lo studente
-CREATE OR REPLACE FUNCTION carriera_completa_esami_sostenuti(S varchar) RETURNS TABLE (
+CREATE OR REPLACE FUNCTION carriera_completa_esami_sostenuti(TARGET varchar) RETURNS TABLE (
                 studente varchar,
+                nomstu varchar,
+                cogstu varchar,
+                cdl varchar,
+                matr integer,
                 codins varchar,
                 nomins varchar,
+                nomdoc varchar,
+                cogdoc varchar,
                 voto smallint,
                 data date
             ) AS $$
 BEGIN
     RETURN QUERY
-        SELECT ic.studente, ic.insegnamento, i.nome, c.valutazione, c.data
+        SELECT ic.studente,
+               u2.nome nomstu,
+               u2.cognome cogstu,
+               cdl.nome cdl,
+               s.matricola matr,
+               ic.insegnamento,
+               i.nome,
+               u.nome nomedoc,
+               u.cognome cogndoc,
+               c.valutazione,
+               c.data
         FROM insegnamenti_per_carriera ic
                  INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
+                 INNER JOIN docente_responsabile d ON d.insegnamento = ic.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente u2 ON ic.studente = u2.email
+                 INNER JOIN studente s ON ic.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
                  INNER JOIN insegnamento i ON ic.insegnamento = i.codice
-        WHERE ic.studente = S;
+        WHERE ic.studente = TARGET;
 END;
 $$ LANGUAGE plpgsql;

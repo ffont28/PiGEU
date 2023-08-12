@@ -1,0 +1,2 @@
+Questo è il contenuto del file di testo.
+Puoi scrivere qualsiasi cosa qui.

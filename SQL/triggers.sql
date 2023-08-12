@@ -40,10 +40,8 @@ EXECUTE FUNCTION check_inserimento_esame();
 CREATE OR REPLACE FUNCTION check_appartenenza_cdl() RETURNS TRIGGER as $$
 BEGIN
     PERFORM * FROM calendario_esami c
-            INNER JOIN iscrizione i ON c.id = i.esame
-            INNER JOIN insegnamento_parte_di_cdl ipc ON ipc.insegnamento = c.insegnamento
-            INNER JOIN studente s ON s.corso_di_laurea = ipc.corso_di_laurea
-            WHERE s.utente = NEW.studente;
+            INNER JOIN insegnamenti_per_carriera ipc ON ipc.insegnamento = c.insegnamento
+            WHERE ipc.studente = NEW.studente;
     IF FOUND THEN
         -- l'esame che si vuole inserire in calendario_esami è presente nel cdL
         RETURN NEW;

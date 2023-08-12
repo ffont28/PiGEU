@@ -21,12 +21,21 @@ function importVari(){
 }
 function setNavbarSegreteria($link){
 $active = "active"; $disabled = "disabled";
-$h_active = $gu_active = $gi_active = $gc_active = "";
-$h_disab = $au_disab = $ai_disab = $ac_disab = $mu_disab = $mi_disab = $mc_disab = $ru_disab = $ri_disab = $rc_disab ="";
+$h_active = $gu_active = $gi_active = $gc_active = $ce_active ="";
+$h_disab = $au_disab = $ai_disab = $ac_disab = $mu_disab = $mi_disab =
+           $mc_disab = $ru_disab = $ri_disab = $rc_disab = $cv_disab = $cc_disab ="";
 if ($link == "/segreteria/main.php") {$h_active = $active; $h_disab = $disabled;}
 if ($link == "/segreteria/aggiungiutente.php") {$gu_active = $active; $au_disab = $disabled;}
 if ($link == "/segreteria/gestisciutente.php") {$gu_active = $active; $mu_disab = $disabled;}
 if ($link == "/segreteria/rimuoviutente.php") {$gu_active = $active; $ru_disab = $disabled;}
+if ($link == "/segreteria/aggiungiinsegnamento.php") {$gi_active = $active; $ai_disab = $disabled;}
+if ($link == "/segreteria/modificainsegnamento.php") {$gi_active = $active; $mi_disab = $disabled;}
+if ($link == "/segreteria/rimuoviinsegnamento.php") {$gi_active = $active; $ri_disab = $disabled;}
+if ($link == "/segreteria/aggiungicdl.php") {$gc_active = $active; $ac_disab = $disabled;}
+if ($link == "/segreteria/modificacdl.php") {$gc_active = $active; $mc_disab = $disabled;}
+if ($link == "/segreteria/rimuovicdl.php") {$gc_active = $active; $rc_disab = $disabled;}
+if ($link == "/segreteria/generacarrieravalida.php") {$ce_active = $active; $cv_disab = $disabled;}
+if ($link == "/segreteria/generacarrieracompleta.php") {$ce_active = $active; $cc_disab = $disabled;}
 //echo $link;
     echo '    <!-- INIZIO NAVBAR -->
 <div class="container">
@@ -70,6 +79,16 @@ if ($link == "/segreteria/rimuoviutente.php") {$gu_active = $active; $ru_disab =
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item '.$rc_disab.'" href="rimuovicdl.php">RimozioneCorso di Laurea</a></li>
           </ul>
+</li>
+<li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle '.$ce_active.'" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+          <strong>📄 CERTIFICAZIONI</strong>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown" data-bs-popper="none">
+            <li><a class="dropdown-item '.$cv_disab.'" href="generacarriera.php">Genera certificato di carriera</a></li>
+      <!--      <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item '.$cc_disab.'" href="generacarrieracompleta.php">Genera altri certificati</a></li>
+     -->  </ul>
 </li>
 <li class="nav-item">
   <a class="nav-link disabled" aria-current="page" href="main.php">👤 '.$_SESSION['cognome'].'  '.$_SESSION['nome'].'</a>
