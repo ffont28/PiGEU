@@ -1,9 +1,23 @@
+% UN PO DI IMPORT
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \graphicspath{ {./images/} }
 \usepackage[svgnames]{xcolor}
 \usepackage{listings}
+\usepackage{xcolor} % Per il colore del testo
+\usepackage{fontawesome5}
+
+
+% Definizione del nuovo comando
+\newcommand{\tabb}[1]{\texttt{\textcolor{blue}{#1}}}
+\newcommand{\tab}[1]{\texttt{\textcolor{cyan}{#1}}}
+\newcommand{\attr}[1]{\texttt{\textcolor{gray}{#1}}}
+\newcommand{\m}[1]{\texttt{}}
+\newcommand{\und}[0]{\textunderscore}
+\newcommand{\alert}[0]{\textcolor{red}{\faExclamationCircle}}
+\newcommand{\danger}[0]{\textcolor{red}{\faExclamationCircle}}
+
 
 \title{PiGEU\\ Piattaforma per la Gestione degli Esami Universitari}
 %\subtitle{DOCUMENTAZIONE TECNICA}
@@ -13,186 +27,70 @@
 
 \begin{document}
 
-\maketitle
-\begin{abstract}
+    \maketitle
+    \begin{abstract}
 
-La Piattaforma per la Gestione degli Esami Universitari, d'ora in poi chiamata PiGEU per comodità, è una soluzione che permette di gestire
-uno scenario universitario in cui siano presenti insegnamenti e corsi di laurea, docenti, studenti e segretari, iscrizioni e verbalizzazioni
-ai diversi appelli di esame di ogni insegnamento, generazione di documentazioni valide per gli studenti quali i certificati di carriera, visibili
-o anche scaricabili in formato PDF.
+        La Piattaforma per la Gestione degli Esami Universitari, d'ora in poi chiamata PiGEU per comodità, è una soluzione che permette di gestire
+        uno scenario universitario in cui siano presenti insegnamenti e corsi di laurea, docenti, studenti e segretari, iscrizioni e verbalizzazioni
+        ai diversi appelli di esame di ogni insegnamento, generazione di documentazioni valide per gli studenti quali i certificati di carriera, visibili
+        o anche scaricabili in formato PDF.
 
-PiGEU, nel suo complesso, abbraccia principalmente tre tecnologie, quali:
-\begin{itemize}
-    \item \textbf{PostgreSQL} per la gestione del database nel quale tramite \emph{tabelle} vi è la memorizzazione dei dati di tutte
-le entità coinvolte, tramite \emph{trigger} vengono controllate alcune proprietà della base di dati per preservare la consistenza dell'informazione e rispettare le specifiche fornite
-    \item \textbf{HTML} come linguaggio di markup per rendere l'accesso ai dati maggiormente fruibile e comprensibile da parte dell'utente, rappresentando i dati in forma testuale o grafica (tabelle) e consentendo la possibilità di interrogare la base di dati mediante bottoni. Questo linguaggio è usato per rendere PiGEU maggiormente \emph{user-friendly}
-    \item \textbf{PHP} linguaggio di scripting server-side che "abbraccia" le due tecnologie sopra indicate, utilizzato per:
-    \begin{itemize}
-        \item eseguire in linguaggio SQL-DML le interrogazioni al database che vengono fatte da parte dell'utente tramite la compilazione di form in HTML, inviate tramite la pressione di bottoni HTML
-        \item realizzare documenti in PDF tramite l'apposita libreria TCPDF
-    \end{itemize}
-    \item \textbf{javascript}, linguaggio di scripting (usato in questo caso per la parte client-side) che è stato utilizzato per
-    \begin{itemize}
-        \item eseguire chiamate AJAX migliorando la performance di navigazione
-        \item eseguire interrogazioni al database in maniera più semplice, senza la pressione di bottoni di submit ma solamente con la digitazione da tastiera ad esempio durante la ricerca di una utenza
-    \end{itemize}
-\end{itemize}
-L'intero sviluppo del progetto in tutte le sue fasi, è documentato in un apposito repository di Github al seguente link \url{https://github.com/ffont28/PiGEU } di cui qui sotto viene mostrata un'immagine indicante gli stati di commit
-\includegraphics[scale=0.437]{images/PiGEU-history.png}
-\end{abstract}
+        PiGEU, nel suo complesso, abbraccia principalmente quattro tecnologie, quali:
+        \begin{itemize}
+            \item \textbf{PostgreSQL} per la gestione del database nel quale tramite \emph{tabelle} vi è la memorizzazione dei dati di tutte
+            le entità coinvolte, tramite \emph{trigger} vengono controllate alcune proprietà della base di dati per preservare la consistenza dell'informazione e rispettare le specifiche fornite
+            \item \textbf{HTML} come linguaggio di markup per rendere l'accesso ai dati maggiormente fruibile e comprensibile da parte dell'utente, rappresentando i dati in forma testuale o grafica (tabelle) e consentendo la possibilità di interrogare la base di dati mediante bottoni. Questo linguaggio è usato per rendere PiGEU maggiormente \emph{user-friendly}
+            \item \textbf{PHP} linguaggio di scripting server-side che "abbraccia" le due tecnologie sopra indicate, utilizzato per:
+            \begin{itemize}
+                \item eseguire in linguaggio SQL-DML le interrogazioni al database che vengono fatte da parte dell'utente tramite la compilazione di form in HTML, inviate tramite la pressione di bottoni HTML
+                \item realizzare documenti in PDF tramite l'apposita libreria TCPDF
+            \end{itemize}
+            \item \textbf{Javascript}, linguaggio di scripting (usato in questo caso per la parte client-side) che è stato utilizzato per
+            \begin{itemize}
+                \item eseguire chiamate AJAX migliorando la performance di navigazione
+                \item eseguire interrogazioni al database in maniera più semplice, senza la pressione di bottoni di submit ma solamente con la digitazione da tastiera ad esempio durante la ricerca di una utenza
+            \end{itemize}
+        \end{itemize}
+        L'intero sviluppo del progetto in tutte le sue fasi, è documentato in un apposito repository di Github al seguente link \url{https://github.com/ffont28/PiGEU } di cui qui sotto viene mostrata un'immagine indicante gli stati di commit
+        \includegraphics[scale=0.437]{images/PiGEU-history.png}
+    \end{abstract}
 
-\section{Schema concettuale (ER) della base di dati}
-Di seguito lo schema concettuale alla base della progettazione della base di dati.
-Lo schema seguente è stato successivamente ristrutturato per la realizzazione dello schema logico, dato che la relazione in linguaggio SQL-DDL viene espressa con una tabella.
-
-
-\includegraphics[scale=0.25]{images/SchemaER_PiGEU.png}
-
-\section{Schema logico (relazionale) della base di dati}
-Di seguito viene fornito lo schema logico della base di dati di PiGEU, tramite i comandi DDL utilizzati. Vengono fornite le tabelle del database in ordine alfabetico
-\pagebreak
-
-\lstset{
-basicstyle=\footnotesize,
-keywordstyle=\color{MidnightBlue}\bfseries,
-identifierstyle=\color{Purple},
-commentstyle=\color{Green}\itshape,
-stringstyle=\color{Red}\ttfamily,
-showstringspaces=false,
-numbers=left, numberstyle=\tiny,
-stepnumber=1, numbersep=5pt,
-tabsize=4,
-framexleftmargin=5mm, rulesepcolor=\color{LightGray},
-frame=LtBr,
-language={SQL}, ##
-mathescape=true,
-fontadjust=true,
-breaklines=true,breakatwhitespace=true,breakautoindent
-}
+    \section{Schema concettuale (ER) della base di dati}
+    Di seguito lo schema concettuale alla base della progettazione della base di dati.
+    Lo schema seguente è stato successivamente ristrutturato per la realizzazione dello schema logico, dato che la relazione in linguaggio SQL-DDL viene espressa con una tabella.
 
 
-\begin{lstlisting}[
-language={SQL},
-title={Calendario Esami}]
-CREATE TABLE public.calendario_esami (
-    insegnamento character varying(10) NOT NULL,
-    data date NOT NULL,
-    ora time without time zone NOT NULL,
-    id serial PRIMARY KEY,
-    FOREIGN KEY (insegnamento) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE
-);
-\end{lstlisting}
+    \includegraphics[scale=0.25]{images/SchemaER_PiGEU.png}
 
-\begin{lstlisting}[
-language={SQL},
-title={Carriera}]
-CREATE TABLE public.carriera (
-    studente character varying(50) NOT NULL,
-    insegnamento character varying(10) NOT NULL,
-    valutazione smallint,
-    data date NOT NULL,
-    PRIMARY KEY (studente, data, insegnamento),
-    FOREIGN KEY (studente, insegnamento) REFERENCES public.insegnamenti_per_carriera(studente, insegnamento) ON UPDATE CASCADE ON DELETE CASCADE
-);
-\end{lstlisting}
+    \section{Schema logico (relazionale) della base di dati}
+    Di seguito viene fornito lo schema logico della base di dati di PiGEU, tramite i comandi DDL utilizzati. La base di dati contiene 19 tabelle: per ognuna di esse verrà eventualmente fornito qualche commento per spiegare al meglio le scelte implementative derivanti dalle specifiche assegnate
+    \pagebreak
 
-\begin{lstlisting}[
-language={SQL},
-title={Carriera Storico}]
-CREATE TABLE public.carriera_storico (
-    studente character varying(50) NOT NULL,
-    insegnamento character varying(10) NOT NULL,
-    valutazione smallint,
-    data date NOT NULL,
-    PRIMARY KEY (studente, insegnamento, data),
-    FOREIGN KEY (studente) REFERENCES public.studente_storico(utente) ON UPDATE CASCADE ON DELETE CASCADE
-);
-\end{lstlisting}
+    \lstset{
+        basicstyle=\footnotesize,
+        keywordstyle=\color{MidnightBlue}\bfseries,
+        identifierstyle=\color{Purple},
+        commentstyle=\color{Green}\itshape,
+        stringstyle=\color{Red}\ttfamily,
+        showstringspaces=false,
+        numbers=left, numberstyle=\tiny,
+        stepnumber=1, numbersep=5pt,
+        tabsize=4,
+        framexleftmargin=5mm, rulesepcolor=\color{LightGray},
+        frame=LtBr,
+        language={SQL}, ##
+        mathescape=true,
+        fontadjust=true,
+        breaklines=true,breakatwhitespace=true,breakautoindent
+    }
 
-\begin{lstlisting}[
-language={SQL},
-title={Corso di Laurea}]
-CREATE TABLE public.corso_di_laurea (
-    codice character varying(5) NOT NULL,
-    nome character varying(50),
-    tipo character varying(50),
-    PRIMARY KEY (codice)
-);
-\end{lstlisting}
+    \begin{enumerate}
+        \item La tabella \textbf{Utente} contiene i dati di qualsiasi utente, che sia di tipo \emph{segreteria}, \emph{studente} oppure \emph{docente}. Questa soluzione di utenza generica è pensata appositamente nell'ottica della \emph{scalabilità} di questo software, così da poter aggiungere anche altri tipi di utenze mediante ulteriori tabelle.
 
-\begin{lstlisting}[
-language={SQL},
-title={Credenziali}]
-CREATE TABLE public.credenziali (
-    username character varying(50) NOT NULL,
-    password character varying(50),
-    PRIMARY KEY (username),
-    FOREIGN KEY (username) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
-);
-\end{lstlisting}
-
-\begin{lstlisting}[
-language={SQL},
-title={Docente}]
-CREATE TABLE public.docente (
-    utente character varying(50) NOT NULL,
-    tipo character varying(50),
-    PRIMARY KEY (utente)
-);
-\end{lstlisting}
-
-\begin{lstlisting}[
-language={SQL},
-title={Docente Responsabile}]
-CREATE TABLE public.docente_responsabile (
-    docente character varying(50) NOT NULL,
-    insegnamento character varying(10) NOT NULL
-    PRIMARY KEY (docente, insegnamento),
-    FOREIGN KEY (docente) REFERENCES public.docente(utente) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (insegnamento) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE
-);
-\end{lstlisting}
-
-\begin{lstlisting}[
-language={SQL},
-title={Foto Profilo}]
-CREATE TABLE public.foto_profilo (
-    utente character varying(50) NOT NULL,
-    path character varying(200),
-    "timestamp" timestamp(6) without time zone NOT NULL,
-    PRIMARY KEY (utente, "timestamp"),
-    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
-);
-\end{lstlisting}
-
-\begin{lstlisting}[
-language={SQL},
-title={Insegnamento}]
-CREATE TABLE public.insegnamento (
-    codice character varying(10) NOT NULL,
-    nome character varying(50),
-    descrizione text,
-    cfu character(2),
-    PRIMARY KEY (codice)
-);
-\end{lstlisting}
-
-\begin{lstlisting}[
-language={SQL},
-title={Insegnamento parte di un Corso di Laurea}]
-CREATE TABLE public.insegnamento_parte_di_cdl (
-    insegnamento character varying(10) NOT NULL,
-    corso_di_laurea character varying(5) NOT NULL,
-    anno integer NOT NULL,
-    PRIMARY KEY (insegnamento, corso_di_laurea, anno),
-    FOREIGN KEY (corso_di_laurea) REFERENCES public.corso_di_laurea(codice) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (insegnamento) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE
-);
-\end{lstlisting}
-
-\begin{lstlisting}[
-language={SQL},
-title={Utente}]
+        Questa tabella contiene i dati fondamentali di un utente, quali l'\texttt{email} che è l'identificatore univoco (chiave primaria) di ciascun utente nel database, corrisponde a quella che è l'email istituzionale di università, il suo \texttt{nome} e \texttt{cognome}, il suo \texttt{indirizzo} e \texttt{città} di residenza, il suo \texttt{codice fiscale} da cui si può desumere \textbf{la data di nascita} e il \textit{luogo di nascita} e da ultimo l'\texttt{emailpersonale} che rappresenta la mail di recupero dell'utente, al di fuori del dominio email di università.
+        \begin{lstlisting}[
+            language={SQL},
+            title={Utente}]
 CREATE TABLE public.utente (
     email character varying(50) NOT NULL,
     nome character varying(50),
@@ -203,47 +101,144 @@ CREATE TABLE public.utente (
     emailpersonale character varying(60),
     PRIMARY KEY (email)
 );
-\end{lstlisting}
+        \end{lstlisting}
 
-\begin{lstlisting}[
-language={SQL},
-title={Insegna}]
+        \item La tabella \tabb{Segreteria} contiene i dati degli utenti di tipo \textit{segreteria} identificati da un livello come ad esempio la segreteria del personale piuttosto che la segreteria studenti o segreteria didattica. L'attributo \texttt{utente} referenzia l'\attr{email} della tabella \tab{Utente}
+        \begin{lstlisting}[
+            language={SQL},
+            title={Segreteria}]
+CREATE TABLE public.segreteria (
+    utente character varying(50) NOT NULL,
+    livello character varying(9) NOT NULL,
+    PRIMARY KEY (utente),
+    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+        \pagebreak
+
+        \item La tabella \tabb{Docente} contiene i dati degli utenti di tipo \textit{docente}. Oltre a referenziare l'\attr{email} della tabella \tab{Utente}, contiene anche un attributo \attr{tipo} che indica il tipo di docente, ad esempio "ordinario", "associato", "a contratto",...
+        \begin{lstlisting}[
+            language={SQL},
+            title={Docente}]
+CREATE TABLE public.docente (
+    utente character varying(50) NOT NULL,
+    tipo character varying(50),
+    PRIMARY KEY (utente),
+    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+        \item La tabella \tabb{Studente} contiene i dati degli utenti di tipo \textit{studente}. Anch'essa referenzia l'\attr{email} della tabella \tab{Utente}, e contiene due attributi caratteristici di uno stuente:
+        \begin{itemize}
+            \item l'attributo \attr{matricola} che indica la matricola dello studente
+            \item l'attributo \attr{corso\und di\und laurea} in riferimento al corso di laurea a cui risulta iscritto lo studdente
+        \end{itemize}
+        \begin{lstlisting}[
+            language={SQL},
+            title={Studente}]
+CREATE TABLE public.studente (
+    utente character varying(50) NOT NULL,
+    matricola serial NOT NULL,
+    corso_di_laurea character varying(5),
+    PRIMARY KEY (utente),
+    FOREIGN KEY (corso_di_laurea) REFERENCES public.corso_di_laurea(codice) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+        \item La tabella \tabb{Corso\und di\und laurea} contiene i dati di un corso di laurea, quali:
+        \begin{itemize}
+            \item il \attr{codice}, identificatore univoco di uno specifico corso di laurea
+            \item il \attr{nome} del corso di laurea
+            \item il \attr{tipo} del corso di laurea, che può essere
+            \begin{itemize}
+                \item \textit{triennale}, ovvero della durata di tre anni
+                \item \textit{magistrale} ovvero della durata di due anni
+                \item \textit{magistrale a ciclo unico} della durata di cinque anni
+            \end{itemize}
+        \end{itemize}
+        \begin{lstlisting}[
+            language={SQL},
+            title={Corso di Laurea}]
+CREATE TABLE public.corso_di_laurea (
+    codice character varying(5) NOT NULL,
+    nome character varying(50),
+    tipo character varying(50),
+    PRIMARY KEY (codice)
+);
+        \end{lstlisting}
+
+        \item La tabella \tabb{Insegnamento} contiene i dati relativi a un insegnamento, quali:
+        \begin{itemize}
+            \item il \attr{codice}, identificatore univoco di uno specifico insegnamento
+            \item il \attr{nome} dell'insegnamento
+            \item una \attr{descrizione} testuale dell'insegnamento, che enumera le conoscenze che tale disciplina vuole trasmettere allo studente
+            \item i \attr{cfu}, ovvero i crediti formativi universitari che l'insegnamento attribuisce allo studente che consegue un profitto in questa disciplina
+        \end{itemize}
+        \alert l'attributo indicante l'\textit{anno} in cui è previsto l'insegnamento è volutamente omesso e verrà specificata la motivazione succesivamente nella descrizione della tabella \tab{insegnamento\und parte\und di\und cdl}
+        \begin{lstlisting}[
+            language={SQL},
+            title={Insegnamento}]
+CREATE TABLE public.insegnamento (
+    codice character varying(10) NOT NULL,
+    nome character varying(50),
+    descrizione text,
+    cfu character(2),
+    PRIMARY KEY (codice)
+);
+        \end{lstlisting}
+
+        \item Ogni insegnamento ha un \tabb{docente\und responsabile} ovvero un docente che si occupa dell'organizzazione didattica dell'insegnamento come ad esempio, come vedremo in seguito, la pianificazione del calendario esami per l'insegnamento, e la verbalizzazione degli esiti degli esami dell'insegnamento.
+        Questa tabella quindi indica la relazione tra un \attr{docente} e un \attr{insegnamento} i quali referenziano le omonime tabelle nelle loro chiavi primarie.
+        \begin{lstlisting}[
+            language={SQL},
+            title={Docente Responsabile}]
+CREATE TABLE public.docente_responsabile (
+    docente character varying(50) NOT NULL,
+    insegnamento character varying(10) NOT NULL
+    PRIMARY KEY (docente, insegnamento),
+    FOREIGN KEY (docente) REFERENCES public.docente(utente) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (insegnamento) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+        \item Ogni insegnamento può avere uno o più docenti: la tabella \tabb{insegnamento} esprime questa relazione. Questa tabella conterrà solamente i docenti di un insegnamento che non siano già responsabili di quell'insegnamento. Come nella tabella \tab{docente\und responsabile} i due attributi fanno riferimento a un docente e a un insegnamento.
+        \begin{lstlisting}[
+            language={SQL},
+            title={Insegna}]
 CREATE TABLE public.insegna (
     docente character varying(50) NOT NULL,
     insegnamento character varying(10) NOT NULL,
     PRIMARY KEY (docente, insegnamento),
     FOREIGN KEY (docente) REFERENCES public.docente(utente) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (insegnamento) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (insegnamento) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE
 );
-\end{lstlisting}
+        \end{lstlisting}
 
-\begin{lstlisting}[
-language={SQL},
-title={Insegnamenti per carriera}]
-CREATE TABLE public.insegnamenti_per_carriera (
-    studente character varying(50) NOT NULL,
+        \item La tabella \tabb{insegnamento\und parte\und di\und cdl} descrive la relazione per la quale ogni insegnamento non sia a se stante, ma faccia parte di un determinato corso di laurea.
+
+
+        \alert Si noti che una scelta implementativa che diverge dalle specifiche è inserire l'attirbuto \attr{anno} all'interno di questa relazione e non come proprietà di un singolo corso di laurea, dal momento che uno stesso insegnamento può essere erogato in più corsi di laurea in anni diversi (ad esempio l'insegnamento \texttt{i} può essere erogato per il corso di laurea \texttt{c1} al primo anno, mentre per il corso di laurea \texttt{c2} al terzo anno)
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Insegnamento parte di un Corso di Laurea}]
+CREATE TABLE public.insegnamento_parte_di_cdl (
     insegnamento character varying(10) NOT NULL,
-    "timestamp" timestamp(6) without time zone,
-    PRIMARY KEY (studente, insegnamento),
-    FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE
+    corso_di_laurea character varying(5) NOT NULL,
+    anno integer NOT NULL,
+    PRIMARY KEY (insegnamento, corso_di_laurea, anno),
+    FOREIGN KEY (corso_di_laurea) REFERENCES public.corso_di_laurea(codice) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (insegnamento) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE
 );
-\end{lstlisting}
+        \end{lstlisting}
 
-\begin{lstlisting}[
-language={SQL},
-title={Iscrizione}]
-CREATE TABLE public.iscrizione (
-    studente character varying(50) NOT NULL,
-    esame integer NOT NULL,
-    PRIMARY KEY (studente, esame),
-    FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE
-);
-\end{lstlisting}
+        \item La tabella \tabb{propedeuticita} descrive la relazione per la quale eventualmente un insegnamento \attr{insegnamento1} possa essere propedeutico a un altro insegnamento \attr{insegnamento2} all'interno di un \attr{corso\und di\und laurea}. Anche qui è importante notare come un insegnamento sia propedeutico a un altro solamente nel contesto di un corso di laurea, non in maniera assoluta.
 
-\begin{lstlisting}[
-language={SQL},
-title={Propedeuticità}]
+        \begin{lstlisting}[
+            language={SQL},
+            title={Propedeuticità}]
 CREATE TABLE public.propedeuticita (
     insegnamento1 character varying(10) NOT NULL,
     insegnamento2 character varying(10) NOT NULL,
@@ -253,36 +248,125 @@ CREATE TABLE public.propedeuticita (
     FOREIGN KEY (insegnamento2) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE
     FOREIGN KEY (corso_di_laurea) REFERENCES public.corso_di_laurea(codice) ON UPDATE CASCADE ON DELETE CASCADE
 );
-\end{lstlisting}
+        \end{lstlisting}
 
-\begin{lstlisting}[
-language={SQL},
-title={Segreteria}]
+
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Calendario Esami}]
+CREATE TABLE public.calendario_esami (
+    insegnamento character varying(10) NOT NULL,
+    data date NOT NULL,
+    ora time without time zone NOT NULL,
+    id serial PRIMARY KEY,
+    FOREIGN KEY (insegnamento) REFERENCES public.insegnamento(codice) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Carriera}]
+CREATE TABLE public.carriera (
+    studente character varying(50) NOT NULL,
+    insegnamento character varying(10) NOT NULL,
+    valutazione smallint,
+    data date NOT NULL,
+    PRIMARY KEY (studente, data, insegnamento),
+    FOREIGN KEY (studente, insegnamento) REFERENCES public.insegnamenti_per_carriera(studente, insegnamento) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Carriera Storico}]
+CREATE TABLE public.carriera_storico (
+    studente character varying(50) NOT NULL,
+    insegnamento character varying(10) NOT NULL,
+    valutazione smallint,
+    data date NOT NULL,
+    PRIMARY KEY (studente, insegnamento, data),
+    FOREIGN KEY (studente) REFERENCES public.studente_storico(utente) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Credenziali}]
+CREATE TABLE public.credenziali (
+    username character varying(50) NOT NULL,
+    password character varying(50),
+    PRIMARY KEY (username),
+    FOREIGN KEY (username) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+
+
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Foto Profilo}]
+CREATE TABLE public.foto_profilo (
+    utente character varying(50) NOT NULL,
+    path character varying(200),
+    "timestamp" timestamp(6) without time zone NOT NULL,
+    PRIMARY KEY (utente, "timestamp"),
+    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+
+
+
+
+
+
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Insegnamenti per carriera}]
+CREATE TABLE public.insegnamenti_per_carriera (
+    studente character varying(50) NOT NULL,
+    insegnamento character varying(10) NOT NULL,
+    "timestamp" timestamp(6) without time zone,
+    PRIMARY KEY (studente, insegnamento),
+    FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Iscrizione}]
+CREATE TABLE public.iscrizione (
+    studente character varying(50) NOT NULL,
+    esame integer NOT NULL,
+    PRIMARY KEY (studente, esame),
+    FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+
+
+        \begin{lstlisting}[
+            language={SQL},
+            title={Segreteria}]
 CREATE TABLE public.segreteria (
     utente character varying(50) NOT NULL,
     livello character varying(9) NOT NULL,
     PRIMARY KEY (utente),
     FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
-\end{lstlisting}
+        \end{lstlisting}
 
-\begin{lstlisting}[
-language={SQL},
-title={Studente}]
-CREATE TABLE public.studente (
-    utente character varying(50) NOT NULL,
-    matricola serial NOT NULL,
-    corso_di_laurea character varying(5),
-    PRIMARY KEY (utente),
-    FOREIGN KEY (corso_di_laurea) REFERENCES public.corso_di_laurea(codice) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
-);
 
-\end{lstlisting}
-
-\begin{lstlisting}[
-language={SQL},
-title={Studente Storico}]
+        \begin{lstlisting}[
+            language={SQL},
+            title={Studente Storico}]
 CREATE TABLE public.studente_storico (
     utente character varying(50) NOT NULL,
     matricola integer,
@@ -290,11 +374,11 @@ CREATE TABLE public.studente_storico (
     PRIMARY KEY (utente),
     FOREIGN KEY (utente) REFERENCES public.utente_storico(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
-\end{lstlisting}
+        \end{lstlisting}
 
-\begin{lstlisting}[
-language={SQL},
-title={Utente Storico}]
+        \begin{lstlisting}[
+            language={SQL},
+            title={Utente Storico}]
 CREATE TABLE public.utente_storico (
     email character varying(50) NOT NULL,
     nome character varying(50),
@@ -305,7 +389,10 @@ CREATE TABLE public.utente_storico (
     emailpersonale character varying(60),
     PRIMARY KEY (email)
 );
-\end{lstlisting}
+        \end{lstlisting}
+
+
+    \end{enumerate}
 
 
 
@@ -320,45 +407,42 @@ CREATE TABLE public.utente_storico (
 
 
 
+    \subsection{Si enuncino i tre teoremi dei triangoli rettangoli, riportando enunciato e figure per spiegare meglio} \hspace{50} p872
+    \subsection{Si enunci il teorema della corda}
+    \subsection{Definire cosa sia:}
+    a. Una funzione: \\\\\\\\
+    b. Il Dominio e il Codominio di funzione: \\\\\\\\
+    c. una funzione Dispari con relativo esempio convincente : \\\\\\\\\\\\
+    d. Una funzione invertibile: spiegare bene nel dettaglio: \\\\\\\\\\\\\\
+    e. Lo zero di una funzione, spiegazione con anche grafico di esempio: \\\\\\\\\\
+    f. Il teorema di Bayes: enunciarlo con la formula e dire le analogie e differenze con il teorema della probabilità condizionata  (valuta la possibilità di esporre allora anche il teorema della probabilità condizionata) \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+    \section{Esercizi pratici}
+    \subsection{Si risolvano i seguenti esercizi}
 
 
-
-\subsection{Si enuncino i tre teoremi dei triangoli rettangoli, riportando enunciato e figure per spiegare meglio} \hspace{50} p872
-\subsection{Si enunci il teorema della corda}
-\subsection{Definire cosa sia:}
-a. Una funzione: \\\\\\\\
-b. Il Dominio e il Codominio di funzione: \\\\\\\\
-c. una funzione Dispari con relativo esempio convincente : \\\\\\\\\\\\
-d. Una funzione invertibile: spiegare bene nel dettaglio: \\\\\\\\\\\\\\
-e. Lo zero di una funzione, spiegazione con anche grafico di esempio: \\\\\\\\\\
-f. Il teorema di Bayes: enunciarlo con la formula e dire le analogie e differenze con il teorema della probabilità condizionata  (valuta la possibilità di esporre allora anche il teorema della probabilità condizionata) \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-\section{Esercizi pratici}
-\subsection{Si risolvano i seguenti esercizi}
-
-
-\title{Il mio primo documento LaTeX}
-\author{Nome dell'autore}
-\date{}
+    \title{Il mio primo documento LaTeX}
+    \author{Nome dell'autore}
+    \date{}
 
 
 
 
-Questo è un paragrafo di testo. In LaTeX, i paragrafi vengono separati da una o più righe vuote.
+    Questo è un paragrafo di testo. In LaTeX, i paragrafi vengono separati da una o più righe vuote.
 
-È possibile scrivere testo in \textbf{grassetto} o \emph{corsivo}.
+    È possibile scrivere testo in \textbf{grassetto} o \emph{corsivo}.
 
-\section{Una sezione}
+    \section{Una sezione}
 
-Questo è un paragrafo nella sezione \emph{Una sezione}.
+    Questo è un paragrafo nella sezione \emph{Una sezione}.
 
-\subsection{Una sottosezione}
+    \subsection{Una sottosezione}
 
-Questo è un paragrafo nella sottosezione \emph{Una sottosezione}.
+    Questo è un paragrafo nella sottosezione \emph{Una sottosezione}.
 
-\subsubsection{Una sottosottosezione}
+    \subsubsection{Una sottosottosezione}
 
-Questo è un paragrafo nella sottosottosezione \emph{Una sottosottosezione}.
+    Questo è un paragrafo nella sottosottosezione \emph{Una sottosottosezione}.
 
 
 
