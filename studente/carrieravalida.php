@@ -17,7 +17,7 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
 <?php setNavbarStudente($_SERVER['REQUEST_URI']);?>
 <!-- FINE NAVBAR -->
 
-<h1>LA TUA CARRIERA</h1>
+<h1>LA TUA CARRIERA VALIDA</h1>
 
 <div class="photo-container" style="margin: 30px">
     <div>
@@ -56,7 +56,7 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
 
             $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
 
-            $query = "SELECT * FROM carriera_completa_esami_sostenuti(:studente)";
+            $query = "SELECT * FROM carriera_valida(:studente)";
             $stmt = $conn->prepare($query);
 
             $stmt->bindParam(':studente', $_SESSION['username']);

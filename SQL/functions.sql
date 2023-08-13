@@ -29,7 +29,6 @@ BEGIN
 
   -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
   DELETE FROM utente where email = $1;
-  DELETE FROM carriera where studente = $1;
   -- le seguenti operazioni sono fatte già in CASCADE
         -- cancello i dati dalla tabella studente dopo averli spostati in stutente_storico
         -- DELETE FROM studente WHERE utente = $1;
@@ -126,6 +125,9 @@ WITH esamipresenti AS (SELECT DISTINCT c1.insegnamento, ip.corso_di_laurea, ip.a
     WHERE e.anno = :anno AND e.data = :data;
 
 --------------------------------------------------------------------------
+-----------------------
+----------------------- FUNZIONE CREATA DA ME, NON DA UTILIZZARE!-------------
+-------------------------------------------------------------------------------
 -- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [ANCHE ESAMI MAI SOSTENUTI, ANCHE DUPLICATI]
 --- va bene sia per lo studente
 CREATE OR REPLACE FUNCTION carriera_completa_tutti(TARGET varchar) RETURNS TABLE (
@@ -173,6 +175,9 @@ END;
 $$ LANGUAGE plpgsql;
 
 --------------------------------------------------------------------------
+-----------------------
+----------------------- FUNZIONE DA DROPPARE ------------------
+--------------------------------------------------------------
 -- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
 --- va bene sia per lo studente
 CREATE OR REPLACE FUNCTION carriera_completa_esami_sostenuti(TARGET varchar) RETURNS TABLE (
@@ -210,5 +215,91 @@ BEGIN
                  INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
                  INNER JOIN insegnamento i ON ic.insegnamento = i.codice
         WHERE ic.studente = TARGET;
+END;
+$$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------
+-- VERSIONE CORRETTA ------------
+-- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
+--- va bene sia per lo studente
+CREATE OR REPLACE FUNCTION carriera_completa(TARGET varchar) RETURNS TABLE (
+            studente varchar,
+            nomstu varchar,
+            cogstu varchar,
+            cdl varchar,
+            matr integer,
+            codins varchar,
+            nomins varchar,
+            nomdoc varchar,
+            cogdoc varchar,
+            voto smallint,
+            data date
+            ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT ic.studente,
+               u2.nome nomstu,
+               u2.cognome cogstu,
+               cdl.nome cdl,
+               s.matricola matr,
+               ic.insegnamento,
+               i.nome,
+               u.nome nomedoc,
+               u.cognome cogndoc,
+               c.valutazione,
+               c.data
+        FROM insegnamenti_per_carriera ic
+                 INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
+                 INNER JOIN docente_responsabile d ON d.insegnamento = ic.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente u2 ON ic.studente = u2.email
+                 INNER JOIN studente s ON ic.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON ic.insegnamento = i.codice
+        WHERE ic.studente = TARGET;
+END;
+$$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------
+-- VERSIONE CORRETTA ------------
+-- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
+--- va bene sia per lo studente
+CREATE OR REPLACE FUNCTION carriera_valida(TARGET varchar) RETURNS TABLE (
+           studente varchar,
+           nomstu varchar,
+           cogstu varchar,
+           cdl varchar,
+           matr integer,
+           codins varchar,
+           nomins varchar,
+           nomdoc varchar,
+           cogdoc varchar,
+           voto smallint,
+           data date
+       ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT ic.studente,
+               u2.nome nomstu,
+               u2.cognome cogstu,
+               cdl.nome cdl,
+               s.matricola matr,
+               ic.insegnamento,
+               i.nome,
+               u.nome nomedoc,
+               u.cognome cogndoc,
+               c.valutazione,
+               c.data
+        FROM insegnamenti_per_carriera ic
+                 INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
+                 INNER JOIN docente_responsabile d ON d.insegnamento = ic.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente u2 ON ic.studente = u2.email
+                 INNER JOIN studente s ON ic.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON ic.insegnamento = i.codice
+        WHERE ic.studente = TARGET AND c.valutazione >= 18
+        ORDER BY c.data DESC
+        LIMIT 1;
 END;
 $$ LANGUAGE plpgsql;

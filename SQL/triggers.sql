@@ -43,10 +43,10 @@ BEGIN
             INNER JOIN insegnamenti_per_carriera ipc ON ipc.insegnamento = c.insegnamento
             WHERE ipc.studente = NEW.studente;
     IF FOUND THEN
-        -- l'esame che si vuole inserire in calendario_esami è presente nel cdL
+        -- l'esame che si vuole inserire in calendario_esami è presente in ipc
         RETURN NEW;
     ELSE
-        -- l'esame che si vuole inserire in calendario_esami NON è presente nel cdL
+        -- l'esame che si vuole inserire in calendario_esami NON è presente in ipc
         RAISE NOTICE 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui è iscritto lo studente';
         PERFORM pg_notify('notifica', 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui è iscritto lo studente');
         RETURN NULL;
@@ -115,7 +115,7 @@ CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER AS $$
 DECLARE
     esame_trovato BOOLEAN;
 BEGIN
-    -- Verifica la presenza di esami duplicati
+    -- Verifico se ci sono esami duplicati
     SELECT EXISTS (
         SELECT 1
         FROM calendario_esami c1
@@ -124,7 +124,7 @@ BEGIN
     ) INTO esame_trovato;
 
     IF esame_trovato THEN
-        RAISE NOTICE 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata';
+        RAISE NOTICE 'ATTENZIONE: e'' gia'' presente un altro esame dello stesso anno per la data selezionata';
         PERFORM pg_notify('notifica', 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata');
         RETURN NULL;
     ELSE
