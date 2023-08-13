@@ -13,6 +13,9 @@
 \newcommand{\tabb}[1]{\texttt{\textcolor{blue}{#1}}}
 \newcommand{\tab}[1]{\texttt{\textcolor{cyan}{#1}}}
 \newcommand{\attr}[1]{\texttt{\textcolor{gray}{#1}}}
+\newcommand{\sqlcommand}[1]{\texttt{\textcolor{orange}{#1}}}
+\newcommand{\sqlfunc}[1]{\texttt{\textcolor{violet}{#1}}}
+\newcommand{\sqltrigger}[1]{\texttt{\textcolor{teal}{#1}}}
 \newcommand{\m}[1]{\texttt{}}
 \newcommand{\und}[0]{\textunderscore}
 \newcommand{\alert}[0]{\textcolor{red}{\faExclamationCircle}}
@@ -103,6 +106,18 @@ CREATE TABLE public.utente (
 );
         \end{lstlisting}
 
+        \item La tabella \tabb{credenziali} contiene per ciascun utente (denominato \attr{username}), la corrispettiva \attr{password} cifrata con l'algoritmo MD5. Il senso di questa tabella è, come è facile intuire, poter garantire l'accesso solamente agli utenti autorizzati.
+        \begin{lstlisting}[
+            language={SQL},
+            title={Credenziali}]
+CREATE TABLE public.credenziali (
+    username character varying(50) NOT NULL,
+    password character varying(50),
+    PRIMARY KEY (username),
+    FOREIGN KEY (username) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
         \item La tabella \tabb{Segreteria} contiene i dati degli utenti di tipo \textit{segreteria} identificati da un livello come ad esempio la segreteria del personale piuttosto che la segreteria studenti o segreteria didattica. L'attributo \texttt{utente} referenzia l'\attr{email} della tabella \tab{Utente}
         \begin{lstlisting}[
             language={SQL},
@@ -114,8 +129,6 @@ CREATE TABLE public.segreteria (
     FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
         \end{lstlisting}
-
-        \pagebreak
 
         \item La tabella \tabb{Docente} contiene i dati degli utenti di tipo \textit{docente}. Oltre a referenziare l'\attr{email} della tabella \tab{Utente}, contiene anche un attributo \attr{tipo} che indica il tipo di docente, ad esempio "ordinario", "associato", "a contratto",...
         \begin{lstlisting}[
@@ -250,8 +263,27 @@ CREATE TABLE public.propedeuticita (
 );
         \end{lstlisting}
 
+        \item La tabella \tabb{insegnamenti\und per\und carriera} esprime un sottile concetto presente nell'ambito universitario: all'atto dell'immatricolazione a uno studente viene attribuito un \textit{piano di studi} che è rappresentato proprio da questa tabella: a ogni studente viene assegnato un elenco di insegnamenti da superare. Se successivamente all'immatricolazione dello studente (che qui coincide con l'atto dell'inserimento nel database) in un dato corso di laurea viene inserito un nuovo insegnamento, non viene modificato il piano di studi dello studente già iscritto precedentemente la modifica. L'attributo \attr{timestamp} serve per tenere una marca temporale dell'atto della realizzazione del presente piano di insegnamenti da superare. Un'ulteriore indicazione di quanto detto finora è dato dal \textbf{vincolo di chiave esterna} che referenzia solamente l'attributo \textbf{utente} della tabella \tab{studente} (e non anche il \textbf{codice} la tabella \tab{insegnamento}!): se lo studente \texttt{s} viene rimosso dalla tabella \tab{studente} ad esempio perchè abbandona gli studi oppure si è laureato (in questo caso i dati verranno spostati in apposite tabelle di \textit{storico} che verranno mostrate in seguito), decade l'insieme di insegnamenti di cui superare gli esami ai fini della carriera. Qualora \texttt{s} volesse reiscriversi, si troverebbe assegnati gli insegnamenti di cui conseguire profitto all'atto della nuova iscrizione.
+        \begin{lstlisting}[
+            language={SQL},
+            title={Insegnamenti per carriera}]
+CREATE TABLE public.insegnamenti_per_carriera (
+    studente character varying(50) NOT NULL,
+    insegnamento character varying(10) NOT NULL,
+    "timestamp" timestamp(6) without time zone,
+    PRIMARY KEY (studente, insegnamento),
+    FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
 
+        \item La tabella \tabb{calendario\und esami} rappresenta un calendario di esami in cui vengono indicati:
+        \begin{itemize}
+            \item un \attr{insegnamento} che referenzia l'attributo \textit{codice} della tabella \tabb{insegnamento}
+            \item la \attr{data} dell'esame
+            \item l' \attr{ora} dell'esame
+            \item un \attr{id} univoco identificativo di uno specifico \textit{esame} che è costituito dalla tripla sopra indicata, ovvero $\langle$\textit{insegnamento}, \textit{data}, \textit{ora}$\rangle$
 
+        \end{itemize}
         \begin{lstlisting}[
             language={SQL},
             title={Calendario Esami}]
@@ -264,6 +296,20 @@ CREATE TABLE public.calendario_esami (
 );
         \end{lstlisting}
 
+        \item La tabella \tabb{iscrizione} esprime l'iscrizione di uno \attr{studente} a un \attr{esame}, quest'ultimo attributo che referenzia la tabella \tab{calendario\und esami} nel suo attributo \attr{id}
+        \begin{lstlisting}[
+            language={SQL},
+            title={Iscrizione}]
+CREATE TABLE public.iscrizione (
+    studente character varying(50) NOT NULL,
+    esame integer NOT NULL,
+    PRIMARY KEY (studente, esame),
+    FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (esame) REFERENCES public.calendario_esami(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+        \item La tabella \tabb{Carriera} contiene i dati della carriera di ciascun studente, ovvero per ogni \attr{insegnamento} di cui sia stato sostenuto \textit{almeno} un esame, la corrispettiva \attr{valutazione} conseguita in tal \attr{data}. Si noti l'enfasi sul termine "almeno" per indicare che in carriera vengono registrati tutti i tentativi di sostenimento di esame, essendo stabilita come chiave primaria la tripla $\langle$\textit{studente}, \textit{insegnamento}, \textit{data}$\rangle$ è costituita quella che in gergo viene detta \textit{serie storica}.
         \begin{lstlisting}[
             language={SQL},
             title={Carriera}]
@@ -277,105 +323,7 @@ CREATE TABLE public.carriera (
 );
         \end{lstlisting}
 
-
-
-        \begin{lstlisting}[
-            language={SQL},
-            title={Carriera Storico}]
-CREATE TABLE public.carriera_storico (
-    studente character varying(50) NOT NULL,
-    insegnamento character varying(10) NOT NULL,
-    valutazione smallint,
-    data date NOT NULL,
-    PRIMARY KEY (studente, insegnamento, data),
-    FOREIGN KEY (studente) REFERENCES public.studente_storico(utente) ON UPDATE CASCADE ON DELETE CASCADE
-);
-        \end{lstlisting}
-
-
-
-        \begin{lstlisting}[
-            language={SQL},
-            title={Credenziali}]
-CREATE TABLE public.credenziali (
-    username character varying(50) NOT NULL,
-    password character varying(50),
-    PRIMARY KEY (username),
-    FOREIGN KEY (username) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
-);
-        \end{lstlisting}
-
-
-
-
-        \begin{lstlisting}[
-            language={SQL},
-            title={Foto Profilo}]
-CREATE TABLE public.foto_profilo (
-    utente character varying(50) NOT NULL,
-    path character varying(200),
-    "timestamp" timestamp(6) without time zone NOT NULL,
-    PRIMARY KEY (utente, "timestamp"),
-    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
-);
-        \end{lstlisting}
-
-
-
-
-
-
-
-
-        \begin{lstlisting}[
-            language={SQL},
-            title={Insegnamenti per carriera}]
-CREATE TABLE public.insegnamenti_per_carriera (
-    studente character varying(50) NOT NULL,
-    insegnamento character varying(10) NOT NULL,
-    "timestamp" timestamp(6) without time zone,
-    PRIMARY KEY (studente, insegnamento),
-    FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE
-);
-        \end{lstlisting}
-
-        \begin{lstlisting}[
-            language={SQL},
-            title={Iscrizione}]
-CREATE TABLE public.iscrizione (
-    studente character varying(50) NOT NULL,
-    esame integer NOT NULL,
-    PRIMARY KEY (studente, esame),
-    FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE
-);
-        \end{lstlisting}
-
-
-
-        \begin{lstlisting}[
-            language={SQL},
-            title={Segreteria}]
-CREATE TABLE public.segreteria (
-    utente character varying(50) NOT NULL,
-    livello character varying(9) NOT NULL,
-    PRIMARY KEY (utente),
-    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
-);
-        \end{lstlisting}
-
-
-        \begin{lstlisting}[
-            language={SQL},
-            title={Studente Storico}]
-CREATE TABLE public.studente_storico (
-    utente character varying(50) NOT NULL,
-    matricola integer,
-    corso_di_laurea character varying(5),
-    PRIMARY KEY (utente),
-    FOREIGN KEY (utente) REFERENCES public.utente_storico(email) ON UPDATE CASCADE ON DELETE CASCADE
-);
-        \end{lstlisting}
-
+        \item La tabella \tabb{utente\und storico} contiene gli utenti inseriti in storico. Per il momento l'unica tipologia di utenti per cui è previsto lo storico sono gli \textit{studenti}. La struttura e la semantica è del tutto identica alla tabella \tab{utente}
         \begin{lstlisting}[
             language={SQL},
             title={Utente Storico}]
@@ -391,59 +339,135 @@ CREATE TABLE public.utente_storico (
 );
         \end{lstlisting}
 
+        \item La tabella \tabb{studente\und storico} contiene i dati degli studenti inseriti in storico. La struttura e la semantica è del tutto identica alla tabella \tab{studente}
+        \begin{lstlisting}[
+            language={SQL},
+            title={Studente Storico}]
+CREATE TABLE public.studente_storico (
+    utente character varying(50) NOT NULL,
+    matricola integer,
+    corso_di_laurea character varying(5),
+    PRIMARY KEY (utente),
+    FOREIGN KEY (utente) REFERENCES public.utente_storico(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
 
+        \item La tabella \tabb{carriera\und storico} contiene i dati della carriera di studenti inseriti in storico. La struttura e la semantica è del tutto identica alla tabella \tab{carriera}
+        \begin{lstlisting}[
+            language={SQL},
+            title={Carriera Storico}]
+CREATE TABLE public.carriera_storico (
+    studente character varying(50) NOT NULL,
+    insegnamento character varying(10) NOT NULL,
+    valutazione smallint,
+    data date NOT NULL,
+    PRIMARY KEY (studente, insegnamento, data),
+    FOREIGN KEY (studente) REFERENCES public.studente_storico(utente) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
+
+        \item La tabella \tabb{foto\und profilo} contiene, per ciascun \attr{utente}, il corrispettivo percorso interno al server in cui si trova l'immagine del profilo, tramite l'attributo \attr{path}. Inoltre l'attirbuto \attr{timestamp} serve per tenere memoria delle vecchie foto profilo dell'utente in questione.
+        \begin{lstlisting}[
+            language={SQL},
+            title={Foto Profilo}]
+CREATE TABLE public.foto_profilo (
+    utente character varying(50) NOT NULL,
+    path character varying(200),
+    "timestamp" timestamp(6) without time zone NOT NULL,
+    PRIMARY KEY (utente, "timestamp"),
+    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
     \end{enumerate}
 
+    \section{Esauriente descrizione delle funzioni realizzate}
+    \subsection{Funzioni SQL-DML}
+    Questa sezione ha lo scopo di mostrare le funzioni in linguaggio SQL per la manipolazione dei dati interni al lato PostgreSQL di PiGEU. Per ciascuna funzione verrà mostrata l'ulitità ed eventuali osservazioni.
+    \subsubsection{Rimozione di uno studente - [specifica 2.2.1]}
+    Nelle specifiche indicate, la rimozione di uno studente \texttt{s} non corrisponde con il solo comando di \sqlcommand{DELETE} all'interno della tabella \tabb{utente} ma comporta il trasferimento di tutte le informazioni relative ad \texttt{s} in apposite tabelle di \textit{storico}. La funzione \sqlfunc{sposta\und dati\und studente} contiene diversi comandi DML che consentono di soddisfare le specifiche. Di seguito il codice sorgente della funzione che oltre alle operazioni richieste, restituisce anche un messaggio di stato oppure, nel caso di sollevamento di eccezioni, il messaggio di eccezione.
 
+    \pagebreak
+    \begin{lstlisting}[
+    language={SQL},
+    title={sposta\und dati\und studente(\texttt{E} \attr{varchar})}]
+    CREATE OR REPLACE FUNCTION sposta_dati_studente(E varchar) RETURNS TEXT AS $$
+    DECLARE
+    status TEXT := 'Dati spostati con successo.';
+    BEGIN
+    -- INSERT utente --> utente_storico
+    INSERT INTO utente_storico (email, nome, cognome, indirizzo, citta, codicefiscale, emailpersonale)
+    SELECT email, nome, cognome, indirizzo, citta, codicefiscale, emailpersonale
+    FROM utente where email = $1;
 
+    -- INSERT studente --> studente_storico
+    INSERT INTO studente_storico (utente, matricola, corso_di_laurea)
+    SELECT utente, matricola, corso_di_laurea
+    FROM studente WHERE utente = $1;
 
+    -- INSERT carriera --> carriera_storico
+    INSERT INTO carriera_storico (studente, insegnamento, valutazione, data)
+    SELECT studente, insegnamento, valutazione, data
+    FROM carriera WHERE studente = $1;
 
-
-
-
-
-
-
-
-
-
-    \subsection{Si enuncino i tre teoremi dei triangoli rettangoli, riportando enunciato e figure per spiegare meglio} \hspace{50} p872
-    \subsection{Si enunci il teorema della corda}
-    \subsection{Definire cosa sia:}
-    a. Una funzione: \\\\\\\\
-    b. Il Dominio e il Codominio di funzione: \\\\\\\\
-    c. una funzione Dispari con relativo esempio convincente : \\\\\\\\\\\\
-    d. Una funzione invertibile: spiegare bene nel dettaglio: \\\\\\\\\\\\\\
-    e. Lo zero di una funzione, spiegazione con anche grafico di esempio: \\\\\\\\\\
-    f. Il teorema di Bayes: enunciarlo con la formula e dire le analogie e differenze con il teorema della probabilità condizionata  (valuta la possibilità di esporre allora anche il teorema della probabilità condizionata) \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-    \section{Esercizi pratici}
-    \subsection{Si risolvano i seguenti esercizi}
-
-
-    \title{Il mio primo documento LaTeX}
-    \author{Nome dell'autore}
-    \date{}
-
-
-
-
-    Questo è un paragrafo di testo. In LaTeX, i paragrafi vengono separati da una o più righe vuote.
-
-    È possibile scrivere testo in \textbf{grassetto} o \emph{corsivo}.
-
-    \section{Una sezione}
-
-    Questo è un paragrafo nella sezione \emph{Una sezione}.
-
-    \subsection{Una sottosezione}
-
-    Questo è un paragrafo nella sottosezione \emph{Una sottosezione}.
-
-    \subsubsection{Una sottosottosezione}
-
-    Questo è un paragrafo nella sottosottosezione \emph{Una sottosottosezione}.
-
+    -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
+    DELETE FROM utente where email = $1;
+    -- le seguenti operazioni sono fatte gia in CASCADE
+    -- cancello i dati dalla tabella studente dopo averli spostati in stutente_storico
+    -- DELETE FROM studente WHERE utente = $1;
+    -- cancello i dati dalla tabella carriera dopo averli spostati in carriera_storico
+    -- DELETE FROM carriera WHERE email = $1;
+    -- cancello i dati dalla tabella insegnamenti_per_carriera
+    -- DELETE FROM insegnamenti_per_carriera WHERE studente = $1;
+    RETURN status;
+    -- Gestione delle eccezioni
+    EXCEPTION
+    WHEN OTHERS THEN
+    -- In caso di errore restituisco il messaggio di errore
+    status := 'Errore: ' || SQLERRM;
+    RETURN status;
+    END;
+    $$ LANGUAGE plpgsql;
+\end{lstlisting}
+\subsubsection{Correttezza delle iscrizioni agli esami - [specifica 2.2.2]}
+Nella \textit{specifica 2.2.2} viene detto che
+\begin{quote}
+    Ciascuno studente può iscriversi ad un esame solo se l'insegnamento è previsto dal proprio corso di laurea, e solamente se tutte le propedeuticità sono rispettate.
+\end{quote}
+La prima condizione, cioé la possibilità di iscrizione ai soli esami di insegnamenti del proprio corso di laurea, viene controllata tramite un trigger denominato \sqltrigger{no\und iscriz\und se\und non\und in\und CdL} di cui viene fornito il codice sorgente
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{no\und iscriz\und se\und non\und in\und CdL}}]
+CREATE OR REPLACE TRIGGER no_iscriz_se_non_in_CdL
+    BEFORE INSERT OR UPDATE ON iscrizione
+    FOR EACH ROW
+EXECUTE FUNCTION check_appartenenza_cdl();
+\end{lstlisting}
+Tale trigger prima che venga inserita una riga nella tabella \tabb{iscrizione} chiama l'esecuzione della funzione \sqlfunc{check\und appartenenza\und cdl} di seguito mostrata
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{check\und appartenenza\und cdl()}}]
+CREATE OR REPLACE FUNCTION check_appartenenza_cdl() RETURNS TRIGGER as $$
+BEGIN
+    PERFORM * FROM calendario_esami c
+            INNER JOIN insegnamenti_per_carriera ipc ON ipc.insegnamento = c.insegnamento
+            WHERE ipc.studente = NEW.studente;
+    IF FOUND THEN
+        -- l'esame che si vuole inserire in calendario_esami e presente in ipc
+        RETURN NEW;
+    ELSE
+        -- l'esame che si vuole inserire in calendario_esami NON e presente in ipc
+        RAISE NOTICE 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui e iscritto lo studente';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui e iscritto lo studente');
+        RETURN NULL;
+    END IF;
+END;
+$$ language 'plpgsql';
+\end{lstlisting}
+La funzione appena mostrata mostra alcune particolarità dovute all'implementazione scelta:
+\begin{itemize}
+    \item a livello di progettazione, si verifica non tanto che l'insegnamento a cui si vuole iscrivere lo studente appartenga al corso di laurea, quanto all'\textit{elenco di insegnamenti}, presente nella tabella \tabb{insegnamenti\und per\und carriera} che lo studente è tenuto a superare, che viene generato all'atto dell'immatricolazione dello studente. Tale elenco di insegnamenti viene preso riferendosi al corso di laurea quindi si aderisce alle specifiche date, pur aggiungendo una sottigliezza, ovvero quella della mutabilità di un corso di laurea che oggi può contenere \texttt{n} insegnamenti, domani ne può contenere \texttt{m} con \texttt{n}$\neq$\texttt{m}
+    \item a livello di funzione contiene anche i messaggi che verranno catturati dagli script PHP coni PERFORM pg_notify
+\end{itemize}
 
 
 
