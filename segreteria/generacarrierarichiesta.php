@@ -13,9 +13,9 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
     try {
 
     $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-    $query = "SELECT * FROM carriera_completa_esami_sostenuti(:studente)";
+    $query = "SELECT * FROM carriera_valida(:studente)";
     if ($_POST['action'] == 'carriera_completa'){
-        $query = "SELECT * FROM carriera_completa_tutti(:studente)";
+        $query = "SELECT * FROM carriera_completa(:studente)";
     }
     $stmt = $conn->prepare($query);
 
@@ -25,7 +25,7 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
     if ($stmt->rowCount() == 0) {
         ?>
         <div class="alert alert-warning" role="alert">
-            Nessun insegnamento trovato in carriera per <?php echo $studente ?>
+            Nessun insegnamento registrato in carriera per <?php echo $studente ?>
         </div>
         <?php
     } else {

@@ -1,7 +1,9 @@
 <?php
 session_start();
 include('conf.php');
-
+?>
+<script></script>
+<?php
 function importVari(){
     echo '  <!-- import di Bootstrap-->
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
@@ -113,7 +115,8 @@ function setNavbarStudente($link){
     if ($link == "/studente/main.php") {$h_active = $active; $h_disab = $disabled;}
     if ($link == "/studente/iscrizioneEsame.php") {$ie_active = $active; $ie_disab = $disabled;}
     if ($link == "/studente/infoCdL.php") {$in_active = $active; $in_disab = $disabled;}
-    if ($link == "/studente/carriera.php") {$ca_active = $active; $ca_disab = $disabled;}
+    if ($link == "/studente/carrieravalida.php") {$ca_active = $active; $cv_disab = $disabled;}
+    if ($link == "/studente/carrieracompleta.php") {$ca_active = $active; $cc_disab = $disabled;}
 //echo $link;
     echo '    <!-- INIZIO NAVBAR -->
 <div class="container">
@@ -128,9 +131,14 @@ function setNavbarStudente($link){
           </a>
 </li>
 <li class="nav-item">
-          <a class="nav-link '.$ca_active. ' '.$ca_disab.'" href="carriera.php"  role="button" aria-expanded="true">
+          <a class="nav-link dropdown-toggle'.$ca_active. '"  id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
           <strong>🧑‍🏫 LA TUA CARRIERA</strong>
           </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown" data-bs-popper="none">
+            <li><a class="dropdown-item '.$cv_disab.'" href="carrieravalida.php" >Carriera Valida</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item '.$cc_disab.'" href="carrieracompleta.php" >Carriera Completa</a></li>
+          </ul>
 </li>
 <li class="nav-item">
           <a class="nav-link '.$in_active. ' '.$in_disab.'" href="infoCdL.php" role="button" aria-expanded="true">
