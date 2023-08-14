@@ -39,7 +39,10 @@ session_start();
         <div class="row justify-content-center sansation">
             <div class="col-md-6 text-center mb-5">
                 <h1 class="bigtitle"> <b>PiGEU</b></h1>
-                <h4>piattaforma di gestione per esami universitari</h4>>
+                <h4>piattaforma di gestione per esami universitari</h4>
+                <div style="color: #1b1e21">powered by
+                    <img src="/images/gothicF.png" width="40" alt="FontLogo">
+                </div>
             </div>
         </div>
         <div class="row justify-content-center">
@@ -71,19 +74,22 @@ session_start();
                     </form>
                   <!--  <p class="w-100 text-center">&mdash; Or Sign In With &mdash;</p> -->
                     <p class="w-100 text-center"></p>
-                    esito connessione:
+
                         <?php
                           include_once('functions.php');
                           $db = open_pg_connection();
                             if ($db) {
                             ?>
-                            <div class="uk-alert-success" uk-alert>
-                                <a class="uk-alert-close" uk-close></a>
-                                <p>connessione al database effettuata correttamente</p>
+                            <div>
+                                <p style="text-align: center">🟢 ONLINE</p>
                             </div>
                             <?php
                             } else {
-	                        print('errore accesso db');
+                                ?>
+                                <div>
+                                    <p style="text-align: center">🔴 OFFLINE</p>
+                                </div>
+                                <?php
                             exit;
                             }
                         ?>

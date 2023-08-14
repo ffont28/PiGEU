@@ -19,6 +19,24 @@ function importVari(){
             
              <meta charset="utf-8">';
 }
+
+function importVariPerHomePage(){
+    echo '  <!-- import di Bootstrap-->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+            
+            <!-- Includi jQuery dalla rete tramite un link CDN -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            
+            <link rel="stylesheet" href="/css/cssSegreteria.css">
+            <link rel="stylesheet" href="/css/from-re.css">
+            <link rel="stylesheet" href="/css/calendarioesami.css">
+            <link rel="stylesheet" href="/css/general.css">
+            <script src="/js/segreteria.js"></script>
+            <script src="/js/general.js"></script>
+            
+             <meta charset="utf-8">';
+}
 function setNavbarSegreteria($link){
 $active = "active"; $disabled = "disabled";
 $h_active = $gu_active = $gi_active = $gc_active = $ce_active ="";
@@ -53,7 +71,7 @@ if ($link == "/segreteria/generacarrieracompleta.php") {$ce_active = $active; $c
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item '.$mu_disab.'" href="gestisciutente.php">Modifica Utente</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item '.$ru_disab.'" href="rimuoviutente.php">Rimuozione Utente</a></li>
+            <li><a class="dropdown-item '.$ru_disab.'" href="rimuoviutente.php">Rimozione Utente</a></li>
           </ul>
 </li>
 <li class="nav-item dropdown">
@@ -222,13 +240,22 @@ function check_login($user, $password){
 
     if (pg_num_rows($result) > 0) {
         $param = array ($user);
+        $emailpersonale = "";
 
         //prelevo il NOME e il COGNOME dell'utente
-        $sql = "SELECT nome, cognome FROM utente WHERE email = $1";
+        $sql = "SELECT nome, cognome, emailpersonale FROM utente WHERE email = $1";
         $result = pg_query_params($db, $sql, $param);
         if ($row = pg_fetch_assoc($result)) {
             $_SESSION['nome'] = $row['nome'];
             $_SESSION['cognome'] = $row['cognome'];
+            $emailpersonale = $row['emailpersonale'];
+        }
+
+        // caso in cui è il primo accesso dell'utente, deve modificare la password
+        if (md5($emailpersonale) == $password){
+            $_SESSION['firstaccess'] = "YES";
+            header("Location: modificaPassword.php");
+            exit();
         }
 
         //caso in cui è SEGRETERIA

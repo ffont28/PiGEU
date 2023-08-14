@@ -629,5 +629,43 @@ FROM corso_di_laurea c INNER JOIN insegnamento_parte_di_cdl ip ON c.codice = ip.
                        INNER JOIN utente u ON u.email = d.docente;
 \end{lstlisting}
 \section{Prove di funzionamento}
-Assumendo il fatto che ciò che è consentito a basso livello (terminale e comandi SQL-DML) è ciò che viene anche consentito ad alto livello (GUI relizzata tramite HTML con interazioni grazie a PHP e Javascript), le prove di funzionamento verranno esibite mostrando delle schermate del terminale in cui si prova il funzionamento di quanto descritto finora, per la corretta esecuzione delle operazioni previste.
+Assumendo il fatto che ciò che è consentito a basso livello (terminale e comandi SQL-DML) è ciò che viene anche consentito ad alto livello (GUI relizzata tramite HTML con interazioni grazie a PHP e Javascript), le prove di funzionamento verranno esibite mostrando soprattutto schermate del terminale in cui si prova il funzionamento di quanto descritto finora, per la corretta esecuzione delle operazioni previste. Più precisamente verranno mostrate:
+\begin{itemize}
+    \item schermate dell'\textbf{interfaccia grafica} realizzata tramite HTML nel momento in cui vi è un inserimento di dati
+    \item schermate del \textbf{terminale} nel momento in cui si vuole provare la consistenza della base di dati dopo alcune operazioni. Verranno esaminate le operazioni più critiche che potrebbero compromettere la correttezza della rappresentazione della situazione reale nell'astrazione della base di dati.
+\end{itemize}
+Si cercherà, lungo l'esposizione di seguire un filo cronologico che possa rispecchiare l'effettivo utilizzo dell'utente che per la prima volta utilizza il presente software.
+\subsection{L'inserimento di un utente}
+La prima operazione da compiere per poter usufruire delle potenzialità di PiGEU è popolare la base di dati con utenti, ricordando che tra i tre diversi tipi di utenza, \textit{Segreteria}, \textit{Docente}, \textit{Studente}, solo la prima tipologia è autorizzata alla gestione delle utenze, nelle operazioni di inserimento, modifica e rimozione (consideriamo lo spostamento dello studente in \textit{storico} come un particolare tipo di rimozione)
+\subsubsection{Studente}
+Proviamo ora ad inserire un nuovo \textbf{studente} e verifichiamo come si comporta la base di dati dopo il suo inserimento come nuovo utente.
+Lo studente che prendiamo come modello è \texttt{demo\und studente@studenti.unimi.it}. Come mostrato nella schermata sottostante, tale studente in un primo momento non è presente nella base di dati:
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 12-21-45.png}
+
+Ora, dopo aver effettuato l'accesso come utente di segreteria, inseriamo il nuovo utente avente tipoloia \textit{studente}, come iscritto al corso di laurea in \textit{informatica}
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 14-09-50.png}
+
+Ed ecco mostrata la situazione all'interno della base di dati successivamente l'inserimento:
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 14-14-54.png}
+
+La rappresentazione dei dati è corretta: ora troviamo un nuovo utente con \attr{nome}, \attr{cognome}, \attr{email} e gli altri dati correttamente settati nella tabella \tabb{utente}. Siccome il tipo di utente è uno \textit{studente}, esso è presente anche nella tabella \tabb{studente} dove viene attribuita anche una \attr{matricola} e vi è l'indicazione di appartenenza a un \attr{corso\und di\und laurea}. Allo studente \texttt{Demo} è inoltre stato assegnato un elenco di insegnamenti di cui conseguire profitto per ottenere il titolo di laurea desiderato: ciascun \attr{insegnamento} della tabella \tabb{insegnamenti\und per\und carriera} è preso dalla tabella \tabb{insegnamento\und parte\und di\und cdl}
+
+\subsubsection{Docente}
+La seconda macro-entità coinvolta in PiGEU è il \textit{docente}: in questa sede ci avvarremo di \texttt{demo\und docente@unimi.it}. Anche in questo caso l'utente non è presente nella base di dati, e all'atto dell'inserimento decidiamo che sarà un docente \textit{associato} di \textit{informatica}
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 14-48-20.png}
+
+Vediamo che vi è consistenza nella base di dati: ora abbiamo un nuovo utente e anche un nuovo docente; l'ultima interrogazione alla base di dati è fatta appositamente per mostrare che, allo stato attuale, \texttt{demo\und docente@unimi.it} non è responsabile di nessun \textit{insegnamento}: tale riga della tabella \tabb{docente\und responsabile} verrà aggiunta all'atto della creazione di un nuovo \textit{insegnamento}, nella omonima tabella: all'aggiunta di un nuovo inserimento verrà specificato anche il docente responsabile.
+
+\subsection{L'inserimento di un nuovo insegnamento}
+Per continuare a popolare la base di dati è opportuno inserire anche degli insegnamenti: qui inseriremo \texttt{InsProva} all'interno del corso di laurea di \textit{Dimostrazione}, notando che al momento non è ancora presente l'isnegnamento nel corso di laurea, non essendo presente nemmeno l'insegnamento stesso:
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-00-26.png}
+
+allora procediamo come segue:
+
+
 \end{document}
