@@ -661,11 +661,56 @@ La seconda macro-entità coinvolta in PiGEU è il \textit{docente}: in questa se
 Vediamo che vi è consistenza nella base di dati: ora abbiamo un nuovo utente e anche un nuovo docente; l'ultima interrogazione alla base di dati è fatta appositamente per mostrare che, allo stato attuale, \texttt{demo\und docente@unimi.it} non è responsabile di nessun \textit{insegnamento}: tale riga della tabella \tabb{docente\und responsabile} verrà aggiunta all'atto della creazione di un nuovo \textit{insegnamento}, nella omonima tabella: all'aggiunta di un nuovo inserimento verrà specificato anche il docente responsabile.
 
 \subsection{L'inserimento di un nuovo insegnamento}
-Per continuare a popolare la base di dati è opportuno inserire anche degli insegnamenti: qui inseriremo \texttt{InsProva} all'interno del corso di laurea di \textit{Dimostrazione}, notando che al momento non è ancora presente l'isnegnamento nel corso di laurea, non essendo presente nemmeno l'insegnamento stesso:
+Per continuare a popolare la base di dati è opportuno inserire anche degli insegnamenti: qui inseriremo \texttt{InsProva} all'interno del corso di laurea di \textit{Dimostrazione}, notando che al momento non è ancora presente l'insegnamento nel corso di laurea, non essendo presente nemmeno l'insegnamento stesso:
 
-\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-00-26.png}
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-06-41.png}
 
-allora procediamo come segue:
+allora procediamo come segue, notando che all'atto dell'inserimento di un \textit{insegnamento} si può specificare anche una sua \textit{propedeuticità}
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-09-42.png}
+
+ottentendo così lo stato attuale:
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-15-08.png}
+
+\subsection{L'iscrizione a un esame}
+Una delle richieste fatte nelle speficiche indica che lo \textit{studente} deve potersi iscrivere ad esami del \textbf{solo} proprio corso di laurea. Per costruzione dell'interfaccia grafica lo studente può visualizzare il bottone di iscrizione solamente per esami di insegnamenti del proprio corso di laurea:
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-24-37.png}
+
+\subsubsection{Iscrizione all'un esame di un insegnamento al di fuori del corso di laurea}
+
+Ora possiamo provare a "forzare" l'iscrizione dal momento che notiamo che nella base di dati non sono presenti in calendario esami di altri insegnamenti,
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-48-17.png}
+
+ne possiamo fare aggiungere alcuni al nostro \attr{demo\und docente@unimi.it} ottenendo così la seguente situazione:
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-54-45.png}
+
+adesso abbiamo altri due esami calendarizzati non appartenenti al corso di laurea in \textit{informatica} in cui è iscritto \texttt{demo\und studente@studenti.unimi.it} e siccome il nostro \texttt{demo\und studente@studenti.unimi.it} non "vede" gli esami calendarizzati degli insegnamenti al di fuori del suo corso di laurea
+
+\includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-59-27.png}
+
+dobbiamo tentare l'iscrizione da terminale così da vedere se veramente il comportamento esibito dalla base di dati è quello atteso, eseguendolo nei seguenti step:
+\begin{itemize}
+    \item iscrizione corretta ad un esame di un insegnamento che fa parte del corso di laurea
+
+    \includegraphics[scale=0.2]{images/Schermata del 2023-08-14 16-02-39.png}
+
+    ottenendo così la situazione seguente
+
+    \includegraphics[scale=0.2]{images/Schermata del 2023-08-14 16-39-16.png}
+
+    \item tentativo di iscrizione ad un esame non consentito
+
+    \includegraphics[scale=0.2]{images/Schermata del 2023-08-14 16-47-21.png}
+
+    con il conseguente sollevamento dell'informazione da parte del trigger che comunica il messaggio personalizzato impostato nella dichiarazione dello stesso.
+
+\end{itemize}
+
+\subsubsection{Iscrizione senza rispettare la propedeuticità}
 
 
 \end{document}
