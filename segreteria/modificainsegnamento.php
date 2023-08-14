@@ -218,22 +218,6 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                             </select>
                     </div>';
 
-                                        //// VA TENUTO PER LA RICHIESTA AJAX ////
-//            echo '<div id="anno">
-//                    <label for="exampleFormControlInput1" class="form-label">Anno dell\'insegnamento</label>
-//                    <select class="form-select" aria-label="Default select example" id="anno" name="anno">
-//                              <option ';
-//            if ($cfu == '6') {echo " selected ";}
-//            echo 'value="6">6</option>
-//                              <option ';
-//            if ($cfu== '9') {echo 'selected ';}
-//            echo 'value="9">9</option>
-//                              <option ';
-//            if ($cfu == '12') {echo 'selected ';}
-//            echo 'value="12">12</option>
-//                            </select>
-//                    </div>';
-
             echo " <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA INSEGNAMENTO\" name='action'/>
                         </div>
                     </form>
@@ -243,6 +227,179 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
+    ///////////////////////////// DOCENTI CHE INSEGNANO IN QUESTO CORSO //////////////////////
+    try {
+
+
+        $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $query_insegnano =   "SELECT u.nome, u.cognome, u.email
+                              FROM utente u INNER JOIN docente d ON u.email = d.utente
+                                            INNER JOIN insegna i ON d.utente = i.docente
+                                            WHERE i.insegnamento = :i";
+        $query_non_insegnano ="SELECT u.nome, u.cognome, u.email
+                               FROM utente u INNER JOIN docente d ON u.email = d.utente
+                                             WHERE d.utente <> ALL (SELECT docente FROM insegna WHERE insegnamento = :i)
+                                             ";
+
+        $stmt1 = $conn->prepare($query_insegnano);
+        $stmt2 = $conn->prepare($query_non_insegnano);
+
+        $stmt1->bindParam(':i', $codiceInsegnamento, PDO::PARAM_STR);
+        $stmt2->bindParam(':i', $codiceInsegnamento, PDO::PARAM_STR);
+
+        $stmt1->execute();
+        $stmt2->execute();
+
+        $results1 = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+        $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+        <div><label for="exampleFormControlInput1" class="form-label"><h3>Docenti coinvolti con l'insegnamento</h3></label></div>
+        <div class="splitin2">
+            <div>
+            <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">DOCENTI CHE INSEGNANO QUESTA DISCIPLINA </th>
+                <th scope="col" style="text-align: center;">RIMUOVI</th>
+            </tr>
+            </thead>
+            <tbody>';
+<?php
+        $counter = 1;
+        foreach ($results1 as $row) {
+            ?> <tr>
+               <th scope="row"><?php echo $counter++ ?></th>
+               <td><?php echo $row["cognome"]. " ".$row["nome"]?></td>
+               <td style="text-align: center;">
+               <button class="button-canc-doc"
+                       docente="<?php echo $row['email'] ?>"
+                       insegnamento="<?php echo $codiceInsegnamento ?>">rimuovi docente</button></td>
+<?php   }
+        ?>
+            </tbody>
+        </table>
+    </div>
+            <div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">DOCENTI CHE NON INSEGNANO QUESTA DISCIPLINA </th>
+                        <th scope="col" style="text-align: center;">AGGIUNGI</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $counter = 1;
+                    foreach ($results2 as $row) {
+                        ?> <tr>
+                            <th scope="row"><?php echo $counter++ ?></th>
+                            <td><?php echo $row["cognome"]. " ".$row["nome"]?></td>
+                            <td style="text-align: center;">
+                                <button class="button-add-doc"
+                                        docente="<?php echo $row['email'] ?>"
+                                        insegnamento="<?php echo $codiceInsegnamento ?>">aggiungi docente</button></td>
+                        </tr>
+                    <?php   }
+                    ?>
+                    </tbody>
+                </table>
+
+
+
+
+            </div>
+        </div>
+    <?php
+    } catch (PDOException $e) {
+        echo "Errore: " . $e->getMessage();
+    }
+
+   ?>
+        <script>
+  // RIMUOVI IL DOCENTE DALLA TABELLA INSEGNA
+  function cancellaDocDaIns(insegnamento, docente) {
+    const xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function() {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          // Gestisci la risposta del server
+          const response = JSON.parse(this.responseText);
+          console.log(response);
+        if (response.success) {
+            window.location.reload();
+          }
+        } else {
+          // Gestisci eventuali errori
+          console.error('Errore nella richiesta AJAX 338:', this.statusText);
+          window.location.reload();
+         }
+      }
+    };
+
+    xhttp.open('POST', 'rimuovidocdains.php', true);
+    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + '&docente=' + encodeURIComponent(docente);
+    xhttp.send(params);
+  }
+
+  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
+  const removeDocDaIns = document.querySelectorAll('.button-canc-doc');
+  removeDocDaIns.forEach(button => {
+    button.addEventListener('click', function() {
+      const insegnamento = this.getAttribute('insegnamento');
+      const docente = this.getAttribute('docente');
+
+      // Effettua la richiesta AJAX
+      cancellaDocDaIns(insegnamento, docente);
+    });
+  });
+
+/// AGGIUNGI IL DOCENTE ALLA TABELLA INSEGNA
+
+  function inserisciDocInIns(insegnamento, docente) {
+      const xhttp = new XMLHttpRequest();
+
+      xhttp.onreadystatechange = function() {
+          if (this.readyState === 4) {
+              if (this.status === 200) {
+                  // Gestisci la risposta del server
+                  const response = JSON.parse(this.responseText);
+                  console.log(response);
+                  if (response.success) {
+                      window.location.reload();
+                  }
+              } else {
+                  // Gestisci eventuali errori
+                  console.error('Errore nella richiesta AJAX:', this.statusText);
+              }
+          }
+      };
+
+      xhttp.open('POST', 'aggiungidocains.php', true);
+      xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+      const params = 'insegnamento=' + encodeURIComponent(insegnamento) + '&docente=' + encodeURIComponent(docente);
+      xhttp.send(params);
+  }
+
+  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
+  const addDocIntoIns = document.querySelectorAll('.button-add-doc');
+  addDocIntoIns.forEach(button => {
+      button.addEventListener('click', function() {
+          const insegnamento = this.getAttribute('insegnamento');
+          const docente = this.getAttribute('docente');
+
+          // Effettua la richiesta AJAX
+          inserisciDocInIns(insegnamento, docente);
+      });
+  });
+
+</script>
+<?php
 ///////////////////////////// CDL DI CUI QUESTO INSEGNAMENTO FA PARTE E CHE POSSO RIMUOVERE //////////////////////
     try {
 

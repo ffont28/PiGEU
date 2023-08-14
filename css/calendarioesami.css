@@ -55,6 +55,24 @@ input[type="submit"]:hover {
     cursor: pointer;
 }
 
+.button-canc-doc {
+    padding: 1px 10px;
+    background-color: #fc1800; /* Colore di sfondo rosso */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-add-doc {
+    padding: 1px 10px;
+    background-color: #0eaf00; /* Colore di sfondo rosso */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
 .button-iscr {
     padding: 1px 10px;
     background-color: #28930a; /* Colore di sfondo rosso */
