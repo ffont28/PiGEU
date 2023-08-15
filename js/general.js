@@ -43,3 +43,31 @@ function submitForm() {
     form.submit();
 }
 
+function isCookieSet(name) {
+    return document.cookie.indexOf(name + "=") !== -1;
+}
+
+function getCookie(name) {
+    const value = "; " + document.cookie;
+    const parts = value.split("; " + name + "=");
+
+    if (parts.length === 2) {
+        return parts.pop().split(";").shift();
+    }
+}
+
+function getNumericCookie(name) {
+    const value = getCookie(name); // Assume che tu abbia una funzione getCookie() come descritto in precedenza
+    if (value) {
+        return parseInt(value); // Converti la stringa in un numero intero
+    }
+    return null; // Se il cookie non è presente
+}
+
+function setCookie(name, value, days) {
+    const expirationDate = new Date();
+    expirationDate.setTime(expirationDate.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + expirationDate.toUTCString();
+    document.cookie = name + "=" + value.toString() + ";" + expires + ";path=/";
+}
+

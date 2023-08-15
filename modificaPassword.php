@@ -57,8 +57,7 @@ importVariPerHomePage();
 if($_SERVER['REQUEST_METHOD']=='POST'){
     include_once('functions.php');
 
-
-    $db = open_pg_connection();
+$db = open_pg_connection();
 $new_password = md5($_POST['password1']);
 $params = array($_SESSION['username'], $new_password);
 $sql = "UPDATE credenziali SET password = $2 WHERE username = $1";
@@ -67,32 +66,27 @@ $result = pg_prepare($db, 'modificapwd', $sql);
 if ($result) {
     $result = pg_execute($db, 'modificapwd', $params);
 
-    if ($result) {  ?>
-    <script>
-        const popup = document.getElementById('popup');
-        const popupText = document.getElementById('popup-text');
-        popupText.textContent = 'Password modificata con successo, attendi il redirecting alla Home Page';
-        popup.classList.add('active');
-        setTimeout(function() {
-            window.location.href = "index.php";
-        }, 4000);
-    </script>
-    <?php
+            if ($result) {  ?>
+            <script>
+                const popup = document.getElementById('popup');
+                const popupText = document.getElementById('popup-text');
+                popupText.textContent = 'Password modificata con successo, attendi il redirecting alla Home Page';
+                popup.classList.add('active');
+                setTimeout(function() {
+                    window.location.href = "index.php";
+                }, 4000);
+            </script>
+            <?php
 
+            } else {
+                // Operazione fallita
+                echo "Errore durante l'aggiornamento della password.";
+            }
     } else {
-        // Operazione fallita
-        echo "Errore durante l'aggiornamento della password.";
+        // Errore nella preparazione della query
+        echo "Errore nella preparazione della query.";
     }
-} else {
-    // Errore nella preparazione della query
-    echo "Errore nella preparazione della query.";
 }
-
-
-
-}
-
-
 ?>
 
 <form> <!-- action="../index.php" > -->
