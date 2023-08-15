@@ -434,44 +434,88 @@ Nella \textit{specifica 2.2.2} viene detto che
 \begin{quote}
     Ciascuno studente può iscriversi ad un esame solo se l'insegnamento è previsto dal proprio corso di laurea, e solamente se tutte le propedeuticità sono rispettate.
 \end{quote}
-La prima condizione, cioé la possibilità di iscrizione ai soli esami di insegnamenti del proprio corso di laurea, viene controllata tramite un trigger denominato \sqltrigger{no\und iscriz\und se\und non\und in\und CdL} di cui viene fornito il codice sorgente
-\begin{lstlisting}[
-    language={SQL},
-    title={\texttt{no\und iscriz\und se\und non\und in\und CdL}}]
+
+\begin{itemize}
+    \item La prima condizione, cioé la possibilità di iscrizione ai soli esami di insegnamenti del proprio corso di laurea, viene controllata tramite un trigger denominato \sqltrigger{no\und iscriz\und se\und non\und in\und CdL} di cui viene fornito il codice sorgente
+    \begin{lstlisting}[
+        language={SQL},
+        title={\texttt{no\und iscriz\und se\und non\und in\und CdL}}]
 CREATE OR REPLACE TRIGGER no_iscriz_se_non_in_CdL
     BEFORE INSERT OR UPDATE ON iscrizione
     FOR EACH ROW
 EXECUTE FUNCTION check_appartenenza_cdl();
-\end{lstlisting}
-Tale trigger prima che venga inserita una riga nella tabella \tabb{iscrizione} chiama l'esecuzione della funzione \sqlfunc{check\und appartenenza\und cdl} di seguito mostrata
-\begin{lstlisting}[
-    language={SQL},
-    title={\texttt{check\und appartenenza\und cdl()}}]
+    \end{lstlisting}
+    Tale trigger prima che venga inserita una riga nella tabella \tabb{iscrizione} chiama l'esecuzione della funzione \sqlfunc{check\und appartenenza\und cdl} di seguito mostrata
+    \begin{lstlisting}[
+        language={SQL},
+        title={\texttt{check\und appartenenza\und cdl()}}]
 CREATE OR REPLACE FUNCTION check_appartenenza_cdl() RETURNS TRIGGER as $$
 BEGIN
     PERFORM * FROM calendario_esami c
             INNER JOIN insegnamenti_per_carriera ipc ON ipc.insegnamento = c.insegnamento
-            WHERE ipc.studente = NEW.studente;
+            WHERE ipc.studente = NEW.studente AND NEW.esame = c.id;
     IF FOUND THEN
-        -- l'esame che si vuole inserire in calendario_esami e' presente in ipc
+        -- l'esame che si vuole inserire in calendario_esami e'' presente in ipc
         RETURN NEW;
     ELSE
-        -- l'esame che si vuole inserire in calendario_esami NON e' presente in ipc
-        RAISE NOTICE 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui e'' iscritto lo studente';
-        PERFORM pg_notify('notifica', 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui e iscritto lo studente');
+        -- l'esame che si vuole inserire in calendario_esami NON e'' presente in ipc
+        RAISE NOTICE 'ATTENZIONE: non e'' consentita l''iscrizione ad un esame che non appartiene al corso di laurea di uno studente';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: non e'' consentita l''iscrizione ad un esame che non appartiene al corso di laurea di uno studente');
         RETURN NULL;
     END IF;
 END;
 $$ language 'plpgsql';
-\end{lstlisting}
-La funzione appena mostrata mostra alcune particolarità dovute all'implementazione scelta:
-\begin{itemize}
-    \item a livello di progettazione, si verifica non che l'insegnamento a cui si vuole iscrivere lo studente appartenga non tanto al corso di laurea, quanto all'\textit{elenco di insegnamenti}, presente nella tabella \tabb{insegnamenti\und per\und carriera} che lo studente è tenuto a superare, che viene generato all'atto dell'immatricolazione dello studente. Tale elenco di insegnamenti viene preso riferendosi al corso di laurea quindi si aderisce alle specifiche date, pur aggiungendo una sottigliezza, ovvero quella della mutabilità di un corso di laurea che oggi può contenere \texttt{n} insegnamenti, domani ne può contenere \texttt{m} con \texttt{n}$\neq$\texttt{m}
-    \item a livello di funzionalità, la funzione contiene anche i messaggi di informazione:
+    \end{lstlisting}
+    La funzione appena mostrata mostra alcune particolarità dovute all'implementazione scelta:
     \begin{itemize}
-        \item la \sqlcommand{NOTICE} verrà mostrata come messaggio se la funzione viene chiamata da terminale
-        \item il comando \sqlcommand{PERFORM pg\und notify} invece genererà una notifica che potrà essere catturata dal linguaggio di scripting PHP
+        \item a livello di progettazione, si verifica non che l'insegnamento a cui si vuole iscrivere lo studente appartenga non tanto al corso di laurea, quanto all'\textit{elenco di insegnamenti}, presente nella tabella \tabb{insegnamenti\und per\und carriera} che lo studente è tenuto a superare, che viene generato all'atto dell'immatricolazione dello studente. Tale elenco di insegnamenti viene preso riferendosi al corso di laurea quindi si aderisce alle specifiche date, pur aggiungendo una sottigliezza, ovvero quella della mutabilità di un corso di laurea che oggi può contenere \texttt{n} insegnamenti, domani ne può contenere \texttt{m} con \texttt{n}$\neq$\texttt{m}
+        \item a livello di funzionalità, la funzione contiene anche i messaggi di informazione:
+        \begin{itemize}
+            \item la \sqlcommand{NOTICE} verrà mostrata come messaggio se la funzione viene chiamata da terminale
+            \item il comando \sqlcommand{PERFORM pg\und notify} invece genererà una notifica che potrà essere catturata dal linguaggio di scripting PHP
+        \end{itemize}
     \end{itemize}
+
+    \item La seconda condizione invece, ovvero il rispetto delle propedeuticità, è controllata dal seguente trigger:
+    \begin{lstlisting}[
+        language={SQL},
+        title={\texttt{no\und esami\und senza\und propedeuticità}}]
+CREATE OR REPLACE TRIGGER no_esami_senza_propedeuticita
+    BEFORE INSERT OR UPDATE ON iscrizione
+    FOR EACH ROW
+EXECUTE FUNCTION check_propedeuticita();
+    \end{lstlisting}
+
+    che chiama l'esecuzione della seguente funzione
+
+    \begin{lstlisting}[
+        language={SQL},
+        title={\texttt{check\und propedeuticita()}}]
+CREATE OR REPLACE FUNCTION check_propedeuticita() RETURNS TRIGGER as $$
+BEGIN
+    -- cerco se c'e' in propedeuticita' e nel caso che in carriera 'insegnamento1' sia superato
+    PERFORM * FROM propedeuticita p
+        --INNER JOIN carriera c ON c.insegnamento = p.insegnamento1 AND c.studente = NEW.studente
+        INNER JOIN calendario_esami ce ON ce.insegnamento = p.insegnamento2
+        WHERE ce.id = NEW.esame;
+        IF NOT FOUND THEN
+            RETURN NEW;
+        ELSE        PERFORM * FROM carriera c
+                    INNER JOIN calendario_esami ce ON ce.insegnamento = c.insegnamento
+                    INNER JOIN propedeuticita p ON p.insegnamento1 = ce.insegnamento
+                    WHERE c.valutazione >= 18;
+                    IF FOUND THEN
+                        RETURN NEW;
+                    ELSE
+                        RAISE NOTICE 'ATTENZIONE: non e'' possibile iscriversi ad un esame senza aver superato la sua propedeuticita'' ';
+                        PERFORM pg_notify('notifica', 'ATTENZIONE: non e' possibile iscriversi ad un esame senza aver superato la sua propedeuticita'' ');
+                        RETURN NULL;
+                    END IF;
+        END IF;
+END;
+$$ language 'plpgsql';
+    \end{lstlisting}
+    Le osservazioni su quanto riguarda il sollevamento della \sqlcommand{NOTICE} che verrà catturata poi dallo script PHP grazie al comando \sqlcommand{PERFORM pg\und notify} sono del tutto analoghe al punto precedente.
 \end{itemize}
 \subsubsection{Correttezza del calendario d'esame - [specifica 2.2.3]}
 Viene richiesto, tra le specifiche:
@@ -634,7 +678,7 @@ Assumendo il fatto che ciò che è consentito a basso livello (terminale e coman
     \item schermate dell'\textbf{interfaccia grafica} realizzata tramite HTML nel momento in cui vi è un inserimento di dati
     \item schermate del \textbf{terminale} nel momento in cui si vuole provare la consistenza della base di dati dopo alcune operazioni. Verranno esaminate le operazioni più critiche che potrebbero compromettere la correttezza della rappresentazione della situazione reale nell'astrazione della base di dati.
 \end{itemize}
-Si cercherà, lungo l'esposizione di seguire un filo cronologico che possa rispecchiare l'effettivo utilizzo dell'utente che per la prima volta utilizza il presente software.
+Si cercherà, lungo l'esposizione di seguire un filo cronologico che possa rispecchiare l'effettivo utilizzo dell'utente che per la prima volta utilizza il presente software. Inoltre verrà mostrato il funzionamento di PiGEU nell'ottica dell'adesione alle specifiche, e anche altre prove di funzionamento che si ritiene opportuno mostrare.
 \subsection{L'inserimento di un utente}
 La prima operazione da compiere per poter usufruire delle potenzialità di PiGEU è popolare la base di dati con utenti, ricordando che tra i tre diversi tipi di utenza, \textit{Segreteria}, \textit{Docente}, \textit{Studente}, solo la prima tipologia è autorizzata alla gestione delle utenze, nelle operazioni di inserimento, modifica e rimozione (consideriamo lo spostamento dello studente in \textit{storico} come un particolare tipo di rimozione)
 \subsubsection{Studente}
@@ -711,6 +755,42 @@ dobbiamo tentare l'iscrizione da terminale così da vedere se veramente il compo
 \end{itemize}
 
 \subsubsection{Iscrizione senza rispettare la propedeuticità}
+L'iscrizione ad un esame di cui non si è rispettata la propedeuticità viene impedita sia da interfaccia grafica, sia da terminale a causa di un trigger che controlla il rispetto delle propedeuticità. Prendiamo come esempio il corso di \textit{informatica} in cui l'insegnamento di \textit{Matematica del Continuo} è propedeutico all'insegnamento di \textit{Statistica e analisi dei dati}
+Nella fattispecie:
+\begin{itemize}
+    \item Nell'interfaccia grafica, qualora si clicchi sul pulsante "iscriviti", viene mostrato un messaggio di errore sollevato dal trigger e caturato dallo script PHP che riflette tale messaggio a schermo:
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-14 17-54-19.png}
+
+    \item Da terminale invece, viene mostrato il messaggio del trigger, lo stesso mostrato prima in interfaccia grafica:
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-14 17-59-09.png}
+\end{itemize}
+
+\subsection{Calendarizzare un esame}
+Abbiamo già visto che con PiGEU si possono calendarizzare esami, ma nelle specifiche viene chiesto che venga inibita la possibilità di calendarizzare nella stessa data, due esami dello stesso anno di un corso di laurea.
+Ecco un estratto della situazione attuale per quanto riguarda gli insegnamenti:
+
+\includegraphics[scale=0.35]{images/Schermata del 2023-08-14 18-12-19.png}
+
+E per quanto riguarda il calendario esami:
+
+\includegraphics[scale=0.35]{images/Schermata del 2023-08-14 18-15-09.png}
+
+Notiamo subito che il trigger impostato per non permettere nella stessa giornata due esami di insegnamenti dello stesso anno dello stesso corso di laurea dovrebbe inibire la possibilità all'insegnamento di \textit{Matematica del Continuo} di inserire un esame per la data del \texttt{23-02-2222} poiché in tale data c'è già programmato un esame di \textit{Architetura degli elaboratori i}.
+\begin{itemize}
+    \item Nell'interfaccia grafica, cliccando su "inserisci" l'esame non viene calendarizzato
+\end{itemize}
+\section{Funzionalità \textit{user-friendly}}
+\section{Sicurezza di PiGEU}
+\subsection{crittografia delle credenziali}
+\subsection{autorizzazioni per determinati utenti}
+\begin{itemize}
+    \item il controllo in homepage del tipo di utente
+    \item la navbar limitata all'utente
+    \item controllo in testa a ogni pagina
+\end{itemize}
+
 
 
 \end{document}
