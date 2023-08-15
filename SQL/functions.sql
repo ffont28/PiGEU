@@ -303,3 +303,27 @@ BEGIN
         LIMIT 1;
 END;
 $$ LANGUAGE plpgsql;
+
+
+----------------------------------------------------
+----------- creo una funzione che restituisca una tabella con tutti i cdl di cui fa parte un dato insegnamento
+CREATE OR REPLACE FUNCTION cdl_di_appartenenza(I varchar) RETURNS TABLE (
+             codice varchar,
+             nome varchar,
+             anno integer,
+             cfu char,
+             codiceins varchar
+         ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT c.codice,
+               c.nome,
+               ip.anno,
+               ins.cfu,
+               ins.codice
+        FROM corso_di_laurea c
+                 INNER JOIN insegnamento_parte_di_cdl ip ON c.codice = ip.corso_di_laurea
+                 INNER JOIN insegnamento ins ON ip.insegnamento = ins.codice
+        WHERE ip.insegnamento = I;
+END;
+$$ LANGUAGE plpgsql;

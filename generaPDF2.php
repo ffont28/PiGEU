@@ -63,9 +63,9 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
     try {
 
         $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-        $query = "SELECT * FROM carriera_completa_esami_sostenuti(:studente)";
+        $query = "SELECT * FROM carriera_valida(:studente)";
         if ($_POST['action'] == 'carriera_completa'){
-            $query = "SELECT * FROM carriera_completa_tutti(:studente)";
+            $query = "SELECT * FROM carriera_completa(:studente)";
         }
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':studente', $studente);
