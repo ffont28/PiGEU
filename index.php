@@ -1,5 +1,11 @@
+<?php
+session_start();
+include('functions.php');
+importVariPerHomePage();
+$_SESSION['waitValue'] = 2000;
+?>
 <!doctype html>
-<html lang="en">
+<html lang="it">
 <head>
     <title>PiGEU login</title>
     <meta charset="utf-8">
@@ -39,14 +45,17 @@ session_start();
         <div class="row justify-content-center sansation">
             <div class="col-md-6 text-center mb-5">
                 <h1 class="bigtitle"> <b>PiGEU</b></h1>
-                <h4>piattaforma di gestione per esami universitari</h4>>
+                <h4>piattaforma di gestione per esami universitari</h4>
+                <div style="color: #1b1e21">powered by
+                    <img src="/images/gothicF.png" width="40" alt="FontLogo">
+                </div>
             </div>
         </div>
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-4">
                 <div class="login-wrap p-0">
                     <h3 class="mb-4 text-center">inserisci le tue credenziali per accedere ai servizi universitari</h3>
-                    <form action="loggedin.php" class="signin-form" method= "POST">
+                    <form action="#" class="signin-form" method= "POST">
                         <div class="form-group">
                             <input type="text" class="form-control" placeholder="Username" name="username" required>
                         </div>
@@ -71,19 +80,22 @@ session_start();
                     </form>
                   <!--  <p class="w-100 text-center">&mdash; Or Sign In With &mdash;</p> -->
                     <p class="w-100 text-center"></p>
-                    esito connessione:
+
                         <?php
                           include_once('functions.php');
                           $db = open_pg_connection();
                             if ($db) {
                             ?>
-                            <div class="uk-alert-success" uk-alert>
-                                <a class="uk-alert-close" uk-close></a>
-                                <p>connessione al database effettuata correttamente</p>
+                            <div>
+                                <p style="text-align: center">🟢 ONLINE</p>
                             </div>
                             <?php
                             } else {
-	                        print('errore accesso db');
+                                ?>
+                                <div>
+                                    <p style="text-align: center">🔴 OFFLINE</p>
+                                </div>
+                                <?php
                             exit;
                             }
                         ?>
@@ -104,6 +116,55 @@ session_start();
 <script src="js/main.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8b253dfea2ab4077af8c6f58422dfbfd1689876627854" integrity="sha512-bjgnUKX4azu3dLTVtie9u6TKqgx29RBwfj3QXYt5EKfWM/9hPSAI/4qcV5NACjwAo8UtTeWefx6Zq5PHcMm7Tg==" data-cf-beacon='{"rayId":"7ede14c73b0c83a3","token":"cd0b4b3a733644fc843ef0b185f98241","version":"2023.7.0","si":100}' crossorigin="anonymous"></script>
 
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <h2 style="text-align: center">⛔ ACCESSO NEGATO ⛔</h2>
+        <p style="text-align: center" id="popup-text"></p>
+    </div>
+</div>
+
 
 </body>
 </html>
+<?php
+if($_SERVER['REQUEST_METHOD']=='POST'){
+    include_once('functions.php');
+
+    $db = open_pg_connection();
+    $username= $_POST['username'];
+    $password = md5($_POST['password']);
+    $params = array($username, $password);
+    $sql = "SELECT FROM credenziali WHERE password = $2 AND username = $1";
+    $result = pg_prepare($db, 'checkauth', $sql);
+
+    $result = pg_execute($db, 'checkauth', $params);
+        if (pg_num_rows($result) == 0) {
+            ?>
+            <script>
+                const popup = document.getElementById('popup');
+                const popupText = document.getElementById('popup-text');
+                popupText.textContent = 'NOME UTENTE o PASSWORD NON CORRETTI';
+                popup.classList.add('active');
+                setTimeout(function() {
+                    popup.classList.remove('active');
+                }, <?php echo $_SESSION['waitValue']; ?>); // Utilizza il valore corrente di waitValue
+                <?php $_SESSION['waitValue'] = $_SESSION['waitValue'] * 2; ?>
+            </script>
+            <?php
+            echo $_SESSION['waitValue'];
+        } else { ?>
+            <form id="postForm" method="post" action="loggedin.php">
+        <input type="hidden" name="username" value="<?php echo $username ?>">
+        <input type="hidden" name="password" value="<?php echo $password ?>">
+        <button type="submit" style="display: none;"></button>
+    </form>
+
+    <script>
+            // Sottometti automaticamente il form quando la pagina si carica
+            window.onload = function() {
+                document.getElementById('postForm').submit();
+            };
+    </script>
+ <?php }
+}
+?>

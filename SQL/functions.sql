@@ -170,7 +170,7 @@ BEGIN
                  INNER JOIN studente s ON ic.studente = s.utente
                  INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
                  INNER JOIN insegnamento i ON ic.insegnamento = i.codice
-        WHERE ic.studente = TARGET;
+        WHERE ic.studente = TARGET and c.studente = TARGET;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -237,7 +237,7 @@ CREATE OR REPLACE FUNCTION carriera_completa(TARGET varchar) RETURNS TABLE (
             ) AS $$
 BEGIN
     RETURN QUERY
-        SELECT ic.studente,
+        SELECT DISTINCT ic.studente,
                u2.nome nomstu,
                u2.cognome cogstu,
                cdl.nome cdl,
@@ -256,10 +256,47 @@ BEGIN
                  INNER JOIN studente s ON ic.studente = s.utente
                  INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
                  INNER JOIN insegnamento i ON ic.insegnamento = i.codice
-        WHERE ic.studente = TARGET;
+        WHERE ic.studente = TARGET AND c.studente = TARGET
+        GROUP BY ic.studente, u2.nome, u2.cognome, cdl.nome, s.matricola, ic.insegnamento, i.nome, u.nome, u.cognome, c.valutazione, c.data;
 END;
 $$ LANGUAGE plpgsql;
-
+----------------------------------
+CREATE OR REPLACE FUNCTION carriera_completa_sto(TARGET varchar) RETURNS TABLE (
+               studente varchar,
+               nomstu varchar,
+               cogstu varchar,
+               cdl varchar,
+               matr integer,
+               codins varchar,
+               nomins varchar,
+               nomdoc varchar,
+               cogdoc varchar,
+               voto smallint,
+               data date
+           ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT DISTINCT c.studente,
+                        u2.nome nomstu,
+                        u2.cognome cogstu,
+                        cdl.nome cdl,
+                        s.matricola matr,
+                        c.insegnamento,
+                        i.nome,
+                        u.nome nomedoc,
+                        u.cognome cogndoc,
+                        c.valutazione,
+                        c.data
+        FROM carriera_storico c
+                 INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente_storico u2 ON c.studente = u2.email
+                 INNER JOIN studente_storico s ON c.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON c.insegnamento = i.codice
+        WHERE c.studente = TARGET;
+        END;
+$$ LANGUAGE plpgsql;
 --------------------------------------------------------------------------
 -- VERSIONE CORRETTA ------------
 -- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
@@ -279,7 +316,7 @@ CREATE OR REPLACE FUNCTION carriera_valida(TARGET varchar) RETURNS TABLE (
        ) AS $$
 BEGIN
     RETURN QUERY
-        SELECT ic.studente,
+        SELECT DISTINCT ic.studente,
                u2.nome nomstu,
                u2.cognome cogstu,
                cdl.nome cdl,
@@ -298,8 +335,76 @@ BEGIN
                  INNER JOIN studente s ON ic.studente = s.utente
                  INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
                  INNER JOIN insegnamento i ON ic.insegnamento = i.codice
-        WHERE ic.studente = TARGET AND c.valutazione >= 18
-        ORDER BY c.data DESC
-        LIMIT 1;
+        WHERE ic.studente = TARGET AND c.studente = TARGET
+          AND c.valutazione >= 18
+          AND c.data = (SELECT MAX(c2.data)
+                            FROM carriera c2 WHERE c2.insegnamento = ic.insegnamento);
 END;
 $$ LANGUAGE plpgsql;
+
+--------------
+
+CREATE OR REPLACE FUNCTION carriera_valida_sto(TARGET varchar) RETURNS TABLE (
+                 studente varchar,
+                 nomstu varchar,
+                 cogstu varchar,
+                 cdl varchar,
+                 matr integer,
+                 codins varchar,
+                 nomins varchar,
+                 nomdoc varchar,
+                 cogdoc varchar,
+                 voto smallint,
+                 data date
+             ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT DISTINCT c.studente,
+                        u2.nome nomstu,
+                        u2.cognome cogstu,
+                        cdl.nome cdl,
+                        s.matricola matr,
+                        c.insegnamento,
+                        i.nome,
+                        u.nome nomedoc,
+                        u.cognome cogndoc,
+                        c.valutazione,
+                        c.data
+        FROM  carriera_storico c
+                 INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente_storico u2 ON c.studente = u2.email
+                 INNER JOIN studente_storico s ON c.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON c.insegnamento = i.codice
+        WHERE c.studente = TARGET
+          AND c.valutazione >= 18
+          AND c.data = (SELECT MAX(c2.data)
+                        FROM carriera_storico c2 WHERE c2.insegnamento = c.insegnamento);
+END;
+$$ LANGUAGE plpgsql;
+
+
+----------------------------------------------------
+----------- creo una funzione che restituisca una tabella con tutti i cdl di cui fa parte un dato insegnamento
+CREATE OR REPLACE FUNCTION cdl_di_appartenenza(I varchar) RETURNS TABLE (
+             codice varchar,
+             nome varchar,
+             anno integer,
+             cfu char,
+             codiceins varchar
+         ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT c.codice,
+               c.nome,
+               ip.anno,
+               ins.cfu,
+               ins.codice
+        FROM corso_di_laurea c
+                 INNER JOIN insegnamento_parte_di_cdl ip ON c.codice = ip.corso_di_laurea
+                 INNER JOIN insegnamento ins ON ip.insegnamento = ins.codice
+        WHERE ip.insegnamento = I;
+END;
+$$ LANGUAGE plpgsql;
+

@@ -19,17 +19,12 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
 
     <h1> PAGINA DI GESTIONE CALENDARIO ESAMI</h1>
 
-    <div class="alert alert-primary" role="alert">
-        Benvenuto <?php echo $_SESSION['nome'] . " " . $_SESSION['cognome']; ?> !
-    </div>
     <div>
         <label for="exampleFormControlInput1" class="form-label">Inserisci la data e l'ora per l'esame</label>
             <form id="inserimentoDataOra" action="" method="POST">
                 <label for="insegnamento" >Insegnamento:</label>
                 <select type='insegnamento' id="insegnamento" name="insegnamento">
                 <?php
-                include('../functions.php');
-                include('../conf.php');
                 $docente = $_SESSION['username'];
                 echo "<script>console.log('Debug Objects:>> " . $docente .  " ' );</script>";
 

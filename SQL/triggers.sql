@@ -41,14 +41,14 @@ CREATE OR REPLACE FUNCTION check_appartenenza_cdl() RETURNS TRIGGER as $$
 BEGIN
     PERFORM * FROM calendario_esami c
             INNER JOIN insegnamenti_per_carriera ipc ON ipc.insegnamento = c.insegnamento
-            WHERE ipc.studente = NEW.studente;
+            WHERE ipc.studente = NEW.studente AND NEW.esame = c.id;
     IF FOUND THEN
         -- l'esame che si vuole inserire in calendario_esami è presente in ipc
         RETURN NEW;
     ELSE
         -- l'esame che si vuole inserire in calendario_esami NON è presente in ipc
-        RAISE NOTICE 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui è iscritto lo studente';
-        PERFORM pg_notify('notifica', 'ATTENZIONE: l''esame a cui ti vuoi iscrivere non fa parte del CdL a cui è iscritto lo studente');
+        RAISE NOTICE 'ATTENZIONE: non è consentita l''iscrizione ad un esame che non appartiene al corso di laurea di uno studente';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: non è consentita l''iscrizione ad un esame che non appartiene al corso di laurea di uno studente');
         RETURN NULL;
     END IF;
 END;
@@ -64,16 +64,23 @@ CREATE OR REPLACE FUNCTION check_propedeuticita() RETURNS TRIGGER as $$
 BEGIN
     -- cerco se c'è in propedeuticità e nel caso che in carriera 'insegnamento1' sia superato
     PERFORM * FROM propedeuticita p
-        INNER JOIN carriera c ON c.insegnamento = p.insegnamento1 AND c.studente = NEW.studente
-        INNER JOIN calendario_esami ce ON ce.insegnamento = p.insegnamento2 and ce.id = NEW.esame
-    WHERE c.valutazione < 18;
-    IF FOUND THEN
-        RAISE NOTICE 'ATTENZIONE: non è possibile iscriversi ad un esame senza aver superato la sua propedeuticità';
-        PERFORM pg_notify('notifica', 'ATTENZIONE: non è possibile iscriversi ad un esame senza aver superato la sua propedeuticità');
-        RETURN NULL;
-    ELSE
-        RETURN NEW;
-    END IF;
+        --INNER JOIN carriera c ON c.insegnamento = p.insegnamento1 AND c.studente = NEW.studente
+        INNER JOIN calendario_esami ce ON ce.insegnamento = p.insegnamento2
+        WHERE ce.id = NEW.esame;
+        IF NOT FOUND THEN
+            RETURN NEW;
+        ELSE        PERFORM * FROM carriera c
+                    INNER JOIN calendario_esami ce ON ce.insegnamento = c.insegnamento
+                    INNER JOIN propedeuticita p ON p.insegnamento1 = ce.insegnamento
+                    WHERE c.valutazione >= 18;
+                    IF FOUND THEN
+                        RETURN NEW;
+                    ELSE
+                        RAISE NOTICE 'ATTENZIONE: non è possibile iscriversi ad un esame senza aver superato la sua propedeuticità';
+                        PERFORM pg_notify('notifica', 'ATTENZIONE: non è possibile iscriversi ad un esame senza aver superato la sua propedeuticità');
+                        RETURN NULL;
+                    END IF;
+        END IF;
 END;
 $$ language 'plpgsql';
 
@@ -138,7 +145,65 @@ CREATE OR REPLACE TRIGGER no_esami_stesso_anno_stesso_giorno
     FOR EACH ROW
 EXECUTE FUNCTION check_inserimento_esame();
 
+-------------
+CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER AS $$
+BEGIN
+    -- trovo tutti i corsi di laurea di cui fa parte l'insegnamento che voglio inserire
+    -- con il corrispettivo anno
 
+    IF EXISTS (
+        WITH cdl_insegnamento AS(
+            SELECT i.corso_di_laurea cdl, i.anno FROM insegnamento_parte_di_cdl i
+            WHERE i.insegnamento = NEW.insegnamento
+        ), cdl_coinvolti AS (
+            SELECT * FROM insegnamento_parte_di_cdl ip
+                      INNER JOIN cdl_insegnamento c ON c.cdl = ip.corso_di_laurea
+                                AND c.anno = ip.anno
+                      INNER JOIN calendario_esami cal ON ip.insegnamento = cal.insegnamento
+                      WHERE cal.data = NEW.data
+
+        )
+        SELECT 1 FROM cdl_insegnamento ci
+                          INNER JOIN cdl_coinvolti cc ON ci.cdl = cc.corso_di_laurea
+    ) THEN
+        RAISE NOTICE 'ATTENZIONE: e'' gia'' presente un altro esame dello stesso anno per la data selezionata';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+-----------------------------------
+----RIPROVO ANCORA
+CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM insegnamento_parte_di_cdl ip
+--             INNER JOIN insegnamento i ON ip.insegnamento = i.codice
+        --WHERE i.codice = NEW.insegnamento
+--           WHERE ip.anno = ANY (
+--             SELECT anno
+--             FROM insegnamento_parte_di_cdl ip2
+--                 WHERE ip2.insegnamento = NEW.insegnamento )
+        WHERE ip.corso_di_laurea = ANY (
+            SELECT corso_di_laurea
+            FROM calendario_esami c
+                INNER JOIN insegnamento_parte_di_cdl ip2 ON c.insegnamento = ip2.insegnamento
+                WHERE ip2.anno = ANY (SELECT anno from cdl_di_appartenenza(NEW.insegnamento))
+        )
+    ) THEN
+        RAISE NOTICE 'Violazione della condizione: esiste già un esame dello stesso anno per la data selezionata.';
+        PERFORM pg_notify('notifica', 'Violazione della condizione: esiste già un esame dello stesso anno per la data selezionata');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+        END IF;
+
+END;
+$$ LANGUAGE plpgsql;
 --------------------------------------------------------------
 -------------- VERIFICA CHE IL VOTO VERBALIZZATO SIA COMPRESO TRA 0 E 31 (= 30L)
 CREATE OR REPLACE FUNCTION check_voto_valido() RETURNS TRIGGER as $$
@@ -180,3 +245,30 @@ CREATE OR REPLACE TRIGGER registrazione_in_carriera
     BEFORE INSERT OR UPDATE ON carriera -- metto anche UPDATE PERCHÈ SE L'ins VIENE RIMOSSO, IL VOTO NON PUÒ ESSERE TOCCATO
     FOR EACH ROW
 EXECUTE FUNCTION check_registrazione_carriera();
+--------------------------------------------------------------------------------------
+--- TRIGGER CHE VERIFICA CHE UN DOCENTE SIA RESPONSABILE DI AL PIÙ 3 INSEGNAMENTI ----
+
+CREATE OR REPLACE FUNCTION check_docente_responsabile_max_tre() RETURNS TRIGGER AS $$
+DECLARE
+    nir INT;
+BEGIN
+
+    SELECT COUNT(*)
+    INTO nir
+    FROM docente_responsabile dr
+    WHERE dr.docente = NEW.docente;
+
+    IF nir > 2 THEN
+        RAISE NOTICE 'ATTENZIONE: il docente e'' gia'' responsabile di tre insegnamenti';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: il docente e'' gia'' responsabile di tre insegnamenti');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER responsab_non_piu_di_tre
+    BEFORE INSERT OR UPDATE ON docente_responsabile
+    FOR EACH ROW
+EXECUTE FUNCTION check_docente_responsabile_max_tre();

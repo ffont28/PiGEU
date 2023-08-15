@@ -4,7 +4,7 @@ include('../functions.php');
 include('../conf.php');
 if (isset($_POST['action']) && isset($_POST['utente']) &&
     ($_POST['action'] == 'carriera_completa' || $_POST['action'] == 'carriera_valida')){
-
+    $tipo = $_POST['tipo'];
     $studente = $_POST['utente'];
     $nome = "";
     $cognome = "";
@@ -14,10 +14,16 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
 
     $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
     $query = "SELECT * FROM carriera_valida(:studente)";
-    if ($_POST['action'] == 'carriera_completa'){
+    if ($tipo == 'storico' && $_POST['action'] == 'carriera_completa') {
+        $query = "SELECT * FROM carriera_completa_sto(:studente)";
+    } else if ($tipo == 'storico' && $_POST['action'] == 'carriera_valida') {
+        $query = "SELECT * FROM carriera_valida_sto(:studente)";
+    } else if ($tipo == 'normal' && $_POST['action'] == 'carriera_completa'){
         $query = "SELECT * FROM carriera_completa(:studente)";
     }
-    $stmt = $conn->prepare($query);
+
+
+        $stmt = $conn->prepare($query);
 
     $stmt->bindParam(':studente', $studente);
 
