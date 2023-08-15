@@ -150,15 +150,22 @@ CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER AS $$
 BEGIN
     -- trovo tutti i corsi di laurea di cui fa parte l'insegnamento che voglio inserire
     -- con il corrispettivo anno
-    WITH cdl_insegnamento AS(
-        SELECT i.corso_di_laurea cdl, i.anno FROM insegnamento_parte_di_cdl i
-        WHERE i.insegnamento = NEW.insegnamento
-    )
-    PERFORM * FROM calendario_esami c
-        INNER JOIN insegnamento_parte_di_cdl ip ON c.insegnamento = ip.insegnamento
-        INNER JOIN cdl_insegnamento t ON t.cdl = ip.corso_di_laurea
-    WHERE ip.insegnamento = NEW.insegnamento AND ip.anno = t.anno;
-    IF FOUND THEN
+
+    IF EXISTS (
+        WITH cdl_insegnamento AS(
+            SELECT i.corso_di_laurea cdl, i.anno FROM insegnamento_parte_di_cdl i
+            WHERE i.insegnamento = NEW.insegnamento
+        ), cdl_coinvolti AS (
+            SELECT * FROM insegnamento_parte_di_cdl ip
+                      INNER JOIN cdl_insegnamento c ON c.cdl = ip.corso_di_laurea
+                                AND c.anno = ip.anno
+                      INNER JOIN calendario_esami cal ON ip.insegnamento = cal.insegnamento
+                      WHERE cal.data = NEW.data
+
+        )
+        SELECT 1 FROM cdl_insegnamento ci
+                          INNER JOIN cdl_coinvolti cc ON ci.cdl = cc.corso_di_laurea
+    ) THEN
         RAISE NOTICE 'ATTENZIONE: e'' gia'' presente un altro esame dello stesso anno per la data selezionata';
         PERFORM pg_notify('notifica', 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata');
         RETURN NULL;
@@ -238,3 +245,30 @@ CREATE OR REPLACE TRIGGER registrazione_in_carriera
     BEFORE INSERT OR UPDATE ON carriera -- metto anche UPDATE PERCHÈ SE L'ins VIENE RIMOSSO, IL VOTO NON PUÒ ESSERE TOCCATO
     FOR EACH ROW
 EXECUTE FUNCTION check_registrazione_carriera();
+--------------------------------------------------------------------------------------
+--- TRIGGER CHE VERIFICA CHE UN DOCENTE SIA RESPONSABILE DI AL PIÙ 3 INSEGNAMENTI ----
+
+CREATE OR REPLACE FUNCTION check_docente_responsabile_max_tre() RETURNS TRIGGER AS $$
+DECLARE
+    nir INT;
+BEGIN
+
+    SELECT COUNT(*)
+    INTO nir
+    FROM docente_responsabile dr
+    WHERE dr.docente = NEW.docente;
+
+    IF nir > 2 THEN
+        RAISE NOTICE 'ATTENZIONE: il docente e'' gia'' responsabile di tre insegnamenti';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: il docente e'' gia'' responsabile di tre insegnamenti');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER responsab_non_piu_di_tre
+    BEFORE INSERT OR UPDATE ON docente_responsabile
+    FOR EACH ROW
+EXECUTE FUNCTION check_docente_responsabile_max_tre();

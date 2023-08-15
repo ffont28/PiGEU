@@ -2,6 +2,7 @@
 session_start();
 include('functions.php');
 importVariPerHomePage();
+$_SESSION['waitValue'] = 2000;
 ?>
 <!doctype html>
 <html lang="it">
@@ -140,17 +141,17 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
         if (pg_num_rows($result) == 0) {
             ?>
             <script>
-                var waitValue = 5100;
                 const popup = document.getElementById('popup');
                 const popupText = document.getElementById('popup-text');
                 popupText.textContent = 'NOME UTENTE o PASSWORD NON CORRETTI';
                 popup.classList.add('active');
                 setTimeout(function() {
-                    waitValue *= 2;
                     popup.classList.remove('active');
-                }, waitValue);
+                }, <?php echo $_SESSION['waitValue']; ?>); // Utilizza il valore corrente di waitValue
+                <?php $_SESSION['waitValue'] = $_SESSION['waitValue'] * 2; ?>
             </script>
             <?php
+            echo $_SESSION['waitValue'];
         } else { ?>
             <form id="postForm" method="post" action="loggedin.php">
         <input type="hidden" name="username" value="<?php echo $username ?>">
