@@ -968,10 +968,48 @@ E per quanto riguarda il calendario esami:
 
 Notiamo subito che il trigger impostato per non permettere nella stessa giornata due esami di insegnamenti dello stesso anno dello stesso corso di laurea dovrebbe inibire la possibilità all'insegnamento di \textit{Matematica del Continuo} di inserire un esame per la data del \texttt{23-02-2222} poiché in tale data c'è già programmato un esame di \textit{Architetura degli elaboratori i}.
 \begin{itemize}
-    \item Nell'interfaccia grafica, cliccando su "inserisci" l'esame non viene calendarizzato
+    \item Nell'interfaccia grafica, cliccando su "inserisci" l'esame non viene calendarizzato e viene mostrato un messaggio di errore, che viene catturato dallo script PHP dalla \sqlcommand{NOTICE} del trigger
+
+    \includegraphics[scale=0.26]{images/Schermata del 2023-08-15 23-26-35.png}
+
+    \item Nel terminale viene sempre inibita la possibilità di calendarizzare:
+
+    \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-28-54.png}
+
+    \subsection{Il docente Responsabile}
+    Nelle specifiche viene richiesto che un docente sia responsabile di al più tre insegnamenti. Anche in questo caso proviamo a forzare la base di dati e vediamo se il trigger adibito al controllo funziona correttamente:
+    \begin{itemize}
+        \item Notiamo dalla seguente interrogazione che \texttt{demo\und docente@unimi.it} è responsabile di un solo insegnamento, \attr{IP}:
+
+        \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-31-07.png}
+
+        \item Proviamo allora ad inserire un ulteriore insegnamento di cui sia responsabile:
+
+        \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-36-02.png}
+
+        \item il comportamento atteso è infatti quello di un normalissimo inserimento che non viola ancora le condizioni dal momento che \texttt{demo\und docente@unimi.it} si trova ad essere responsabile di due insegnamenti, ora:
+
+        \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-37-54.png}
+
+        \item ma cosa succede se proviamo a rendere \texttt{demo\und docente@unimi.it} responsabile di altri due insegnamenti, ovvero arrivando a quattro responsabilità cercando così di violare la specifica con l'ultimo inserimento?
+
+        \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-39-58.png}
+
+        \item come da comportamento desiderato, l'ultimo inserimento viene vietato, mostrando il messaggio del trigger indicante il raggiungimento della soglia massima di insegnamenti per cui un docente può essere responsabile, mantenendo così, nonostante le 4 richieste di responsabilità, la consistenza della base di dati che contiene tre responsabilità per \texttt{demo\und docente@unimi.it}:
+
+        \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-42-34.png}
+    \end{itemize}
+
+
 \end{itemize}
 \section{Funzionalità \textit{user-friendly}}
 \subsection{Icona di connessione}
+Nella pagina di login, sotto al form in cui inserire le proprie credenziali, vi è un'icona indicante lo stato della connessione con la base di dati, così che l'utente che sia difficoltato all'accesso può comprendere se le cause del mancato servizio sono dovute a cause tecniche della connessione con la base di dati oppure a problematiche del dispositivo dell'utente. Le icone di stato sono due:
+\begin{itemize}
+    \item un cerchio ripieno verde con la dicitura ONLINE indica la connessione corretta con la base di dati
+    \item un cerchio ripieno rosso con la dicitura OFFLINE indica la connessione corretta con la base di dati
+\end{itemize}
+
 \subsection{Produzione dei documenti in PDF}
 \section{Sicurezza di PiGEU}
 \subsection{crittografia delle credenziali}
@@ -987,4 +1025,5 @@ La home page, in fase di autenticazione, effettua un redirecting a seconda della
 Una parte interessante per quanto riguarda la sicurezza è proprio il controllo che viene fatto all'atto del caricamento di ogni pagina: tutte le pagine tengono in considerazione le variabili \sqltrigger{\$\und SESSION} in cui sono memorizzati l'username e la password cifrata. Al caricamento di ogni pagina del tipo di utente, viene effettuata una interrogazione al database per verificare se quelle credenziali sono associate ad un tipo di utenza che sia autorizzata ad accedere alle informazioni e comandi presenti nella pagina desiderata. Ciò risolve anche i problemi di manipolazione di codice o di barra degli indirizzi descritti all'inizio di questa sezione.
 \subsubsection{Prevenzione attacchi DOS}
 La pagina di login è pensata per prevenire anche attacchi di \textit{Denial of Service}, bloccando qualsiasi interazione con la pagina per alcuni secondi, qualora le credenziali siano errate: ciò può arginare i danni originati da \textit{bot} programmati per fare \textit{bruteforcing} sulle password una volta note le credenziali di un utente, per esempio.
+\subsubsection{Modifica password iniziale}
 \end{document}
