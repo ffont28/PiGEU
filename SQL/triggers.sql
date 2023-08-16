@@ -1,40 +1,40 @@
 ------------------------------------------------------------------------------
 ------ VERIFICA CHE IN UNA DATA d NON POSSANO ESSERE INSERITI DUE ESAMI DELLO STESSO ANNO
 ----- sotto c'è la versione più aggiornata, questo trigger è stato DROPPED
-CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER as $$
-BEGIN
---     PERFORM * FROM calendario_esami c
---        -- INNER JOIN insegnamento i ON c.insegnamento = i.codice
---         INNER JOIN insegnamento_parte_di_cdl ip1 ON c.insegnamento= ip1.insegnamento
---         INNER JOIN insegnamento_parte_di_cdl ip2 ON ip1.anno = ip2.anno AND
---         WHERE c.data = NEW.data AND ip.anno = (SELECT anno FROM insegnamento_parte_di_cdl ip
---                                                WHERE codice = NEW.insegnamento);
-
-        WITH esamipresenti AS (SELECT DISTINCT c1.insegnamento, ip.corso_di_laurea, ip.anno ,c1.data
-                               FROM calendario_esami c1
-                               INNER JOIN insegnamento_parte_di_cdl ip ON c1.insegnamento = ip.insegnamento),
-             cdltarget AS (SELECT ip.corso_di_laurea, ip.anno
-                           FROM insegnamento_parte_di_cdl ip
-                           WHERE ip.insegnamento = NEW.insegnamento)
-        PERFORM *
-        FROM esamipresenti e INNER JOIN cdltarget c
-            ON e.corso_di_laurea = c.corso_di_laurea AND e.anno = c.anno
-            WHERE e.data = NEW.data;
-    IF FOUND THEN
-        RAISE NOTICE 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata';
-        PERFORM pg_notify('notifica', 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata+');
-        RETURN NULL;
-    ELSE
-        RETURN NEW;
-    END IF;
-END;
-$$ language 'plpgsql';
-
-
-CREATE OR REPLACE TRIGGER no_esami_stesso_anno_stesso_giorno
-BEFORE INSERT OR UPDATE ON calendario_esami
-FOR EACH ROW
-EXECUTE FUNCTION check_inserimento_esame();
+-- CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER as $$
+-- BEGIN
+-- --     PERFORM * FROM calendario_esami c
+-- --        -- INNER JOIN insegnamento i ON c.insegnamento = i.codice
+-- --         INNER JOIN insegnamento_parte_di_cdl ip1 ON c.insegnamento= ip1.insegnamento
+-- --         INNER JOIN insegnamento_parte_di_cdl ip2 ON ip1.anno = ip2.anno AND
+-- --         WHERE c.data = NEW.data AND ip.anno = (SELECT anno FROM insegnamento_parte_di_cdl ip
+-- --                                                WHERE codice = NEW.insegnamento);
+--
+--         WITH esamipresenti AS (SELECT DISTINCT c1.insegnamento, ip.corso_di_laurea, ip.anno ,c1.data
+--                                FROM calendario_esami c1
+--                                INNER JOIN insegnamento_parte_di_cdl ip ON c1.insegnamento = ip.insegnamento),
+--              cdltarget AS (SELECT ip.corso_di_laurea, ip.anno
+--                            FROM insegnamento_parte_di_cdl ip
+--                            WHERE ip.insegnamento = NEW.insegnamento)
+--         PERFORM *
+--         FROM esamipresenti e INNER JOIN cdltarget c
+--             ON e.corso_di_laurea = c.corso_di_laurea AND e.anno = c.anno
+--             WHERE e.data = NEW.data;
+--     IF FOUND THEN
+--         RAISE NOTICE 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata';
+--         PERFORM pg_notify('notifica', 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata+');
+--         RETURN NULL;
+--     ELSE
+--         RETURN NEW;
+--     END IF;
+-- END;
+-- $$ language 'plpgsql';
+--
+--
+-- CREATE OR REPLACE TRIGGER no_esami_stesso_anno_stesso_giorno
+-- BEFORE INSERT OR UPDATE ON calendario_esami
+-- FOR EACH ROW
+-- EXECUTE FUNCTION check_inserimento_esame();
 ------------------------------------------------------------------------------
 ------ VERIFICA CHE L'INSEGNAMENTO A CUI LO STUDENTE SI VUOLE ISCRIVERE FACCIA PARTE DEL SUO CdL
 CREATE OR REPLACE FUNCTION check_appartenenza_cdl() RETURNS TRIGGER as $$
@@ -121,32 +121,35 @@ EXECUTE FUNCTION inserisci_in_insegnamenti_per_carriera();
 
 
 --------------------------------------------- versione più aggiornata
-CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER AS $$
-DECLARE
-    esame_trovato BOOLEAN;
-BEGIN
-    -- Verifico se ci sono esami duplicati
-    SELECT EXISTS (
-        SELECT 1
-        FROM calendario_esami c1
-                 INNER JOIN insegnamento_parte_di_cdl ip ON c1.insegnamento = ip.insegnamento
-        WHERE c1.data = NEW.data AND ip.corso_di_laurea = (SELECT corso_di_laurea FROM insegnamento_parte_di_cdl WHERE insegnamento = NEW.insegnamento) AND ip.anno = (SELECT anno FROM insegnamento_parte_di_cdl WHERE insegnamento = NEW.insegnamento)
-    ) INTO esame_trovato;
+----------------------------- DEPRECATED
 
-    IF esame_trovato THEN
-        RAISE NOTICE 'ATTENZIONE: e'' gia'' presente un altro esame dello stesso anno per la data selezionata';
-        PERFORM pg_notify('notifica', 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata');
-        RETURN NULL;
-    ELSE
-        RETURN NEW;
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER no_esami_stesso_anno_stesso_giorno
-    BEFORE INSERT OR UPDATE ON calendario_esami
-    FOR EACH ROW
-EXECUTE FUNCTION check_inserimento_esame();
+-- CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER AS $$
+-- DECLARE
+--     esame_trovato BOOLEAN;
+-- BEGIN
+--     -- Verifico se ci sono esami duplicati
+--     SELECT EXISTS (
+--         SELECT 1
+--         FROM calendario_esami c1
+--                  INNER JOIN insegnamento_parte_di_cdl ip ON c1.insegnamento = ip.insegnamento
+--         WHERE c1.data = NEW.data AND ip.corso_di_laurea = (SELECT corso_di_laurea FROM insegnamento_parte_di_cdl WHERE insegnamento = NEW.insegnamento) AND ip.anno = (SELECT anno FROM insegnamento_parte_di_cdl WHERE insegnamento = NEW.insegnamento)
+--     ) INTO esame_trovato;
+--
+--     IF esame_trovato THEN
+--         RAISE NOTICE 'ATTENZIONE: e'' gia'' presente un altro esame dello stesso anno per la data selezionata';
+--         PERFORM pg_notify('notifica', 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata');
+--         RETURN NULL;
+--     ELSE
+--         RETURN NEW;
+--     END IF;
+-- END;
+-- $$ LANGUAGE plpgsql;
+--
+-- CREATE OR REPLACE TRIGGER no_esami_stesso_anno_stesso_giorno
+--     BEFORE INSERT OR UPDATE ON calendario_esami
+--     FOR EACH ROW
+-- EXECUTE FUNCTION check_inserimento_esame();
 
 -------------
 CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER AS $$
@@ -275,3 +278,47 @@ CREATE OR REPLACE TRIGGER responsab_non_piu_di_tre
     BEFORE INSERT OR UPDATE ON docente_responsabile
     FOR EACH ROW
 EXECUTE FUNCTION check_docente_responsabile_max_tre();
+
+-----------------------------------------------------------------------------------------
+---- TRIGGER CHE VERIFICA CHE UN INSEGNAMENTO NON ABBIA PIÙ DI UN DOCENTE
+CREATE OR REPLACE FUNCTION check_max_resp_per_ins() RETURNS TRIGGER AS $$
+
+BEGIN
+
+    PERFORM * FROM docente_responsabile dr
+    WHERE dr.insegnamento = NEW.insegnamento;
+    IF FOUND THEN
+        RAISE NOTICE 'ATTENZIONE: un insegnamento non puo'' avere più di un responsabile';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: un insegnamento non puo'' avere più di un responsabile');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER max_un_resp_per_ins
+    BEFORE INSERT OR UPDATE ON docente_responsabile
+    FOR EACH ROW
+EXECUTE FUNCTION check_max_resp_per_ins();
+
+
+---- TRIGGER CHE VERIFICA CHE UN DOCENTE RESPONSABILE NON VENGA INSERITO ANCHE NELLA TABELLA INSEGNA
+CREATE OR REPLACE FUNCTION responsabile_non_in_insegna() RETURNS TRIGGER AS $$
+BEGIN
+    PERFORM * FROM docente_responsabile dr
+    WHERE dr.docente = NEW.docente AND dr.insegnamento = NEW.insegnamento;
+    IF FOUND THEN
+        RAISE NOTICE 'ATTENZIONE: un insegnamento non puo'' avere più di un responsabile';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: un insegnamento non puo'' avere più di un responsabile');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER responsabile_non_in_insegna
+    BEFORE INSERT OR UPDATE ON insegna
+    FOR EACH ROW
+EXECUTE FUNCTION responsabile_non_in_insegna();
