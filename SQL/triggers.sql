@@ -66,13 +66,16 @@ BEGIN
     PERFORM * FROM propedeuticita p
         --INNER JOIN carriera c ON c.insegnamento = p.insegnamento1 AND c.studente = NEW.studente
         INNER JOIN calendario_esami ce ON ce.insegnamento = p.insegnamento2
-        WHERE ce.id = NEW.esame;
+        INNER JOIN studente s ON s.corso_di_laurea = p.corso_di_laurea
+        WHERE ce.id = NEW.esame AND s.utente = NEW.studente;
         IF NOT FOUND THEN
             RETURN NEW;
         ELSE        PERFORM * FROM carriera c
                     INNER JOIN calendario_esami ce ON ce.insegnamento = c.insegnamento
                     INNER JOIN propedeuticita p ON p.insegnamento1 = ce.insegnamento
-                    WHERE c.valutazione >= 18;
+                    INNER JOIN studente s ON s.corso_di_laurea = p.corso_di_laurea
+                    WHERE s.utente = NEW.studente
+                    AND c.valutazione >= 18;
                     IF FOUND THEN
                         RETURN NEW;
                     ELSE
