@@ -219,7 +219,7 @@ END;
 $$ language 'plpgsql';
 
 CREATE OR REPLACE TRIGGER no_esami_senza_propedeuticita
-    BEFORE UPDATE ON carriera
+    BEFORE INSERT OR UPDATE ON carriera
     FOR EACH ROW
 EXECUTE FUNCTION check_voto_valido();
 --------------------------------------------------------------------

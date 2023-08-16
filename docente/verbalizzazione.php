@@ -1,7 +1,6 @@
 <?php
 session_start();
 include('../functions.php');
-include('../conf.php');
 controller("docente", $_SESSION['username'], $_SESSION['password']);
 ?>
 <!doctype html>
@@ -19,17 +18,13 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
 
 <h1> PAGINA DI VERBALIZZAZIONE ESITI</h1>
 
-<div class="alert alert-primary" role="alert">
-    Benvenuto <?php echo $_SESSION['nome'] . " " . $_SESSION['cognome']; ?> !
-</div>
+
 <div>
     <label for="exampleFormControlInput1" class="form-label">Seleziona l'appello per cui si vuole procedere alla verbalizzazione</label>
     <form id="inserimentoInsegnamentoEData" action="" method="POST">
         <label for="insegnamento" >Appello di:</label>
         <select type='insegnamento' id="insegnamento" name="insegnamento">
             <?php
-            include('../functions.php');
-            include('../conf.php');
             $docente = $_SESSION['username'];
             echo "<script>console.log('Debug Objects:>> " . $docente .  " ' );</script>";
 
@@ -207,6 +202,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         } else {
           // Gestisci eventuali errori
           console.error('Errore nella richiesta AJAX:', this.statusText);
+          window.location.reload();
          }
       }
     };
