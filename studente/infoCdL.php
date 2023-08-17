@@ -85,10 +85,8 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
 
             if ($infoIniziali) {
-
-                echo '<div><label for="exampleFormControlInput1" class="form-label"><h4>Informazioni sul Corso di Laurea in </h4><h2>' . strtoupper($row['nome']) . '</h2>
-                      <h4>laurea ' . $row['tipo'] . '</h4><h5>codice: ' . $row['codice'] . '</h5> </label></div>';
-                echo '  
+                ?><div><label for="exampleFormControlInput1" class="form-label"><h4>Informazioni sul Corso di Laurea in </h4><h2><?php echo strtoupper($row['nome'])?></h2>
+                      <h4>laurea <?php echo $row['tipo']?></h4><h5>codice: <?php echo $row['codice']?></h5> </label></div>
                 <div>
                 <table class="table">
                     <thead>
@@ -99,42 +97,45 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                         <th scope="col">anno</th>
                         <th scope="col">CFU</th>
                         <th scope="col" style="width: 200px" >Docente</th>
-                        <th scope="col">Descrizione dell\'insegnamento</th>
+                        <th scope="col">Descrizione dell'insegnamento</th>
                     </tr>
                     </thead>
-                    <tbody>';
-                $infoIniziali = false;
+                    <tbody>
+<?php           $infoIniziali = false;
             }
-            echo '  <tr>
-                            <th scope="row">' . $counter++ . '</th>
-                            <td>' . $nomec . '</td>
-                            <td>' . $codicec . '</td>
-                            <td>' . $anno . '</td>
-                            <td>' . $cfu . '</td>
-                            <td>' . $responsabile;
-                                    $query = "SELECT *
-                                              FROM insegna i
-                                              INNER JOIN utente u ON i.docente = u.email
-                                              WHERE insegnamento = :ins ORDER BY u.cognome,u.nome";
-                                    $stmt = $conn->prepare($query);
-                                    $stmt->bindParam(':ins', $codicec, PDO::PARAM_STR);
-                                    $stmt->execute();
-                                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                                    $firstrow = true;
-                                    foreach ($results as $row) {
-                                        if ($firstrow) {?> (Resp.) <?php $firstrow = false;}
-                                        $docenteins = $row['cognome'] . " " .$row['nome'];    ?>
-                                        <br>
+?>
+                    <tr>
+                        <th scope="row"><?php $counter++ ?></th>
+                        <td><?php echo $nomec ?></td>
+                        <td><?php echo $codicec ?></td>
+                        <td><?php echo $anno ?></td>
+                        <td><?php echo $cfu ?></td>
+                        <td><?php echo $responsabile;
+                                $query = "SELECT *
+                                          FROM insegna i
+                                          INNER JOIN utente u ON i.docente = u.email
+                                          WHERE insegnamento = :ins ORDER BY u.cognome,u.nome";
+                                $stmt = $conn->prepare($query);
+                                $stmt->bindParam(':ins', $codicec, PDO::PARAM_STR);
+                                $stmt->execute();
+                                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                $firstrow = true;
+                                foreach ($results as $row) {
+                                    if ($firstrow) {?> (Resp.) <?php $firstrow = false;}
+                                    $docenteins = $row['cognome'] . " " .$row['nome'];
+?>
+                                    <br>
 <?php                               echo $docenteins; }
-                echo '</td>
-                            <td>' . $descrizione . '</td>
-                            </tr> ';
-        }
-        echo '
+?>
+                        </td>
+                        <td><?php echo $descrizione ?></td>
+                        </tr>
+<?php        }
+?>
                     </tbody>
                 </table>
-            </div>';
-    } catch (PDOException $e) {
+            </div>
+<?php } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
 }
