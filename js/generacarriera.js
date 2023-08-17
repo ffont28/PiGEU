@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateUtentiTrovati() {
         var search = searchInput.value;
         var xhr = new XMLHttpRequest();
+        console.log(">" + search);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {

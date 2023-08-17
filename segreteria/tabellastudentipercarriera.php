@@ -24,10 +24,10 @@ if(isset($_POST['search'])) {
                   WHERE u.cognome ILIKE :search OR u.nome ILIKE :search OR u.email ILIKE :search
                   ORDER BY cognome";
         $stmt2 = $conn->prepare($query2);
-
         $stmt2->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
         $stmt2->execute();
-        if (($stmt->rowCount() == 0) && (stmt2->rowCount() == 0)) {
+
+        if (($stmt->rowCount() == 0) && ($stmt2->rowCount() == 0)) {
             echo '<div class="alert alert-warning" role="alert">
                             Nessun utente trovato
                       </div>';
@@ -78,7 +78,7 @@ if(isset($_POST['search'])) {
             $tipo = $row['nomecdl'];
 
             echo '  <tr>
-                    <th scope="row">' . $counter++ . ' ❗</th>
+                    <th scope="row">' . $counter++ . ' <a style="text-align: right">❗</a></th>
                     <td>' . $cognome . '</td>
                     <td>' . $nome . '</td>
                     <td>' . $email . '</td>
@@ -88,11 +88,18 @@ if(isset($_POST['search'])) {
                       <button class="button-iscr" utente="' . $email . '" tipo="storico"> CARRIERA VALIDA</button>
                       </td>
                     </tr> ';
-        }
-        echo '
+        } ?>
+
+
             </tbody>
         </table>
-        </div>';
+
+        <?php if ($stmt2->rowCount() > 0){ ?>
+            <div><b>NOTA:</b> il segno ❗ accanto al numero progressivo indica che lo studente contenuto in quella riga è uno <i>studente storico</i></div>
+  <?php      }?>
+
+        </div>
+        <?php
     } catch
     (PDOException $e) {
         echo "Errore: " . $e->getMessage();

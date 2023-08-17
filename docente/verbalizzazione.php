@@ -1,7 +1,6 @@
 <?php
 session_start();
 include('../functions.php');
-include('../conf.php');
 controller("docente", $_SESSION['username'], $_SESSION['password']);
 ?>
 <!doctype html>
@@ -14,24 +13,71 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
 
 <body>
 <!-- INIZIO NAVBAR -->
-<?php setNavbarDocente($_SERVER['REQUEST_URI']);?>
+<?php setNavbarDocente($_SERVER['REQUEST_URI']);
+?>
 <!-- FINE NAVBAR -->
 
 <h1> PAGINA DI VERBALIZZAZIONE ESITI</h1>
 
-<div class="alert alert-primary" role="alert">
-    Benvenuto <?php echo $_SESSION['nome'] . " " . $_SESSION['cognome']; ?> !
-</div>
-<div>
-    <label for="exampleFormControlInput1" class="form-label">Seleziona l'appello per cui si vuole procedere alla verbalizzazione</label>
-    <form id="inserimentoInsegnamentoEData" action="" method="POST">
-        <label for="insegnamento" >Appello di:</label>
-        <select type='insegnamento' id="insegnamento" name="insegnamento">
             <?php
-            include('../functions.php');
-            include('../conf.php');
             $docente = $_SESSION['username'];
-            echo "<script>console.log('Debug Objects:>> " . $docente .  " ' );</script>";
+            echo "<script>console.log('Debug_Objects:>> " . $docente .  " ' );</script>";
+
+            if($_SERVER['REQUEST_METHOD']=='POST') {
+
+                if ($_POST['op'] == 'VERBALIZZA' &&
+                    isset($_POST['insegnamento']) &&
+                    isset($_POST['studente']) &&
+                    isset($_POST['data']) &&
+                    isset($_POST['votoDaVerbalizzare'])) {
+
+                    $insegnamento = $_POST['insegnamento'];
+                    $studente = $_POST['studente'];
+                    $dataEsame = $_POST['data'];
+                    $valutazione = $_POST['votoDaVerbalizzare'];
+                    echo "<script>console.log('>> " . $valutazione .  " ' );</script>";
+                    //echo "ciao ISCR=" . $_POST['esame'] . " CANC= " ;
+
+                    try {
+                        $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+                        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                        $db->query("LISTEN notifica");
+
+                        $sql = "INSERT INTO carriera (studente, insegnamento, valutazione, data)  VALUES (:s, :i, :v, :d)";
+                        $stmt = $db->prepare($sql);
+                        $stmt->bindParam(':s', $studente, PDO::PARAM_STR);
+                        $stmt->bindParam(':i', $insegnamento, PDO::PARAM_STR);
+                        $stmt->bindParam(':d', $dataEsame, PDO::PARAM_STR);
+                        $stmt->bindParam(':v', $valutazione, PDO::PARAM_INT);
+
+                        $stmt->execute();
+
+                        while (true) {
+                            echo "<script>console.log('Debug_Objects:>>TRUE " . $docente .  " ' );</script>";
+                            $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50);
+                            if ($notify === false) {
+                                //echo '<script> console.log("qui"); window.location.reload();</script>';
+                                echo '  <div class="alert alert-success" role="alert" name="alert-message" >
+                                 Voto registrato correttamente in carriera 
+                                </div>';
+                                //  echo '<script> console.log("qui"); window.location.reload();</script>';
+                                break;
+                            } else {
+                                //echo '<script> console.log("qui"); window.location.reload();</script>';
+                                echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
+                                  ' . $notify["payload"] . '
+                                </div>';
+                                break;
+                            }
+                        }
+                    } catch (PDOException $e) {
+
+                        echo "<script>console.log('DUPLICATO:>> " . $docente .  " ' );</script>";
+                    }
+                }
+
+            }
 
             try {
                 $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
@@ -51,7 +97,14 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
                 $stmt->execute();
 
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+<div>
+    <label for="exampleFormControlInput1" class="form-label">Seleziona l'appello per cui si vuole procedere alla verbalizzazione</label>
+    <form id="inserimentoInsegnamentoEData" action="" method="POST">
+        <label for="insegnamento" >Appello di:</label>
+        <select type='insegnamento' id="insegnamento" name="insegnamento">
 
+                <?php
 
                 // Elaborazione dei risultati
                 foreach ($results as $row) {
@@ -137,9 +190,15 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                           INNER JOIN calendario_esami c ON c.insegnamento = :insegnamento
                                                         AND c.data = :data
                           INNER JOIN iscrizione i ON i.studente = u.email
-                         -- INNER JOIN carriera ca ON ca.data <> :data 
-                         --                        AND ca.studente = u.email
-                         --                        AND ca.insegnamento = c.insegnamento
+                          EXCEPT 
+                          SELECT DISTINCT u.email, u.cognome, u.nome, s.matricola, c.insegnamento, c.data
+                          FROM studente s
+                          INNER JOIN utente u ON u.email = s.utente
+                          INNER JOIN calendario_esami c ON c.insegnamento = :insegnamento
+                                                        AND c.data = :data
+                          INNER JOIN carriera ca ON ca.studente = s.utente
+                                                 AND ca.data = :data
+                                                 AND ca.insegnamento = :insegnamento
                           ";
 
                 $stmt = $conn->prepare($query);
@@ -167,16 +226,27 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
                 $counter = 1;
                 foreach ($results as $row) {
-                    echo '  <tr>
+                    echo '  <tr> <form action="" method="POST">
                             <th scope="row">' . $counter++ . '</th>
                             <td>' . $row["matricola"] . '</td>
                             <td>' . $row["cognome"] . " " . $row["nome"] . '</td>
                             <td><input type="text" class="form-control"  placeholder="valutazione espressa in trentesimi" id="votoDaVerbalizzare" name="votoDaVerbalizzare"></td>
                             <td>
+                                    <input type="text" id="insegnamento" name="insegnamento" value="'.$row["insegnamento"].'" hidden>
+                                    <input type="text" id="studente" name="studente" value="'.$row["email"].'" hidden>
+                                    <input type="text" id="data" name="data" value="'.$row["data"].'" hidden>
+                                    <input type="text" id="op" name="op" value="VERBALIZZA" hidden>
+                                    <button type="submit2" class="button-verb">VERBALIZZA</button>
+                                </form>
+                            
+                            
+                            
+                            <!--
                               <button class="button-verb" 
                                       insegnamento="' . $row["insegnamento"] . '" 
                                       studente="' . $row["email"] . '"
-                                      dataEsame="' . $row["data"] . '">VERBALIZZA</button></td>
+                                      dataEsame="' . $row["data"] . '">VERBALIZZA</button> -->
+                            </td>
                             </tr> ';
                 }
 
@@ -189,53 +259,54 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                 echo "Errore: " . $e->getMessage();
             }
 }
-    echo "
-        <script>
-  // Funzione per effettuare la richiesta AJAX per verbalizzare
-  function verbalizzaEsame(insegnamento, studente, dataEsame, valutazione) {
-    const xhttp = new XMLHttpRequest();
-
-    xhttp.onreadystatechange = function() {
-      if (this.readyState === 4) {
-        if (this.status === 200) {
-          // Gestisci la risposta del server
-          const response = JSON.parse(this.responseText);
-          console.log(response);
-        if (response.success) {
-           window.location.href = 'verbalizzazione.php';
-          }
-        } else {
-          // Gestisci eventuali errori
-          console.error('Errore nella richiesta AJAX:', this.statusText);
-         }
-      }
-    };
-
-    
-    xhttp.open('POST', 'verbalizza.php', true);
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + 
-                    '&studente=' + encodeURIComponent(studente) + 
-                    '&dataEsame=' + encodeURIComponent(dataEsame) +
-                    '&valutazione=' + encodeURIComponent(valutazione);
-    xhttp.send(params);
-  }
-
-  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
-  const verbButtons = document.querySelectorAll('.button-verb');
-  verbButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const insegnamento = this.getAttribute('insegnamento');
-      const studente = this.getAttribute('studente');
-      const dataEsame = this.getAttribute('dataEsame');
-      var valutazione = this.closest('tr').querySelector('.form-control').value;
-      console.log(insegnamento + \" \" + studente + \" \" + dataEsame + \" \" +valutazione);
-      
-      // Effettua la richiesta AJAX
-      verbalizzaEsame(insegnamento, studente, dataEsame, valutazione);
-    });
-  });
-</script>";
+//    echo "
+//        <script>
+//  // Funzione per effettuare la richiesta AJAX per verbalizzare
+//  function verbalizzaEsame(insegnamento, studente, dataEsame, valutazione) {
+//    const xhttp = new XMLHttpRequest();
+//
+//    xhttp.onreadystatechange = function() {
+//      if (this.readyState === 4) {
+//        if (this.status === 200) {
+//          // Gestisci la risposta del server
+//          const response = JSON.parse(this.responseText);
+//          console.log(response);
+//        if (response.success) {
+//           window.location.href = 'verbalizzazione.php';
+//          }
+//        } else {
+//          // Gestisci eventuali errori
+//          console.error('Errore nella richiesta AJAX:', this.statusText);
+//          window.location.reload();
+//         }
+//      }
+//    };
+//
+//
+//    xhttp.open('POST', 'verbalizza.php', true);
+//    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+//    const params = 'insegnamento=' + encodeURIComponent(insegnamento) +
+//                    '&studente=' + encodeURIComponent(studente) +
+//                    '&dataEsame=' + encodeURIComponent(dataEsame) +
+//                    '&valutazione=' + encodeURIComponent(valutazione);
+//    xhttp.send(params);
+//  }
+//
+//  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
+//  const verbButtons = document.querySelectorAll('.button-verb');
+//  verbButtons.forEach(button => {
+//    button.addEventListener('click', function() {
+//      const insegnamento = this.getAttribute('insegnamento');
+//      const studente = this.getAttribute('studente');
+//      const dataEsame = this.getAttribute('dataEsame');
+//      var valutazione = this.closest('tr').querySelector('.form-control').value;
+//      console.log(insegnamento + \" \" + studente + \" \" + dataEsame + \" \" +valutazione);
+//
+//      // Effettua la richiesta AJAX
+//      verbalizzaEsame(insegnamento, studente, dataEsame, valutazione);
+//    });
+//  });
+//</script>";
 
 ?>
 

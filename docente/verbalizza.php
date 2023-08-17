@@ -1,4 +1,5 @@
 <?php
+/*
 include('../functions.php');
 include('../conf.php');
 if (isset($_POST['insegnamento'])
@@ -33,4 +34,4 @@ if (isset($_POST['insegnamento'])
         echo json_encode(['success' => false, 'message' => 'Errore durante l\'aggiornamento della riga']);
     }
 }
-?>
+*/?>

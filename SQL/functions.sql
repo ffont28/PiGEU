@@ -316,29 +316,30 @@ CREATE OR REPLACE FUNCTION carriera_valida(TARGET varchar) RETURNS TABLE (
        ) AS $$
 BEGIN
     RETURN QUERY
-        SELECT DISTINCT ic.studente,
+        SELECT DISTINCT (c.studente),
                u2.nome nomstu,
                u2.cognome cogstu,
                cdl.nome cdl,
                s.matricola matr,
-               ic.insegnamento,
+               c.insegnamento,
                i.nome,
                u.nome nomedoc,
                u.cognome cogndoc,
                c.valutazione,
                c.data
-        FROM insegnamenti_per_carriera ic
-                 INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
-                 INNER JOIN docente_responsabile d ON d.insegnamento = ic.insegnamento
+        FROM carriera c
+                 INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
                  INNER JOIN utente u ON d.docente = u.email
-                 INNER JOIN utente u2 ON ic.studente = u2.email
-                 INNER JOIN studente s ON ic.studente = s.utente
+                 INNER JOIN utente u2 ON c.studente = u2.email
+                 INNER JOIN studente s ON c.studente = s.utente
                  INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
-                 INNER JOIN insegnamento i ON ic.insegnamento = i.codice
-        WHERE ic.studente = TARGET AND c.studente = TARGET
+                 INNER JOIN insegnamento i ON c.insegnamento = i.codice
+        WHERE c.studente = TARGET
           AND c.valutazione >= 18
           AND c.data = (SELECT MAX(c2.data)
-                            FROM carriera c2 WHERE c2.insegnamento = ic.insegnamento);
+                            FROM carriera c2 WHERE c2.insegnamento = c.insegnamento
+                                             AND c2.studente = s.utente)
+    GROUP BY c.studente, u2.nome, u2.cognome, cdl.nome, s.matricola, c.insegnamento, i.nome, u.nome, u.cognome, c.valutazione, c.data;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -380,7 +381,8 @@ BEGIN
         WHERE c.studente = TARGET
           AND c.valutazione >= 18
           AND c.data = (SELECT MAX(c2.data)
-                        FROM carriera_storico c2 WHERE c2.insegnamento = c.insegnamento);
+                        FROM carriera_storico c2 WHERE c2.insegnamento = c.insegnamento
+                                                   AND c2.studente = s.utente);
 END;
 $$ LANGUAGE plpgsql;
 

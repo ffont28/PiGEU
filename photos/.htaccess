@@ -1,1 +1,4 @@
-deny from all
+#[apache]RewriteEngine on
+#RewriteCond %{HTTP_REFERER}!^$
+#RewriteCond %{HTTP_REFERER}!^http://(www\.)?pigeu.net/.*$ [NC]
+#RewriteRule .*\.(jpg|jpeg|gif|png|bmp)$ – [F][/apache]
