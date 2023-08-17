@@ -150,9 +150,13 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
                 setTimeout(function() {
                     popup.classList.remove('active');
                 }, <?php echo $_SESSION['waitValue']; ?>); // Utilizza il valore corrente di waitValue
-                <?php $_SESSION['waitValue'] = $_SESSION['waitValue'] * 2; ?>
+                <?php
+                $value = $_SESSION['waitValue'] / 1000;
+                $_SESSION['waitValue'] = $_SESSION['waitValue'] * 2;
+                 ?>
             </script>
             <?php
+//            sleep($value);
             echo $_SESSION['waitValue'];
         } else { ?>
             <form id="postForm" method="post" action="loggedin.php">

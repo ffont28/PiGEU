@@ -35,7 +35,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 // vedo TUTTI gli insegnamenti
-                $query = "  SELECT distinct i.nome, i.codice  FROM insegnamento i";
+                $query = "  SELECT distinct i.nome, i.codice  FROM insegnamento i ORDER BY i.nome";
                 $stmt = $conn->prepare($query);
                 $stmt->execute();
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
