@@ -322,3 +322,240 @@ CREATE OR REPLACE TRIGGER responsabile_non_in_insegna
     BEFORE INSERT OR UPDATE ON insegna
     FOR EACH ROW
 EXECUTE FUNCTION responsabile_non_in_insegna();
+---------------------------------------------------------------------------------------------------------
+----------- TRIGGER PER VERIFICARE CHE NON CI SIANO CICLI NELLE PROPEDEUTICITÀ
+
+CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo()
+    RETURNS TRIGGER AS $$
+BEGIN
+    -- tabella temporanea con le propedeuticità visitate
+    CREATE TEMP TABLE propedeuticita_visitate (ins1 varchar, ins2 varchar, cdl varchar) ON COMMIT DROP;
+
+    -- Loop through the chain of propedeuticità
+    LOOP
+        -- Check if the current exam is the same as insegnamenti_id
+        PERFORM *
+        FROM propedeuticita_visitate
+        WHERE   cdl = NEW.corso_di_laurea
+           AND ins1 = NEW.insegnamento2
+           AND ins2 = NEW.insegnamento1;
+        IF FOUND THEN
+            RAISE EXCEPTION 'There is a circular chain of propedeuticita''';
+        ELSE
+            DECLARE righe propedeuticita_visitate%ROWTYPE;
+            DECLARE cursore CURSOR FOR
+                SELECT *
+                FROM propedeuticita_visitate
+                WHERE  cdl = NEW.corso_di_laurea
+                  AND ins2 = NEW.insegnamento1;
+            OPEN cursore;
+
+            LOOP
+                FETCH cursore INTO righe;
+                EXIT WHEN NOT FOUND;
+
+                INSERT INTO propedeuticita_visitate
+                VALUES (propedeuticita_visitate.ins1, NEW.insegnamento2, NEW.cdl)
+
+            END LOOP;
+            CLOSE cursore;
+
+        END IF;
+
+        INSERT INTO propedeuticita_visitate
+            VALUES (NEW.insegnamento1, NEW.insegnamento2, NEW.corso_di_laurea);
+        -- Check if the current exam has already been visited
+        SELECT INTO temp_exam_id exam_id FROM visited_exams WHERE exam_id = current_exam_id;
+        END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER no_cicli_propedeuticità
+    BEFORE INSERT OR UPDATE ON propedeuticita
+    FOR EACH ROW
+EXECUTE FUNCTION check_propedeuticita_ciclo();
+
+------------------------------------ VERSIONE TROVATA IN INTERNET
+CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo()
+    RETURNS TRIGGER AS $$
+DECLARE
+    propedeuticita_visitate propedeuticita%ROWTYPE;
+    righe propedeuticita%ROWTYPE;
+    cursore CURSOR FOR
+        SELECT *
+        FROM propedeuticita_visitate
+        WHERE corso_di_laurea = NEW.corso_di_laurea
+          AND insegnamento2 = NEW.insegnamento1;
+
+BEGIN
+        IF NOT EXISTS (
+            SELECT 1
+            FROM propedeuticita_visitate
+            WHERE corso_di_laurea = NEW.corso_di_laurea
+              AND insegnamento1 = NEW.insegnamento2
+              AND insegnamento2 = NEW.insegnamento1
+        ) THEN
+            OPEN cursore;
+
+            LOOP
+                FETCH cursore INTO righe;
+                EXIT WHEN NOT FOUND;
+
+                -- Inserire nella tabella temporanea
+                INSERT INTO propedeuticita_visitate
+                VALUES (righe.insegnamento2, NEW.insegnamento2, NEW.corso_di_laurea);
+            END LOOP;
+
+            CLOSE cursore;
+        ELSE
+            RAISE EXCEPTION 'There is a circular chain of propedeuticita''';
+        END IF;
+
+        -- Inserire nella tabella temporanea
+        INSERT INTO propedeuticita_visitate
+        VALUES (NEW.insegnamento1, NEW.insegnamento2, NEW.corso_di_laurea);
+        RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+--------------------------------------------------------------------------------
+-------------- VERSIONE MIA CHE MI STO ROMPENDO
+CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo() RETURNS TRIGGER AS $$
+DECLARE
+    counter INTEGER := 0;
+    size INTEGER;
+    instemp VARCHAR;
+    riga record;
+BEGIN
+    RAISE LOG 'INIZIA FUNZIONE';
+    SELECT count(*) INTO size
+    FROM propedeuticita;
+
+    -- tabella temporanea con le propedeuticità visitate
+    CREATE TEMP TABLE propedeuticita_visitate
+                (ins1 varchar, ins2 varchar, cdl varchar) ON COMMIT DROP;
+
+--     INSERT INTO propedeuticita_visitate
+--     VALUES (NEW.insegnamento1, NEW.insegnamento2, NEW.corso_di_laurea);
+
+    INSERT INTO propedeuticita_visitate
+    SELECT insegnamento1, insegnamento2, corso_di_laurea
+    FROM propedeuticita;
+
+    -- Loop through the chain of propedeuticità
+    LOOP
+        IF counter = size THEN EXIT;
+        END IF;
+
+        PERFORM *
+        FROM propedeuticita_visitate
+        WHERE   cdl = NEW.corso_di_laurea
+          AND ins1 = NEW.insegnamento2
+          AND ins2 = NEW.insegnamento1;
+        IF FOUND THEN
+            RAISE EXCEPTION 'Propedeuticita'' circolare non consentita';
+--         ELSE
+--             RAISE LOG 'SONO QUI';
+--             PERFORM *
+--             FROM propedeuticita_visitate
+--             WHERE  cdl = NEW.corso_di_laurea
+--               AND ins1 = NEW.insegnamento1
+--               AND ins2 = NEW.insegnamento2;
+--             IF NOT FOUND THEN
+
+            FOR riga IN
+                SELECT ins1
+                FROM propedeuticita_visitate
+                WHERE ins2 = NEW.insegnamento2
+                LOOP
+                RAISE LOG 'instemp è %',riga.ins1;
+                END LOOP;
+
+                INSERT INTO propedeuticita_visitate
+                VALUES (instemp, NEW.insegnamento2, NEW.corso_di_laurea);
+            END IF;
+        END IF;
+
+    counter := counter +1;
+    END LOOP;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--------------------------------------------------------------------
+--------------- CIAK 1000 ----------------- FUNZIONANTE TRIGGER CHE ORA È ABILITATO
+CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo() RETURNS TRIGGER AS $$
+DECLARE
+    counter INTEGER := 0;
+    size INTEGER;
+    instemp VARCHAR;
+    riga record;
+BEGIN
+    RAISE LOG 'INIZIA FUNZIONE';
+
+    -- tabella temporanea con le propedeuticità visitate
+    CREATE TEMP TABLE propedeuticita_visitate
+    (ins1 varchar, ins2 varchar, cdl varchar) ON COMMIT DROP;
+
+    -- simulo inserimento della nuova propedeuticita
+    INSERT INTO propedeuticita_visitate
+    VALUES (NEW.insegnamento1, NEW.insegnamento2, NEW.corso_di_laurea);
+
+    -- inserisco le propedeuticita presenti
+    INSERT INTO propedeuticita_visitate
+    SELECT insegnamento1, insegnamento2, corso_di_laurea
+    FROM propedeuticita WHERE corso_di_laurea = NEW.corso_di_laurea;
+                        --------------------------------------------
+    SELECT count(*) INTO size
+    FROM propedeuticita_visitate;
+            LOOP
+                IF counter = size THEN
+                    EXIT;
+                END IF;
+
+                FOR riga IN
+                    SELECT ins1, ins2, cdl
+                    FROM propedeuticita_visitate
+                    LOOP
+                        RAISE LOG 'STATUS: % % %', riga.ins1, riga.ins2, riga.cdl;
+                    END LOOP;
+
+                FOR riga IN
+                SELECT pv1.ins1, pv2.ins2, pv1.cdl
+                FROM propedeuticita_visitate pv1 INNER JOIN  propedeuticita_visitate pv2
+                    ON pv1.ins1 <> pv2.ins1 AND pv1.ins2 <> pv2.ins2
+                WHERE pv2.ins1 = pv1.ins2
+                LOOP
+                    IF riga.ins1 = riga.ins2 THEN
+                        RAISE EXCEPTION 'Propedeuticita'' circolare non consentita';
+                    END IF;
+                    RAISE LOG 'INSERISCO % % %',riga.ins1, riga.ins2, NEW.corso_di_laurea;
+                    INSERT INTO propedeuticita_visitate
+                    VALUES (riga.ins1, riga.ins2, NEW.corso_di_laurea);
+--                     size := size + 1;
+                END LOOP;
+
+                FOR riga IN
+                    SELECT ins1, ins2, cdl
+                    FROM propedeuticita_visitate
+                    LOOP
+                        RAISE LOG 'AFTER : % % %', riga.ins1, riga.ins2, riga.cdl;
+                    END LOOP;
+                counter := counter + 1;
+            END LOOP;
+
+    -- VERIFICA FINALE
+    PERFORM *
+    FROM propedeuticita_visitate
+    WHERE   cdl = NEW.corso_di_laurea
+      AND ins1 = NEW.insegnamento2
+      AND ins2 = NEW.insegnamento1;
+    IF FOUND THEN
+        RAISE EXCEPTION 'Propedeuticita'' circolare non consentita';
+    ELSE
+    RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
