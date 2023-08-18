@@ -1,6 +1,24 @@
 <?php session_start();
 include('functions.php');
 importVariPerHomePage();
+if(isset($_GET['id'])){
+    $id = $_GET['id'];
+    //  echo $id;
+    $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+    $query = "SELECT r.utente, u.nome, u.cognome FROM recupero r 
+              INNER JOIN utente u ON u.email= r.utente
+              WHERE randomvalue = :randomvalue
+              LIMIT 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':randomvalue', $id, PDO::PARAM_STR);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+//    echo $result['utente']." -- ".$result['nome'];
+    $_SESSION['username'] = $result['utente'];
+    $_SESSION['nome'] = $result['nome'];
+    $_SESSION['cognome'] = $result['cognome'];
+//    echo ">>".$_SESSION['username']." - ";
+}
 ?>
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
@@ -55,7 +73,7 @@ importVariPerHomePage();
 
 <?php
 if($_SERVER['REQUEST_METHOD']=='POST'){
-    include_once('functions.php');
+
 
 $db = open_pg_connection();
 $new_password = md5($_POST['password1']);

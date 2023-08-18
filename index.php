@@ -76,7 +76,7 @@ session_start();
                                 </label>
                             </div>
                             <div class="w-50 text-md-right">
-                                <a href="#" style="color: #fff">password dimenticata?</a>
+                                <a href="restorepwd.php" style="color: #fff">password dimenticata?</a>
                             </div>
                         </div>
                     </form>
