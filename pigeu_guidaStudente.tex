@@ -1,0 +1,115 @@
+% UN PO DI IMPORT
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage[svgnames]{xcolor}
+\usepackage{listings}
+\usepackage{xcolor} % Per il colore del testo
+\usepackage{fontawesome5}
+
+
+% Definizione del nuovo comando
+\newcommand{\tabb}[1]{\texttt{\textcolor{blue}{#1}}}
+\newcommand{\tab}[1]{\texttt{\textcolor{cyan}{#1}}}
+\newcommand{\attr}[1]{\texttt{\textcolor{gray}{#1}}}
+\newcommand{\sqlcommand}[1]{\texttt{\textcolor{orange}{#1}}}
+\newcommand{\sqlfunc}[1]{\texttt{\textcolor{violet}{#1}}}
+\newcommand{\sqltrigger}[1]{\texttt{\textcolor{teal}{#1}}}
+\newcommand{\sqlview}[1]{\texttt{\textcolor{yellow}{#1}}}
+\newcommand{\m}[1]{\texttt{}}
+\newcommand{\und}[0]{\textunderscore}
+\newcommand{\alert}[0]{\textcolor{red}{\faExclamationCircle}}
+\newcommand{\danger}[0]{\textcolor{red}{\faExclamationCircle}}
+
+
+\title{PiGEU\\ Piattaforma per la Gestione degli Esami Universitari}
+%\subtitle{DOCUMENTAZIONE TECNICA}
+
+\author{\textbf{MANUALE STUDENTE}}
+\date{Fontana Francesco \\ matr. 943519}
+
+\begin{document}
+
+    \maketitle
+
+    \begin{abstract}
+
+        La Piattaforma per la Gestione degli Esami Universitari, d'ora in poi chiamata PiGEU per comodità, è una soluzione che permette di gestire
+        uno scenario universitario in cui siano presenti insegnamenti e corsi di laurea, docenti, studenti e segretari, iscrizioni e verbalizzazioni
+        ai diversi appelli di esame di ogni insegnamento, generazione di documentazioni valide per gli studenti quali i certificati di carriera, visibili
+        o anche scaricabili in formato PDF.
+        Questa guida ha lo scopo di mostrare allo studente la praticità nell'uso di PiGEU
+    \end{abstract}
+
+    \tableofcontents
+
+    \section{Il primo accesso}
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 22-16-07.png}
+
+    Successivamente alla creazione dell'utenza di tipo \textit{Studente} da parte della segreteria, sarà subito fruibile il nuovo account studente con tutte le funzionalità di PiGEU.
+
+    Al primo accesso verrà chiesto di modificare la password, che non può coincidere con l'indirizzo della propria email personale. Dopo aver effettuato la modifica della password, si potrà accedere con le proprie nuove credenziali alla home page:
+
+    \section{La home Page}
+    La home page mostra già nel suo lato superiore la navbar con le operazioni proprie di uno studente:
+    \begin{itemize}
+        \item l'iscrizione a un esame
+        \item consultazione e produzione della propria carriera
+        \item reperire informazioni sui corsi di laurea
+    \end{itemize}
+    viene mostrato inoltre il nome e cognome dell'utente attualmente loggato e vi è da ultimo il pulsate di logout.
+    Nella pagina invece è possibile caricare o modificare la propria foto profilo cliccando su "Scegli un'immagine" e poi "Aggiorna Foto".
+    Da ultimo vi è la possibilità di modificare la propria password cliccando sul pulsante rosso "MODIFICA PASSWORD".
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 22-25-36.png}
+
+    \section{Iscrizione ad un esame}
+    Cliccando nella navbar \textit{ISCRIZIONE ESAMI} si accede alla pagina di iscrizione ad un esame dove per ciascun insegnameno del proprio corso di laurea, se calendarizzato dal docente, è possibile iscriversi ad un appello di esame di quell'insegnamento.
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 22-26-15.png}
+
+    In questo caso l'esito dell'insegnamento \textit{Linguaggi Formali e Automi} è stato già verbalizzato dal docente ed inserito in carriera, pertanto l'iscrizione non si può annullare.
+    Ad esempio, volendosi iscrivere all'appello di \textit{Architettura degli elaboratori i} in data \attr{23/02/2022} e ora \attr{22:22:00} e cliccando su \textit{iscriviti}
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 22-41-18.png}
+
+    la notifica su sfondo verde con la dicitura "Iscrizione a buon fine" indica il buon esito dell'operazione di iscrizione: nella sezione "esami attualmente calendarizzati" nella colonna "iscrizione" dell'appello di esame a cui ci si è appena inseriti comparirà il bottone "cancella iscrizione" indicante la possibilità di cancellare la propria iscrizione al dato appello d'esame. Tale azione non sarà più possibile, come già visto, dopo che il docente avrà verbalizzato un voto per quell'appello d'esame
+
+    quindi dopo il cancellamento dall'iscrizione la dicitura "Ti sei cancellato corretamente dall'iscrizione" e la comparsa nuovamente del bottone "ISCRIVITI" la situazione è la seguente:
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 22-41-35.png}
+
+    Provando invece ad iscriversi ad un esame di cui non si è superata la propedeuticità, ad esempio l'esame di "Statistica e analisi dei dati":
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 22-41-41.png}
+
+    verrà impedita l'iscrzione a tale esame, con una notifica su sfondo rosso indicante il messaggio associato alla mancata iscrizione dovuta al fatto che non è stata rispettata la propedeuticità, come mostrato nell'immagine qui sopra.
+
+    \section{La carriera}
+    Ciascuno stuente può produrre la propria carriera, che sia \textit{completa} o che sia \textit{valida}.
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-20 00-15-42.png}
+
+    Nella fattispecie:
+    \begin{itemize}
+        \item la carriera valida è l'insieme di insegnamenti di cui si è superato con profitto l'esame, tenendo conto per ciascun insegnamento la data più recente in cui si è sostenuto l'esame
+        \item  la carriera completa è l'insieme di tutti gli insegnamenti di cui si è sostenuto almeno un esame, considerando anche gli esami ripetuti e gli esami non superati (ovvero con valutazione inferiore al 18)
+    \end{itemize}
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-20 00-15-52.png}
+
+    Nell'immagine mostrata sopra, abiamo generato la carriera valida dello studente, che si può scaricare anche in formato PDF
+
+    \section{Le informazioni sui corsi di laurea}
+    Ciascuno studente può reperire le informazioni sui vari corsi di laurea ottenendo così la lista di insegnamenti che fanno parte di quel corso di laurea: cercando infatti nel menù a tendina il nome dell'insegnamento
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-20 00-16-03.png}
+
+    e cliccando su "CERCA INFORMAZIONI"
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-20 00-16-05.png}
+
+    si ottengono le informazioni per quel determinato corso di laurea, con il nome degli insegnamenti e per ciascuno il nome dei docenti, tra cui il docente responsabile e una breve descrizione testuale indicante gli obiettivi dell'insegnamento
+\end{document}
