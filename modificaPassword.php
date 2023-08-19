@@ -13,11 +13,19 @@ if(isset($_GET['id'])){
     $stmt->bindParam(':randomvalue', $id, PDO::PARAM_STR);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-//    echo $result['utente']." -- ".$result['nome'];
+    if(!$result) {
+        header("Location: 404.php");
+        exit();
+    }
     $_SESSION['username'] = $result['utente'];
     $_SESSION['nome'] = $result['nome'];
     $_SESSION['cognome'] = $result['cognome'];
 //    echo ">>".$_SESSION['username']." - ";
+    $query = "DELETE FROM recupero_credenziali
+              WHERE randomvalue = :randomvalue";
+    $stmt = $conn->prepare($query);
+    $stmt->bindParam(':randomvalue', $id, PDO::PARAM_STR);
+    $stmt->execute();
 }
 ?>
 <!doctype html>

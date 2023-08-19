@@ -49,8 +49,9 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
             $persona = $result['nome']." ".$result['cognome'];
             $randomValue = uniqid();
             $object = "Recupero credenziali PiGEU";
-            $text = "Salve".$persona.",<br>Di seguito il link 
-                     per recuperare la tua password: ".$indirizzoPiGeu."/modificaPassword.php?id=".$randomValue;
+            $text = "Salve ".$persona.",<br>Di seguito il link monouso
+                     per recuperare la tua password: ".$indirizzoPiGeu."/modificaPassword.php?id=".$randomValue.
+                     "<br>Cordiali saluti,<br>il team di PiGEU.";
             $query = "INSERT INTO recupero_credenziali VALUES (:email, :randomvalue)";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':email', $emailist, PDO::PARAM_STR);
