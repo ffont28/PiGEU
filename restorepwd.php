@@ -26,8 +26,8 @@ importVariPerHomePage();
 <form method="post" >
     <div class="center bred">
         <div class="mb-3">
-            <label for="exampleFormControlInput1" class="form-label">Inserisci la nuova password</label>
-            <input type="text" class="form-control" id="email" name="email">
+            <label for="exampleFormControlInput1" class="form-label">Inserisci la tua email di recupero</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="la tua email di recupero, ad es mariorossi@gmail.com">
 
         </div>
         <input type="submit" class="button1 orange" value="RECUPERA PASSWORD" />
@@ -49,9 +49,10 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
             $persona = $result['nome']." ".$result['cognome'];
             $randomValue = uniqid();
             $object = "Recupero credenziali PiGEU";
-            $text = "Salve".$persona.",<br>Di seguito il link 
-                     per recuperare la tua password: ".$indirizzoPiGeu."/modificaPassword.php?id=".$randomValue;
-            $query = "INSERT INTO recupero VALUES (:email, :randomvalue)";
+            $text = "Salve ".$persona.",<br>Di seguito il link monouso
+                     per recuperare la tua password: ".$indirizzoPiGeu."/modificaPassword.php?id=".$randomValue.
+                     "<br>Cordiali saluti,<br>il team di PiGEU.";
+            $query = "INSERT INTO recupero_credenziali VALUES (:email, :randomvalue)";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':email', $emailist, PDO::PARAM_STR);
             $stmt->bindParam(':randomvalue', $randomValue, PDO::PARAM_STR);
@@ -76,9 +77,9 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 }
 ?>
 
-<form> <!-- action="../index.php" > -->
-    <input type="button" onclick="indietro()"
-           class="button1 lightblue" value="indietro" />
+<form action="../index.php" >
+    <input type="submit"
+           class="button1 lightblue" value="🏠🔑 RITORNA ALLA PAGINA DI ACCESSO" />
 </form>
 </body>
 
