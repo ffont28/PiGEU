@@ -51,7 +51,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
             $object = "Recupero credenziali PiGEU";
             $text = "Salve".$persona.",<br>Di seguito il link 
                      per recuperare la tua password: ".$indirizzoPiGeu."/modificaPassword.php?id=".$randomValue;
-            $query = "INSERT INTO recupero VALUES (:email, :randomvalue)";
+            $query = "INSERT INTO recupero_credenziali VALUES (:email, :randomvalue)";
             $stmt = $conn->prepare($query);
             $stmt->bindParam(':email', $emailist, PDO::PARAM_STR);
             $stmt->bindParam(':randomvalue', $randomValue, PDO::PARAM_STR);

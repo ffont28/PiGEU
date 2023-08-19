@@ -5,7 +5,7 @@ if(isset($_GET['id'])){
     $id = $_GET['id'];
     //  echo $id;
     $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-    $query = "SELECT r.utente, u.nome, u.cognome FROM recupero r 
+    $query = "SELECT r.utente, u.nome, u.cognome FROM recupero_credenziali r 
               INNER JOIN utente u ON u.email= r.utente
               WHERE randomvalue = :randomvalue
               LIMIT 1";
