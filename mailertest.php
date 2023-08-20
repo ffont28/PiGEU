@@ -8,7 +8,9 @@ require 'PHPMailer/src/Exception.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
-
+$dest = "frafontana28@gmail.com";
+$object = "Prova";
+$text = "Questo è un testo di prova";
 function sendMail($dest, $object, $text){
     $mail = new PHPMailer(true);
 
@@ -35,5 +37,6 @@ function sendMail($dest, $object, $text){
     }
 }
 
+sendMail($dest,$object, $text);
 
 ?>
