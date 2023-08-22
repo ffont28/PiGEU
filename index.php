@@ -133,7 +133,7 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     include_once('functions.php');
 
     $db = open_pg_connection();
-    $username= $_POST['username'];
+    $username= strtolower($_POST['username']);
     $password = md5($_POST['password']);
     $params = array($username, $password);
     $sql = "SELECT FROM credenziali WHERE password = $2 AND username = $1";

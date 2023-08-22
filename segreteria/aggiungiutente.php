@@ -143,7 +143,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     $utente = $_COOKIE['username'];
         if ($_POST['username'] != ""){ $utente = $_POST['username'];}
     $dominio = $_COOKIE['dominio'];
-    $istitemail = $utente.$dominio;
+    $istitemail = strtolower($utente.$dominio);
 
     $nome = $_POST['nome'];
     $cognome = $_POST['cognome'];
