@@ -132,18 +132,18 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
  </div>
     <script>
     function updateSecondMenutendina1() {
-                console.log("richiesta funzione1"); ////////////////////////////////////////////////////////////////////////////
+
                 var cdl = document.getElementById("cdl");
                 var anno = document.getElementById("anno");
 
-                // Ottieni il valore selezionato nel primo menù a tendina
+                // Ottiene il valore selezionato nel primo menù a tendina
                 var selezionecdl = cdl.value;
 
                 // Effettua una richiesta AJAX al server per ottenere il contenuto del secondo menù a tendina
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
-                    console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
+
                         if (xhr.status === 200) {
                                console.log("CONNESSO OK QUERY ANNO LAUREA"); /////////////////////////////////////////////////////////////////////
                             // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
@@ -237,17 +237,6 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
     $prop = $_POST['prop'];
 
 
-//
-//    $codice = "23";
-//    $nome = "VENTITRE";
-//    $anno = 3;
-//    $descrizione = " ";
-//    $cfu = '3';
-//    $responsabile = "stefano.aguzzoli@unimi.it";
-//    $cdl = "F1X";
-//    $prop = "no";
-
-
     // inserimento dell'insegnamento nella tabella insegnamento
     $params = array ($codice, $nome , $descrizione, $cfu);
     $sql = "INSERT INTO insegnamento VALUES ($1,$2,$3,$4)";
@@ -274,8 +263,9 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
     $result = pg_execute($db,'insProp', $params);
 
     }
-
+    pg_close($db);
 }
+$conn = null;
  ?>
 
 

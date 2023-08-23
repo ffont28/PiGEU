@@ -24,4 +24,5 @@ if (isset($_POST['utente'])) {
     // Invia una risposta JSON di errore al client se i parametri non sono stati forniti
     echo json_encode(['success' => false, 'message' => 'Parametri mancanti per la cancellazione']);
 }
+$conn = null;
 ?>

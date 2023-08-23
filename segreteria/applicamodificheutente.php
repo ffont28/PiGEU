@@ -7,11 +7,8 @@ var_dump($_POST);
 echo "</pre>";
 echo $_POST['nome'];
 echo $_POST["action"];
-//if (isset($_POST["action"])){
     if ($_POST['action'] == 'MODIFICA ANAGRAFICA UTENTE') {
-        error_log("MODIFIC ANAGRAFICA OK");
         $targ = $_POST['hricercato'];
-        $db = open_pg_connection();
         echo "sono qui";
         // definisco le variabili
 
@@ -21,16 +18,8 @@ echo $_POST["action"];
         $citta = $_POST['citta'];
         $cf = $_POST['codicefiscale'];
         $persemail = $_POST['emailpersonale'];
-        //  $tipo = $_POST['tipo'];
-        //  $tipodocente = $_POST['tipodocente'];
-        //  $tiposegreteria = $_POST['tiposegreteria'];
-        //  $cf = $_POST['codicefiscale'];
-        ///////echo $_POST['tipo'];
 
-        //  echo "elems= ".$nome.$cognome.$cf.$indirizzo.$citta.$persemail.$ricercato;
-        // inserimento generale a livello di utente sia che sia docente, studente o segreteria
-        try { echo "sono qui";
-            ///////////////////////////
+        try {
 
             $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
             $sql = "UPDATE utente SET nome = :nome,
@@ -69,5 +58,5 @@ echo $_POST["action"];
         }
 
     }
-//}
+$pdo = null;
 header("Location: gestisciutente.php");

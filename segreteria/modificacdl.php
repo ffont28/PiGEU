@@ -68,8 +68,6 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         $nome = $_POST['nome'];
         $tipo = $_POST['tipo'];
 
-        echo "<script>console.log('Debug Objects: >>" . $nome . " " . $tipo . " " . $codiceCdL. "' );</script>";
-
         try {
 
             $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
@@ -110,42 +108,39 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo "<form method=\"POST\" > <div class=\"center bblue\">";
+?>      <form method="POST" >
+        <div class="center bblue">
 
-           foreach ($results as $row) {
+<?php     foreach ($results as $row) {
                $tipoinq = $row['tipo'];
                $nomeCdL = $row['nome'];
-                 echo "<div class=\"mb-3\">
-                                <label for=\"exampleFormControlInput1\" class=\"form-label\">Codice</label>
-                      <input readonly type=\"text\" value=\"".$row['codice']."\" class=\"form-control\" id=\"cdl\" name=\"cdl\">
-                        </div>
-                       <div class=\"mb-3\">
-                                <label for=\"exampleFormControlInput1\" class=\"form-label\">Nome</label>
-                     <input type=\"text\" value=\"".$row['nome']."\" class=\"form-control\" id=\"nome\" name=\"nome\">
-                       </div>
-                     ";
-
-                 echo '<div id="tipocorso">
-                       Tipo di corso di studi:
-                        <select class="form-select" aria-label="Default select example" id="tipo" name="tipo">
-                              <option ';
-                            if ($tipoinq == "triennale") {echo " selected ";} /////////////////////// modificato qui era echo "triennale"
-                                echo 'value="triennale">triennale</option>
-                              <option ';
-                            if ($tipoinq == "magistrale") {echo 'selected ';}
-                                echo 'value="magistrale">magistrale</option>
-                              <option ';
-                            if ($tipoinq == "magistrale a ciclo unico") {echo 'selected ';}
-                                echo 'value="magistrale a ciclo unico">magistrale a ciclo unico</option>
-                            </select>
-                    </div>';
-
-               echo " <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA CORSO DI LAUREA\" name='action'/>
-                        </div>
-                    </form>
-                    ";
-
-                 }
+?>              <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Codice</label>
+                    <input readonly type="text" value="<?php echo $row['codice']?>" class="form-control" id="cdl" name="cdl">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Nome</label>
+                    <input type="text" value="<?php echo $row['nome']?>" class="form-control" id="nome" name="nome">
+                </div>
+                <div id="tipocorso">
+                    Tipo di corso di studi:
+                    <select class="form-select" aria-label="Default select example" id="tipo" name="tipo">
+                        <option
+<?php                  if ($tipoinq == "triennale") {?> selected <?php }
+?>                        value="triennale">triennale</option>
+                        <option
+<?php                  if ($tipoinq == "magistrale") {?> selected <?php }
+?>                        value="magistrale">magistrale</option>
+                        <option
+<?php                  if ($tipoinq == "magistrale a ciclo unico") {?> selected <?php }
+?>                        value="magistrale a ciclo unico">magistrale a ciclo unico</option>
+                    </select>
+                </div>
+                <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA CORSO DI LAUREA\" name='action'/>
+        </div>
+        </form>
+<?php
+            }
        } catch (PDOException $e) {
            echo "Errore: " . $e->getMessage();
        }
