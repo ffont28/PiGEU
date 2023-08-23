@@ -19,110 +19,97 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
 
 <h1> PAGINA DI VERBALIZZAZIONE ESITI</h1>
 
-            <?php
-            $docente = $_SESSION['username'];
-            echo "<script>console.log('Debug_Objects:>> " . $docente .  " ' );</script>";
+<?php
+    $docente = $_SESSION['username'];
 
-            if($_SERVER['REQUEST_METHOD']=='POST') {
+    if($_SERVER['REQUEST_METHOD']=='POST') {
 
-                if ($_POST['op'] == 'VERBALIZZA' &&
-                    isset($_POST['insegnamento']) &&
-                    isset($_POST['studente']) &&
-                    isset($_POST['data']) &&
-                    isset($_POST['votoDaVerbalizzare'])) {
+        if ($_POST['op'] == 'VERBALIZZA' &&
+            isset($_POST['insegnamento']) &&
+            isset($_POST['studente']) &&
+            isset($_POST['data']) &&
+            isset($_POST['votoDaVerbalizzare'])) {
 
-                    $insegnamento = $_POST['insegnamento'];
-                    $studente = $_POST['studente'];
-                    $dataEsame = $_POST['data'];
-                    $valutazione = $_POST['votoDaVerbalizzare'];
-                    echo "<script>console.log('>> " . $valutazione .  " ' );</script>";
-                    //echo "ciao ISCR=" . $_POST['esame'] . " CANC= " ;
-
-                    try {
-                        $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-                        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                        $db->query("LISTEN notifica");
-
-                        $sql = "INSERT INTO carriera (studente, insegnamento, valutazione, data)  VALUES (:s, :i, :v, :d)";
-                        $stmt = $db->prepare($sql);
-                        $stmt->bindParam(':s', $studente, PDO::PARAM_STR);
-                        $stmt->bindParam(':i', $insegnamento, PDO::PARAM_STR);
-                        $stmt->bindParam(':d', $dataEsame, PDO::PARAM_STR);
-                        $stmt->bindParam(':v', $valutazione, PDO::PARAM_INT);
-
-                        $stmt->execute();
-
-                        while (true) {
-                            echo "<script>console.log('Debug_Objects:>>TRUE " . $docente .  " ' );</script>";
-                            $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50);
-                            if ($notify === false) {
-                                //echo '<script> console.log("qui"); window.location.reload();</script>';
-                                echo '  <div class="alert alert-success" role="alert" name="alert-message" >
-                                 Voto registrato correttamente in carriera 
-                                </div>';
-                                //  echo '<script> console.log("qui"); window.location.reload();</script>';
-                                break;
-                            } else {
-                                //echo '<script> console.log("qui"); window.location.reload();</script>';
-                                echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
-                                  ' . $notify["payload"] . '
-                                </div>';
-                                break;
-                            }
-                        }
-                    } catch (PDOException $e) {
-
-                        echo "<script>console.log('DUPLICATO:>> " . $docente .  " ' );</script>";
-                    }
-                }
-
-            }
+            $insegnamento = $_POST['insegnamento'];
+            $studente = $_POST['studente'];
+            $dataEsame = $_POST['data'];
+            $valutazione = $_POST['votoDaVerbalizzare'];
 
             try {
-                $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
-                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+                $db->query("LISTEN notifica");
 
-                // vedo TUTTI gli appelli, anche quelli a cui non si è iscritto nessuno
-                $query = "  SELECT distinct i.nome, i.codice  FROM insegnamento i
-                            INNER JOIN calendario_esami c ON c.insegnamento = i.codice
-                            INNER JOIN docente_responsabile d ON d.docente = :docente AND d.insegnamento = i.codice                      
-                            ";
-                //echo "<script>console.log('Qui3');</script>";
-                // Esecuzione della query e recupero dei risultati
-                $stmt = $conn->prepare($query);
+                $sql = "INSERT INTO carriera (studente, insegnamento, valutazione, data)  VALUES (:s, :i, :v, :d)";
+                $stmt = $db->prepare($sql);
+                $stmt->bindParam(':s', $studente, PDO::PARAM_STR);
+                $stmt->bindParam(':i', $insegnamento, PDO::PARAM_STR);
+                $stmt->bindParam(':d', $dataEsame, PDO::PARAM_STR);
+                $stmt->bindParam(':v', $valutazione, PDO::PARAM_INT);
 
-                $stmt->bindParam(':docente', $docente, PDO::PARAM_STR);
                 $stmt->execute();
 
-                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                while (true) {
+
+                    $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50);
+                    if ($notify === false) {
+?>                      <div class="alert alert-success" role="alert" name="alert-message" >
+                         Voto registrato correttamente in carriera
+                        </div>
+<?php                   break;
+                    } else {
+?>                      <div class="alert alert-danger" role="alert" name="alert-message" >
+                          <?php echo $notify["payload"] ?>
+                        </div>
+<?php                   break;
+                    }
+                }
+            } catch (PDOException $e) {
+
+            }
+        }
+
+    }
+
+    try {
+        $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+
+        // vedo TUTTI gli appelli, anche quelli a cui non si è iscritto nessuno
+        $query = "  SELECT distinct i.nome, i.codice  FROM insegnamento i
+                    INNER JOIN calendario_esami c ON c.insegnamento = i.codice
+                    INNER JOIN docente_responsabile d ON d.docente = :docente AND d.insegnamento = i.codice                      
+                    ";
+        //echo "<script>console.log('Qui3');</script>";
+        // Esecuzione della query e recupero dei risultati
+        $stmt = $conn->prepare($query);
+
+        $stmt->bindParam(':docente', $docente, PDO::PARAM_STR);
+        $stmt->execute();
+
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <div>
-    <label for="exampleFormControlInput1" class="form-label">Seleziona l'appello per cui si vuole procedere alla verbalizzazione</label>
-    <form id="inserimentoInsegnamentoEData" action="" method="POST">
-        <label for="insegnamento" >Appello di:</label>
+<label for="exampleFormControlInput1" class="form-label">Seleziona l'appello per cui si vuole procedere alla verbalizzazione</label>
+<form id="inserimentoInsegnamentoEData" action="" method="POST">
+<label for="insegnamento" >Appello di:</label>
         <select type='insegnamento' id="insegnamento" name="insegnamento">
 
-                <?php
-
-                // Elaborazione dei risultati
-                foreach ($results as $row) {
-
-
-                    // Utilizza $row per accedere ai dati dei singoli record
-                    echo "<option ";
-                    if ($_POST['insegnamento'] == $row['codice']){ echo "selected";}
-                    echo " value=\"".$row['codice']."\">".$row['nome']."</option> ";
-                }
-                echo ' </select>';
-
-            } catch (PDOException $e) {
-                echo "Errore: " . $e->getMessage();
-            }
-
-
-            ?>
+<?php
+        foreach ($results as $row) {
+?>      <option
+<?php       if ($_POST['insegnamento'] == $row['codice']){?> selected <?php }
+?>          value="<?php echo $row['codice']?>"> <?php echo $row['nome']?></option>
+<?php   }
+?>
+        </select>
+<?php
+    } catch (PDOException $e) {
+        echo "Errore: " . $e->getMessage();
+    }
+?>
             <label for="data">svolto in data:</label>
             <select type="data" id="data" name="data">
 
@@ -130,39 +117,28 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
 
                 <script>
     function aggiornaData() {
-                console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
                 var insegnamento = document.getElementById("insegnamento").value;
                 var data = document.getElementById("data");
 
-                // Ottieni il valore selezionato nel primo menù a tendina
-                //insegnamento.value;
-
-                // Effettua una richiesta AJAX al server per ottenere il contenuto del secondo menù a tendina
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
-                    console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
+
                         if (xhr.status === 200) {
-                               console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
-                            // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
                             data.innerHTML = xhr.responseText;
                         } else {
-                            // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
                             console.error("Errore durante la richiesta AJAX");
                         }
                     }
                 };
 
-                // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
                 console.log("data->>>" + data.value);
                 xhr.open("GET", "dataEsamePerVerbalizzazione.php?value=" + insegnamento + "&data=" + data.value, true);
                 xhr.send();
             }
 
-            // Aggiungi un ascoltatore di eventi per il menù a tendina 1
             document.getElementById("insegnamento").addEventListener('change', aggiornaData);
 
-            // Inizializza il contenuto del secondo menù a tendina inizialmente
             aggiornaData();
         </script>
 
@@ -211,7 +187,9 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-                echo ' <div><label for="exampleFormControlInput1" class="form-label"><h3>Studenti che hanno sostenuto l\'esame, in attesa di verbalizzazione</h3></label></div> 
+?>              <div>
+                    <label for="exampleFormControlInput1" class="form-label"><h3>Studenti che hanno sostenuto l\'esame, in attesa di verbalizzazione</h3></label>
+                </div>
                 <div>
                 <table class="table">
                     <thead>
@@ -223,95 +201,37 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                         <th scope="col">VERBALIZZA</th>
                     </tr>
                     </thead>
-                    <tbody>';
-
+                    <tbody>
+<?php
                 $counter = 1;
                 foreach ($results as $row) {
-                    echo '  <tr> <form action="" method="POST">
-                            <th scope="row">' . $counter++ . '</th>
-                            <td>' . $row["matricola"] . '</td>
-                            <td>' . $row["cognome"] . " " . $row["nome"] . '</td>
-                            <td><input type="text" class="form-control"  placeholder="valutazione espressa in trentesimi" id="votoDaVerbalizzare" name="votoDaVerbalizzare"></td>
-                            <td>
-                                    <input type="text" id="insegnamento" name="insegnamento" value="'.$row["insegnamento"].'" hidden>
-                                    <input type="text" id="studente" name="studente" value="'.$row["email"].'" hidden>
-                                    <input type="text" id="data" name="data" value="'.$row["data"].'" hidden>
-                                    <input type="text" id="op" name="op" value="VERBALIZZA" hidden>
-                                    <button type="submit2" class="button-verb">VERBALIZZA</button>
-                                </form>
-                            
-                            
-                            
-                            <!--
-                              <button class="button-verb" 
-                                      insegnamento="' . $row["insegnamento"] . '" 
-                                      studente="' . $row["email"] . '"
-                                      dataEsame="' . $row["data"] . '">VERBALIZZA</button> -->
-                            </td>
-                            </tr> ';
-                }
+?>                  <tr> <form action="" method="POST">
+                    <th scope="row"><?php echo $counter++ ?></th>
+                    <td><?php echo $row["matricola"] ?></td>
+                    <td><?php echo $row["cognome"] . " " . $row["nome"]?></td>
+                    <td><input type="text" class="form-control"  placeholder="valutazione espressa in trentesimi" id="votoDaVerbalizzare" name="votoDaVerbalizzare"></td>
+                    <td>
+                            <input type="text" id="insegnamento" name="insegnamento" value="<?php echo $row["insegnamento"]?>" hidden>
+                            <input type="text" id="studente" name="studente" value="<?php echo $row["email"]?>" hidden>
+                            <input type="text" id="data" name="data" value="<?php echo $row["data"]?>" hidden>
+                            <input type="text" id="op" name="op" value="VERBALIZZA" hidden>
+                            <button type="submit2" class="button-verb">VERBALIZZA</button>
+                        </form>
 
-
-                echo '
-                    </tbody>
+                    </td>
+                    </tr>
+<?php           }
+?>
+                  </tbody>
                 </table>
-            </div>';
-            } catch (PDOException $e) {
+            </div>
+<?php       } catch (PDOException $e) {
                 echo "Errore: " . $e->getMessage();
             }
 }
-//    echo "
-//        <script>
-//  // Funzione per effettuare la richiesta AJAX per verbalizzare
-//  function verbalizzaEsame(insegnamento, studente, dataEsame, valutazione) {
-//    const xhttp = new XMLHttpRequest();
-//
-//    xhttp.onreadystatechange = function() {
-//      if (this.readyState === 4) {
-//        if (this.status === 200) {
-//          // Gestisci la risposta del server
-//          const response = JSON.parse(this.responseText);
-//          console.log(response);
-//        if (response.success) {
-//           window.location.href = 'verbalizzazione.php';
-//          }
-//        } else {
-//          // Gestisci eventuali errori
-//          console.error('Errore nella richiesta AJAX:', this.statusText);
-//          window.location.reload();
-//         }
-//      }
-//    };
-//
-//
-//    xhttp.open('POST', 'verbalizza.php', true);
-//    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-//    const params = 'insegnamento=' + encodeURIComponent(insegnamento) +
-//                    '&studente=' + encodeURIComponent(studente) +
-//                    '&dataEsame=' + encodeURIComponent(dataEsame) +
-//                    '&valutazione=' + encodeURIComponent(valutazione);
-//    xhttp.send(params);
-//  }
-//
-//  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
-//  const verbButtons = document.querySelectorAll('.button-verb');
-//  verbButtons.forEach(button => {
-//    button.addEventListener('click', function() {
-//      const insegnamento = this.getAttribute('insegnamento');
-//      const studente = this.getAttribute('studente');
-//      const dataEsame = this.getAttribute('dataEsame');
-//      var valutazione = this.closest('tr').querySelector('.form-control').value;
-//      console.log(insegnamento + \" \" + studente + \" \" + dataEsame + \" \" +valutazione);
-//
-//      // Effettua la richiesta AJAX
-//      verbalizzaEsame(insegnamento, studente, dataEsame, valutazione);
-//    });
-//  });
-//</script>";
 
+$conn = null;
+$db = null;
 ?>
-
 </body>
-
 </html>
-
