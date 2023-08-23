@@ -74,7 +74,7 @@ BEGIN
                     INNER JOIN calendario_esami ce ON ce.insegnamento = c.insegnamento
                     INNER JOIN propedeuticita p ON p.insegnamento1 = ce.insegnamento
                     INNER JOIN studente s ON s.corso_di_laurea = p.corso_di_laurea
-                    WHERE s.utente = NEW.studente
+                    WHERE c.studente = NEW.studente
                     AND c.valutazione >= 18;
                     IF FOUND THEN
                         RETURN NEW;
