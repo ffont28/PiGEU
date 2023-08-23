@@ -1,0 +1,143 @@
+% UN PO DI IMPORT
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\usepackage[svgnames]{xcolor}
+\usepackage{listings}
+\usepackage{xcolor} % Per il colore del testo
+\usepackage{fontawesome5}
+
+
+% Definizione del nuovo comando
+\newcommand{\tabb}[1]{\texttt{\textcolor{blue}{#1}}}
+\newcommand{\tab}[1]{\texttt{\textcolor{cyan}{#1}}}
+\newcommand{\attr}[1]{\texttt{\textcolor{gray}{#1}}}
+\newcommand{\sqlcommand}[1]{\texttt{\textcolor{orange}{#1}}}
+\newcommand{\sqlfunc}[1]{\texttt{\textcolor{violet}{#1}}}
+\newcommand{\sqltrigger}[1]{\texttt{\textcolor{teal}{#1}}}
+\newcommand{\sqlview}[1]{\texttt{\textcolor{yellow}{#1}}}
+\newcommand{\m}[1]{\texttt{}}
+\newcommand{\und}[0]{\textunderscore}
+\newcommand{\alert}[0]{\textcolor{red}{\faExclamationCircle}}
+\newcommand{\danger}[0]{\textcolor{red}{\faExclamationCircle}}
+
+
+\title{PiGEU\\ Piattaforma per la Gestione degli Esami Universitari}
+%\subtitle{DOCUMENTAZIONE TECNICA}
+
+\author{\textbf{MANUALE SEGRETERIA}}
+\date{Fontana Francesco \\ matr. 943519}
+
+\begin{document}
+
+    \maketitle
+
+    \begin{abstract}
+
+        La Piattaforma per la Gestione degli Esami Universitari, d'ora in poi chiamata PiGEU per comodità, è una soluzione che permette di gestire
+        uno scenario universitario in cui siano presenti insegnamenti e corsi di laurea, docenti, studenti e segretari, iscrizioni e verbalizzazioni
+        ai diversi appelli di esame di ogni insegnamento, generazione di documentazioni valide per gli studenti quali i certificati di carriera, visibili
+        o anche scaricabili in formato PDF.
+        Questa guida ha lo scopo di mostrare al docente la praticità nell'uso di Pigeu
+    \end{abstract}
+
+    \tableofcontents
+
+    \section{Il primo accesso}
+    Successivamente alla creazione dell'utenza di tipo \textit{Docente} da parte della segreteria, sarà subto fruibile il nuovo account docente con tutte le funzionalità di PiGEU.
+
+    Al primo accesso verrà chiesto di modificare la password, che non può coincidere con l'indirizzo della propria email personale. Dopo aver effettuato la modifica della password, si potrà accedere con le proprie nuove credenziali alla home page:
+
+    \section{La home Page}
+    La home page mostra già nel suo lato superiore la navbar con le operazioni proprie dell'utente di segreteria:
+    \begin{itemize}
+        \item la gestione delle utenze
+        \begin{itemize}
+            \item inserimento di un utente
+            \item modifica di un utente
+            \item rimozione di un utente
+        \end{itemize}
+        \item la gestione degli insegnamenti
+        \begin{itemize}
+            \item inserimento di un insegnamento
+            \item modifica di un insegnamento
+            \item rimozione di un insegnamento
+        \end{itemize}
+        \item la gestione dei corsi di laurea
+        \begin{itemize}
+            \item inserimento di un corso di laurea
+            \item modifica di un corso di laurea
+            \item rimozione di un corso di laurea
+        \end{itemize}
+    \end{itemize}
+    viene mostrato inoltre il nome e cognome dell'utente attualmente loggato e vi è da ultimo il pulsate di logout.
+    Nella pagina invece è possibile caricare o modificare la propria foto profilo cliccando su "Scegli un'immagine" e poi "Aggiorna Foto".
+    Da ultimo vi è la possibilità di modificare la propria password cliccando sul pulsante rosso "MODIFICA PASSWORD".
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 19-19-16.png}
+
+    \section{La \textit{gestione utenze}}
+
+
+
+
+
+    -------------------------------- SONO ARRIVATO QUI
+
+
+
+
+
+
+
+
+
+
+
+    Cliccando nella navbar \textit{GESTIONE CALENDARIO ESAMI} si accede alla pagina di gesione degli esami dove per ciascun insegnameno di cui si è responsabile, è possibile inserire per la data e ora selezionata un nuovo appello di esame per quell'insegnamento.
+
+    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 19-19-58.png}
+
+    Ad esempio, inserendo un appello per la materia di \textit{Linguaggi Formali e Automi} in data \attr{23/12/2023} e ora \attr{15:50} e cliccando su inserisci
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-34-13.png}
+
+    la notifica su sfondo verde con la dicitura "Inserimento dell'esame andato a buon fine" indica il buon esito dell'operazione di inserimento: nella sezione "esami attualmente calendarizzati" comparirà l'esame appena inserito (insieme agli altri già eventualmente presenti) e gli studenti dalla loro interfaccia potranno vedere l'appello dell'insegnamento ed iscriversi all'esame.
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-34-18.png}
+
+    contrariamente, se si vuole inserire un esame per la stessa data in cui è già calendarizzato un altro esame dello stesso anno, di un corso di laurea che eroga il medesimo insegnamento,
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-34-43.png}
+
+    verrà impedito l'inserimento del nuovo esame, con una notifica su sfondo rosso indicante il messaggio associato al mancato inserimento.
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-39-37.png}
+
+    \section{La verbalizzazione}
+    Ciascun docente responsabile di un insegnamento, oltre a calendarizzare gli esami per quell'insegnamento, può verbalizzare gli esiti degli esami che andranno inseriti nella carriera dello studente.
+    Selezionando l'insegnamento nel menù a tendina più a sinistra, compariranno nel menù a tendina di destra le date in cui ci sono stati esami di quell'insegnamento. Dopodichè cliccando sul tasto dallo sfondo verde "RICERCA STUDENTI ISCRITTI", compariranno gli studenti iscritti a quell'appello di esame
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-39-48.png}
+
+    Per ciascuno studente è possibile verbalizzare un voto che sia compreso tra 0 e 31 (quest'ultimo equivalente del 30 e lode),
+    e se si inserisce un numero al di fuori di questo range, come nell'esempio il numero \texttt{250}
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-40-01.png}
+
+    viene mostrato un messaggio di errore:
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 20-55-28.png}
+
+    Se invece si inserisce un numero valido entro il range consentito, come ad esempio il numero \texttt{25}
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 20-56-10.png}
+
+    Il voto viene registrato correttamente in carriera:
+
+    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 20-56-16.png}
+
+    Attenzione: prima di verbalizzare il voto, bisogna prestare particolare attenzione alla correttezza dei dati che si inviano premendo il pulsante azzurro "VERBALIZZA". Dopo la pressione del tasto, l'operazione è irreversibile.
+
+\end{document}

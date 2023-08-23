@@ -1,4 +1,5 @@
 <?php
+session_start();
 include ('conf.php');
 if(isset($_POST['submit'])) {
 
@@ -84,8 +85,8 @@ try{
 
         <div class="text" >
             <h2><?php echo $_SESSION['nome']?> <?php echo $_SESSION['cognome'] ?></h2>
-            <p>tipo di utenza: </p>
-            <p>Altre informazioni...</p>
+            <p>tipo di utenza: <?php echo $_SESSION['tipo']?></p>
+            <p>---</p>
         </div>
         <div>
             <div class="photo-container-my">

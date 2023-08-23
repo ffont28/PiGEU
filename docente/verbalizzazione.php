@@ -190,6 +190,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                           INNER JOIN calendario_esami c ON c.insegnamento = :insegnamento
                                                         AND c.data = :data
                           INNER JOIN iscrizione i ON i.studente = u.email
+                                                  AND i.esame = c.id
                           EXCEPT 
                           SELECT DISTINCT u.email, u.cognome, u.nome, s.matricola, c.insegnamento, c.data
                           FROM studente s
