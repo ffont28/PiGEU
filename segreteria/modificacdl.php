@@ -133,7 +133,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 ?>                        value="magistrale a ciclo unico">magistrale a ciclo unico</option>
                     </select>
                 </div>
-                <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA CORSO DI LAUREA\" name='action'/>
+                <input type="submit" class="button1 orange" value="MODIFICA CORSO DI LAUREA" name='action'/>
         </div>
         </form>
 <?php
@@ -470,7 +470,9 @@ try {
                 '&insegnamento2=' + encodeURIComponent(ins2) +
                 '&cdl=' + encodeURIComponent(cdl);
             xhttp2.send(params);
+            updateSecondMenutendina();
         }
+
     });
     console.log("fine del MODIFICA CDL -----------------");
 </script>

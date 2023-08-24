@@ -6,7 +6,7 @@ include('../conf.php');
 $selezioneCdL = $_GET['value'];
 
 try {
-    // Connessione al database utilizzando PDO
+
     $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -40,7 +40,8 @@ try {
             </tr>
 
 
-<?    }
+<?php
+    }
 }
 catch
     (PDOException $e) {

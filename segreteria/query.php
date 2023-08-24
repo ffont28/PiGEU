@@ -1,8 +1,7 @@
 <?php
 include('../functions.php');
 include('../conf.php');
-importVari();
-
+$selezioneMenutendina1 = $_GET['value'];
 try {
     $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
 
