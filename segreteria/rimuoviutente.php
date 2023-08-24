@@ -42,11 +42,6 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
         </div>
 
-
-
-
-
-
 </body>
 
 </html>

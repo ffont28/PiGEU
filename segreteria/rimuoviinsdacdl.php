@@ -36,4 +36,5 @@ if (isset($_POST['insegnamento']) && isset($_POST['cdl'])) {
 
     echo json_encode(['success' => true, 'message' => 'Riga eliminata con successo anche eventualmente nella propedeuticita']);
 }
+$db = null;
 ?>

@@ -22,4 +22,5 @@ if (isset($_POST['insegnamento']) && isset($_POST['docente'])) {
         echo json_encode(['success' => false, 'message' => 'Errore durante la DELETE in insegna']);
     }else echo json_encode(['success' => true, 'message' => 'Riga eliminata con successo anche eventualmente nella propedeuticita']);
 }
+$db = null;
 ?>

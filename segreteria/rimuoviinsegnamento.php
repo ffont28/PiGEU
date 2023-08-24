@@ -44,16 +44,13 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
 <script>
     function updateCorsiTrovati() {
-        console.log("richiesta funzione123"); //////////
         var sezioneHtml = document.getElementById("tabellautenti");
         var search = document.getElementById("daricercare").value ;
         console.log("RICERCA SU >>"+search);
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                console.log("qui nell'XMLHTTP...."); ////////////////////////////////////////////////////////////////////////////////////////
                 if (xhr.status === 200) {
-                    console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
                     // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
                     sezioneHtml.innerHTML = xhr.responseText;
                 } else {
@@ -96,8 +93,6 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
         // Listener per l'evento input sull'input di ricerca
         searchInput.addEventListener('input', function() {
             const searchValue = searchInput.value;
-            // Esegui la chiamata AJAX con il valore di ricerca
-            // e aggiorna la tabella con i risultati ottenuti
             updateCorsiTrovati(searchValue);
         });
 
