@@ -32,4 +32,5 @@ if (isset($_POST['insegnamento1']) && isset($_POST['insegnamento2']) && isset($_
     // Invia una risposta JSON di errore al client se i parametri non sono stati forniti
     echo json_encode(['success' => false, 'message' => 'Parametri mancanti per la cancellazione']);
 }
+$conn = null;
 ?>

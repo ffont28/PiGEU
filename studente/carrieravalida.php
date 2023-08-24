@@ -112,7 +112,7 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
         (PDOException $e) {
             echo "Errore: " . $e->getMessage();
         }
-        ?>
+?>
     </div>
     <div>
 
@@ -127,3 +127,9 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
 
     </div>
 </div>
+
+</body>
+<?php
+$conn = null;
+?>
+</html>

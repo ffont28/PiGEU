@@ -27,4 +27,5 @@ if(isset($_GET['cdl'])) {
         echo "Errore: " . $e->getMessage();
     }
 }
+$conn = null;
 ?>

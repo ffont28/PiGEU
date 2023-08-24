@@ -41,5 +41,5 @@ if(isset($_GET['cdl']) && isset($_GET['cod1'])) {
         echo "Errore: " . $e->getMessage();
     }
 }
-
+$conn = null;
 ?>

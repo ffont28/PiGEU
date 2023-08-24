@@ -17,9 +17,6 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
 <h1>MODIFICA UN CORSO DI LAUREA</h1>
 
-<div class="alert alert-primary" role="alert">
-    Benvenuto <?php echo $_SESSION['nome'] . " " . $_SESSION['cognome']; ?> !
-</div>
 <div>
     <label for="exampleFormControlInput1" class="form-label">Seleziona il Corso di Laurea che vuoi modificare:</label>
     <form id="ricercaCdL" action="" method="POST">
@@ -68,8 +65,6 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         $nome = $_POST['nome'];
         $tipo = $_POST['tipo'];
 
-        echo "<script>console.log('Debug Objects: >>" . $nome . " " . $tipo . " " . $codiceCdL. "' );</script>";
-
         try {
 
             $pdo = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
@@ -110,42 +105,39 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo "<form method=\"POST\" > <div class=\"center bblue\">";
+?>      <form method="POST" >
+        <div class="center bblue">
 
-           foreach ($results as $row) {
+<?php     foreach ($results as $row) {
                $tipoinq = $row['tipo'];
                $nomeCdL = $row['nome'];
-                 echo "<div class=\"mb-3\">
-                                <label for=\"exampleFormControlInput1\" class=\"form-label\">Codice</label>
-                      <input readonly type=\"text\" value=\"".$row['codice']."\" class=\"form-control\" id=\"cdl\" name=\"cdl\">
-                        </div>
-                       <div class=\"mb-3\">
-                                <label for=\"exampleFormControlInput1\" class=\"form-label\">Nome</label>
-                     <input type=\"text\" value=\"".$row['nome']."\" class=\"form-control\" id=\"nome\" name=\"nome\">
-                       </div>
-                     ";
-
-                 echo '<div id="tipocorso">
-                       Tipo di corso di studi:
-                        <select class="form-select" aria-label="Default select example" id="tipo" name="tipo">
-                              <option ';
-                            if ($tipoinq == "triennale") {echo " selected ";} /////////////////////// modificato qui era echo "triennale"
-                                echo 'value="triennale">triennale</option>
-                              <option ';
-                            if ($tipoinq == "magistrale") {echo 'selected ';}
-                                echo 'value="magistrale">magistrale</option>
-                              <option ';
-                            if ($tipoinq == "magistrale a ciclo unico") {echo 'selected ';}
-                                echo 'value="magistrale a ciclo unico">magistrale a ciclo unico</option>
-                            </select>
-                    </div>';
-
-               echo " <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA CORSO DI LAUREA\" name='action'/>
-                        </div>
-                    </form>
-                    ";
-
-                 }
+?>              <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Codice</label>
+                    <input readonly type="text" value="<?php echo $row['codice']?>" class="form-control" id="cdl" name="cdl">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Nome</label>
+                    <input type="text" value="<?php echo $row['nome']?>" class="form-control" id="nome" name="nome">
+                </div>
+                <div id="tipocorso">
+                    Tipo di corso di studi:
+                    <select class="form-select" aria-label="Default select example" id="tipo" name="tipo">
+                        <option
+<?php                  if ($tipoinq == "triennale") {?> selected <?php }
+?>                        value="triennale">triennale</option>
+                        <option
+<?php                  if ($tipoinq == "magistrale") {?> selected <?php }
+?>                        value="magistrale">magistrale</option>
+                        <option
+<?php                  if ($tipoinq == "magistrale a ciclo unico") {?> selected <?php }
+?>                        value="magistrale a ciclo unico">magistrale a ciclo unico</option>
+                    </select>
+                </div>
+                <input type="submit" class="button1 orange" value="MODIFICA CORSO DI LAUREA" name='action'/>
+        </div>
+        </form>
+<?php
+            }
        } catch (PDOException $e) {
            echo "Errore: " . $e->getMessage();
        }
@@ -168,47 +160,51 @@ try {
     $stmt->bindParam(':c', $codiceCdL, PDO::PARAM_STR);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo ' <div><label for="exampleFormControlInput1" class="form-label"><h3>Insegnamenti che fanno parte del corso di laurea</h3></label></div> 
+?>      <div>
+            <label for="exampleFormControlInput1" class="form-label"><h3>Insegnamenti che fanno parte del corso di laurea</h3></label>
+        </div>
         <div>
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Codice </th>
-                <th scope="col">Nome Insegnamento</th>
-                <th scope="col">Anno</th>
-                <th scope="col">CFU</th>
-                <th scope="col">Docente Responsabile</th>
-                <th scope="col" style="text-align: center;">RIMUOVI</th>
-            </tr>
-            </thead>
-            <tbody>';
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Codice </th>
+                    <th scope="col">Nome Insegnamento</th>
+                    <th scope="col">Anno</th>
+                    <th scope="col">CFU</th>
+                    <th scope="col">Docente Responsabile</th>
+                    <th scope="col" style="text-align: center;">RIMUOVI</th>
+                </tr>
+                </thead>
+                <tbody>
 
+<?php
     $counter = 1;
     foreach ($results as $row) {
-        echo '  <tr>
-                    <th scope="row">'.$counter++.'</th>
-                    <td>'.$row["codice"].'</td>
-                    <td>'.$row["nome"].'</td>
-                    <td>'.$row["anno"].'</td>
-                    <td>'.$row["cfu"].'</td>
-                    <td>'.$row["cognome"]. " " . $row['nomedoc'].'</td>
+?>              <tr>
+                    <th scope="row"><?php echo $counter++?></th>
+                    <td><?php echo $row["codice"]?></td>
+                    <td><?php echo $row["nome"]?></td>
+                    <td><?php echo $row["anno"]?></td>
+                    <td><?php echo $row["cfu"]?></td>
+                    <td><?php echo $row["cognome"]. " " . $row['nomedoc']?></td>
                     <td style="text-align: center;">
                       <button class="button-canc" 
-                              insegnamento="'. $row["codice"] .'" 
-                              cdl="' . $codiceCdL . '">rimuovi dal CdL '.$nomeCdL.'</button></td>
-                    </tr> ';
+                              insegnamento="<?php echo  $row["codice"] ?>"
+                              cdl="<?php echo $codiceCdL?>">rimuovi dal CdL <?php echo $nomeCdL?></button></td>
+                    </tr>
+<?php
     }
-    echo '
-            </tbody>
-        </table>
-    </div>';
+?>
+                </tbody>
+            </table>
+        </div>
+<?php
 } catch (PDOException $e) {
     echo "Errore: " . $e->getMessage();
 }
-
-echo "
-        <script>
+?>
+<script>
   // Funzione per effettuare la richiesta AJAX
   function cancellaInsdaCdl(insegnamento, cdl) {
     const xhttp = new XMLHttpRequest();
@@ -246,8 +242,8 @@ echo "
       cancellaInsdaCdl(insegnamento, cdl);
     });
   });
-</script>";
-
+</script>
+<?php
     ///////////////////////////// INSEGNAMENTI CHE NON FANNO PARTE DEL CDL E CHE POSSO AGGIUNGERE ORA //////////////////////
     try {
 
@@ -255,37 +251,6 @@ echo "
         $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
- /*       $query= "WITH selezione AS (
-                     SELECT insegnamento
-                     FROM insegnamento_parte_di_cdl
-                     EXCEPT
-                     SELECT insegnamento
-                     FROM insegnamento_parte_di_cdl
-                     WHERE corso_di_laurea = :c
-                 ), tab AS (
-                 SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
-                    INNER JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
-                    INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
-                    INNER JOIN utente u ON d.docente = u.email
-                    WHERE i.codice = ANY (SELECT * FROM selezione) 
-                    ORDER BY anno, cfu
-                 ) SELECT * FROM tab t1 
-                   SELECT * tab t2
-                   "; */
-
-//        $query= "WITH selezione AS (
-//                 SELECT insegnamento
-//                 FROM insegnamento_parte_di_cdl
-//                 EXCEPT
-//                 SELECT insegnamento
-//                 FROM insegnamento_parte_di_cdl
-//                 WHERE corso_di_laurea = :c
-//                 ) SELECT DISTINCT i.codice, i.nome, ip.anno, i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
-//                            INNER JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
-//                            INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
-//                            INNER JOIN utente u ON d.docente = u.email
-//                            WHERE i.codice = ANY (SELECT * FROM selezione)
-//                            ";
         $query = "SELECT DISTINCT i.codice, i.nome, 'ip.anno', i.cfu, u.cognome, u.nome nomedoc FROM insegnamento i
                             LEFT JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento
                             INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
@@ -303,7 +268,9 @@ echo "
         $stmt->bindParam(':c', $codiceCdL, PDO::PARAM_STR);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo ' <div><label for="exampleFormControlInput1" class="form-label"><h3>Insegnamenti che NON fanno parte del corso di laurea</h3></label></div> 
+?>      <div>
+            <label for="exampleFormControlInput1" class="form-label"><h3>Insegnamenti che NON fanno parte del corso di laurea</h3></label>
+        </div>
         <div>
         <table class="table">
             <thead>
@@ -317,26 +284,24 @@ echo "
                 <th scope="col" style="text-align: center;">AGGIUINGI</th>
             </tr>
             </thead>
-            <tbody>';
-
+            <tbody>
+<?php
         $counter = 1;
         foreach ($results as $row) {
             $cfu = $row['cfu'];
             $docResp = $row['cognome']." ".$row['nomedoc'];
             $codiceIns = $row["codice"];
-            echo '  <tr>
-                    <th scope="row">'.$counter++.'</th>
-                    <td>'.$row["codice"].'</td>
-                    <td>'.$row["nome"].'</td>
-                    <td>  
-                    <select class="form-control" id=\"anno\" name=\"anno\">';
-
+?>           <tr>
+                <th scope="row"><?php echo $counter++?></th>
+                <td><?php echo $row["codice"]?></td>
+                <td><?php echo $row["nome"]?></td>
+                <td>
+                <select class="form-control" id=\"anno\" name=\"anno\">
+<?php
             try {
-                // Connessione al database utilizzando PDO
                 $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                // Query con CTE
                 $query = "SELECT tipo
                               FROM corso_di_laurea
                               WHERE codice = :c";
@@ -348,40 +313,39 @@ echo "
 
                 $tipo = "";
                 foreach ($results as $row) {
-                    echo '<option value="' . 1 . '">' . "primo" . '</option>';
-                    echo '<option value="' . 2 . '">' . "secondo" . '</option>';
-                    if ($row['tipo'] == 'magistrale a ciclo unico' || $row['tipo'] == 'triennale' ){
-                        echo '<option value="' . 3 . '">' . "terzo" . '</option>';
-                    }
-                    if ($row['tipo'] == 'magistrale a ciclo unico'){
-                        echo '<option value="' . 4 . '">' . "quarto" . '</option>';
-                        echo '<option value="' . 5 . '">' . "quinto" . '</option>';
-                    }
+?>                  <option value="1">primo</option>
+                    <option value="2">secondo</option>
+<?php                 if ($row['tipo'] == 'magistrale a ciclo unico' || $row['tipo'] == 'triennale' ){
+?>                  <option value="3">terzo</option>
+<?php                 }
+                      if ($row['tipo'] == 'magistrale a ciclo unico'){
+?>                  <option value="4">quarto</option>
+                    <option value="5">quinto</option>
+<?php                 }
                 }
             } catch (PDOException $e) {
                 echo "Errore: " . $e->getMessage();
             }
-            echo '     </select>
-                    
+?>               </select>
                     </td>
-                    <td>'.$cfu.'</td>
-                    <td>'.$docResp.'</td>
+                    <td><?php echo $cfu ?></td>
+                    <td><?php echo $docResp ?></td>
                     <td style="text-align: center;">
                       <button class="button-iscr" 
-                              insegnamento="'. $codiceIns .'" 
-                              cdl="' . $codiceCdL . '">inserisci nel CdL '.$nomeCdL.'</button></td>
-                    </tr> ';
-        }
-        echo '
+                              insegnamento="<?php echo  $codiceIns ?>"
+                              cdl="<?php echo $codiceCdL ?>">inserisci nel CdL <?php echo $nomeCdL ?></button></td>
+                    </tr>
+<?php     }
+?>
             </tbody>
         </table>
-    </div>';
+    </div>
+<?php
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
-
-    echo "
-        <script>
+?>
+<script>
   // Funzione per effettuare la richiesta AJAX
   function inserisciInsinCdL(insegnamento, cdl, anno) {
     const xhttp = new XMLHttpRequest();
@@ -421,8 +385,8 @@ echo "
       inserisciInsinCdL(insegnamento, cdl, anno);
     });
   });
-</script>";
-?>
+</script>
+
     <div id="sezionepropedeuticita">
         <div><label for="exampleFormControlInput1" class="form-label"><h3>GESTIONE PROPEDEUTICITÀ</h3></label></div>
         <div>
@@ -506,7 +470,9 @@ echo "
                 '&insegnamento2=' + encodeURIComponent(ins2) +
                 '&cdl=' + encodeURIComponent(cdl);
             xhttp2.send(params);
+            updateSecondMenutendina();
         }
+
     });
     console.log("fine del MODIFICA CDL -----------------");
 </script>
@@ -552,25 +518,21 @@ echo "
 
 
     </div>
-    <script>
+<script>
         //////////////////////////////////////////// KLINI
 
         function updatePrimoMenutendina() {
-            console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
+            console.log("richiesta funzione");
             var cdl = '<?php echo $codiceCdL;?>';
             var ins1 = document.getElementById("ins1");
-
-            console.log("ciao, ho valori " + cdl +  " " + ins1);
-            // Ottieni il valore selezionato nel primo menù a tendina
-            //var selezionecdl = cdl.value;
 
             // Effettua una richiesta AJAX al server per ottenere il contenuto del secondo menù a tendina
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === XMLHttpRequest.DONE) {
-                    console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
+
                     if (xhr.status === 200) {
-                        console.log("CONNESSO OK per ins2Proped"); /////////////////////////////////////////////////////////////////////
+
                         // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
                         ins1.innerHTML = xhr.responseText;
                         updatePrimoCodice();
@@ -609,25 +571,18 @@ echo "
 
         document.getElementById("ins2").addEventListener('change', updateSecondoCodice);
         updatePrimoCodice();
-        //updateSecondoCodice();
 
 function updateSecondMenutendina() {
-    console.log("richiesta funzione"); ////////////////////////////////////////////////////////////////////////////
     var cdl = '<?php echo $codiceCdL;?>';
     var cod1 = document.getElementById("cod1").innerText;
     var secondaparte = document.getElementById("ins2");
-
-    console.log("ciao, ho valori " + cdl +  " " + cod1 + " " + secondaparte)
-    // Ottieni il valore selezionato nel primo menù a tendina
-    //var selezionecdl = cdl.value;
 
     // Effettua una richiesta AJAX al server per ottenere il contenuto del secondo menù a tendina
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
         if (xhr.readyState === XMLHttpRequest.DONE) {
-            console.log("qui"); ////////////////////////////////////////////////////////////////////////////////////////
+
             if (xhr.status === 200) {
-                console.log("CONNESSO OK per ins2Proped"); /////////////////////////////////////////////////////////////////////
                 // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
                 secondaparte.innerHTML = xhr.responseText;
                 updateSecondoCodice();
@@ -685,72 +640,11 @@ updateSecondMenutendina();
 
     </script>
 
-    <script>
-<!--        function updateTabPropedInBaseACdL() {-->
-<!--            console.log("richiesta funzioneOKKK"); //////////-->
-<!--            var sezioneHtml = document.getElementById("ins2");-->
-<!--            var ins1 = document.getElementById("cod1").innerText;-->
-<!--            var codiceCdL = '--><?php //echo $codiceCdL?>//' ;
-//
-//
-//            var xhr = new XMLHttpRequest();
-//            xhr.onreadystatechange = function() {
-//                if (xhr.readyState === XMLHttpRequest.DONE) {
-//                    console.log("qui nell'XMLHTTP...."); ////////////////////////////////////////////////////////////////////////////////////////
-//                    if (xhr.status === 200) {
-//                        console.log("CONNESSO OK"); /////////////////////////////////////////////////////////////////////
-//                        // Se la richiesta è riuscita, aggiorna il contenuto del secondo menù a tendina
-//                        sezioneHtml.innerHTML = xhr.responseText;
-//                    } else {
-//                        // Se la richiesta ha avuto esito negativo, mostra un messaggio di errore
-//                        console.error("Errore durante la richiesta AJAX");
-//                    }
-//                }
-//            };
-//
-//            // Modifica l'URL della richiesta AJAX in base alla selezione del primo menù a tendina
-//            xhr.open("GET", "possibiliPropedeuticitaDaInserire.php?value=" + codiceCdL, true);
-//            xhr.send();
-//        }
-//
-//        // Aggiungi un ascoltatore di eventi per il menù a tendina 1
-//        document.getElementById("cdl").addEventListener('change', updateTabPropedInBaseACdL);
-//
-//        // Inizializza il contenuto del secondo menù a tendina inizialmente
-//        updateTabPropedInBaseACdL();
-//
-//        // Gestione evento di pressione del bottone
-//        document.addEventListener('click', function(event) {
-//            if (event.target.classList.contains('button-canc')) {
-//                const ins1 = event.target.getAttribute('ins1');
-//                const ins2 = event.target.getAttribute('ins2');
-//                const cdl = event.target.getAttribute('cdl');
-//
-//                // Seconda chiamata AJAX per cancellare la riga
-//                const xhttp2 = new XMLHttpRequest();
-//                xhttp2.onreadystatechange = function() {
-//                    if (this.readyState === 4 && this.status === 200) {
-//                        const response = JSON.parse(this.responseText);
-//                        if (response.success) {
-//                            // Richiama la funzione per aggiornare la tabella
-//                            updateTabPropedInBaseACdL();
-//                        }
-//                    }
-//                };
-//
-//                // Configura e invia la seconda chiamata AJAX per cancellare la riga
-//                xhttp2.open('POST', 'rimuovipropedeuticita.php', true);
-//                xhttp2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-//                const params = 'insegnamento1=' + encodeURIComponent(ins1) +
-//                    '&insegnamento2=' + encodeURIComponent(ins2) +
-//                    '&cdl=' + encodeURIComponent(cdl);
-//                xhttp2.send(params);
-//            }
-//        });
-//        console.log("fine del MODIFICA CDL -----------------");
-//    </script>
 <?php
 }
+
+$pdo = null;
+$conn = null;
 ?>
 
 </body>

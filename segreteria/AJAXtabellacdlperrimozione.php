@@ -30,9 +30,7 @@ if(isset($_POST['search'])) {
             die();
         }
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-        echo '
+?>
             <div class="table-container">
             <table class="table">
             <thead>
@@ -45,8 +43,8 @@ if(isset($_POST['search'])) {
                 <th scope="col" style="text-align: center;">RIMUOVI</th>
             </tr>
             </thead>
-            <tbody>';
-
+            <tbody>
+<?php
         $counter = 1;
         foreach ($results as $row) {
             $codice = $row['codice'];
@@ -54,26 +52,26 @@ if(isset($_POST['search'])) {
             $tipo = $row['tipo'];
             $numinsegnamenti = ($row['conta'] == "" ? 0 : $row['conta']);
 
-            echo '  <tr>
-                    <th scope="row">' . $counter++ . '</th>
-                    <td>' . $codice. '</td>
-                    <td>' . $nome . '</td>
-                    <td>' . $tipo. '</td>
-                    <td>' . $numinsegnamenti . '</td>
+?>                  <tr>
+                    <th scope="row"><?php echo $counter++ ?></th>
+                    <td><?php echo $codice?></td>
+                    <td><?php echo $nome ?></td>
+                    <td><?php echo $tipo?></td>
+                    <td><?php echo $numinsegnamenti ?></td>
                     <td style="text-align: center;">
                       <button class="button-canc"
-                              codice="' . $codice . '"
-                              cdl="' . $nome . '">RIMUOVI CORSO DI LAUREA</button></td>
-                    </tr> ';
-        }
-        echo '
-            </tbody>
+                              codice="<?php echo $codice ?>"
+                              cdl="<?php echo $nome ?>">RIMUOVI CORSO DI LAUREA</button></td>
+                    </tr>
+<?php   }
+?>         </tbody>
         </table>
-        </div>';
+        </div>
+<?php
     } catch
     (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
 }
-
+$conn= null;
 ?>

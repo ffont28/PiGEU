@@ -26,19 +26,15 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
                 <select type='insegnamento' id="insegnamento" name="insegnamento">
                 <?php
                 $docente = $_SESSION['username'];
-                echo "<script>console.log('Debug Objects:>> " . $docente .  " ' );</script>";
 
                 try {
                     $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-
-                    // Query con CTE
                     $query = "  SELECT i.codice, i.nome  FROM insegnamento i
                         INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
                         WHERE d.docente = :docente";
-                    //echo "<script>console.log('Qui3');</script>";
-                    // Esecuzione della query e recupero dei risultati
+
                     $stmt = $conn->prepare($query);
 
                     $stmt->bindParam(':docente', $docente, PDO::PARAM_STR);
@@ -46,40 +42,32 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
 
                     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
-                    // Elaborazione dei risultati
                     foreach ($results as $row) {
+?>
+                    <option value="<?php echo $row['codice']?>"> <?php echo $row['nome'] ?> </option>
+<?php               }
+?>              </select>
 
-                        // Utilizza $row per accedere ai dati dei singoli record
-                        echo "<option value=\"".$row['codice']."\">".$row['nome']."</option> ";
-                    }
-                    echo ' </select>';
-
-                } catch (PDOException $e) {
+<?php           } catch (PDOException $e) {
                     echo "Errore: " . $e->getMessage();
                 }
-
-
-                ?>
+?>
                 <label for="data">Data:</label>
                 <input type="date" id="data" name="data">
                 <label for="time">Ora:</label>
                 <input type="time" id="ora" name="ora">
-           <!-- <label for="submit">conferma l'inserimento</label> -->
                 <input type="submit" class="button1 green" value="INSERISCI" >
             </form>
     </div>
 
 <?php
-
     if($_SERVER['REQUEST_METHOD']=='POST'){
-
         if (isset($_POST['data']) && isset($_POST['ora'])) {
             if ($_POST['data'] == "") {
-                echo '<div class="alert alert-warning" role="alert" name="alert-message" >
+?>              <div class="alert alert-warning" role="alert" name="alert-message" >
                 Attenzione: devi inserire una data e un\'ora prima di selezionare INSERISCI
-                      </div>';
-            }
+                </div>
+<?php       }
             try {
                 $insegnamento = $_POST['insegnamento'];
                 $data = $_POST['data'];
@@ -96,27 +84,25 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
                 $stmt->bindParam(':data', $data, PDO::PARAM_STR);
                 $stmt->bindParam(':ora', $ora, PDO::PARAM_STR);
 
-
                 $stmt->execute();
 
                 while (true) {
                     $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
                     if ($notify === false) {
-
-                        echo '  <div class="alert alert-success" role="alert" name="alert-message" >
-                                  Inserimento dell\'esame andato a buon fine 
-                                </div>';
-                        break;
+?>
+                     <div class="alert alert-success" role="alert" name="alert-message" >
+                        Inserimento dell\'esame andato a buon fine
+                     </div>
+<?php                break;
                     } else {
-                        echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
-                                  ' . $notify["payload"] . '
-                                </div>';
-                        break;
+?>                   <div class="alert alert-danger" role="alert" name="alert-message" >
+                        <?php echo $notify["payload"]?>
+                     </div>
+<?php                break;
                     }
                 }
             } catch (PDOException $e) {
-
-               // echo "Errore in inserimento: " . $e->getMessage();
+               echo "Errore in inserimento: " . $e->getMessage();
             }
             $_POST['data'] = "";
         }
@@ -141,7 +127,9 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
 
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo ' <div><label for="exampleFormControlInput1" class="form-label"><h3>Esami attualmente calendarizzati</h3></label></div> 
+?>      <div>
+            <label for="exampleFormControlInput1" class="form-label"><h3>Esami attualmente calendarizzati</h3></label>
+        </div>
         <div>
         <table class="table">
             <thead>
@@ -154,51 +142,47 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
                 <th scope="col">CANC</th>
             </tr>
             </thead>
-            <tbody>';
-
+            <tbody>
+<?php
         $counter = 1;
         foreach ($results as $row) {
-            echo '  <tr>
-                    <th scope="row">'.$counter++.'</th>
-                    <td>'.$row["codice"].'</td>
-                    <td>'.$row["nome"].'</td>
-                    <td>'.$row["data"].'</td>
-                    <td>'.$row["ora"].'</td>
+?>                  <tr>
+                    <th scope="row"><?php echo $counter++?></th>
+                    <td><?php echo $row["codice"]?></td>
+                    <td><?php echo $row["nome"]?></td>
+                    <td><?php echo $row["data"]?></td>
+                    <td><?php echo $row["ora"]?></td>
                     <td>
                       <button class="button-canc" 
-                              data-cod="'. $row["codice"] .'" 
-                              data-dat="' . $row["data"]. '"
-                              data-ora="' . $row["ora"]. '">🗑️</button></td>
-                    </tr> ';
-        }
-
-
-
-        echo '
+                              data-cod="<?php echo $row["codice"]?>"
+                              data-dat="<?php echo $row["data"]?>"
+                              data-ora="<?php echo $row["ora"]?>">🗑️</button></td>
+                    </tr>
+<?php   }
+?>
             </tbody>
         </table>
-    </div>';
+    </div>
+<?php
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
-
-echo "
-        <script>
-  // Funzione per effettuare la richiesta AJAX
+?>
+<script>
   function deleteRow(cod, data, ora) {
     const xhttp = new XMLHttpRequest();
 
     xhttp.onreadystatechange = function() {
       if (this.readyState === 4) {
         if (this.status === 200) {
-          // Gestisci la risposta del server
+
           const response = JSON.parse(this.responseText);
           console.log(response);
         if (response.success) {
             window.location.reload();
           }
         } else {
-          // Gestisci eventuali errori
+
           console.error('Errore nella richiesta AJAX:', this.statusText);
          }
       }
@@ -218,17 +202,15 @@ echo "
       const cod = this.getAttribute('data-cod');
       const data = this.getAttribute('data-dat');
       const ora = this.getAttribute('data-ora');
-      console.log(\"ma dai qui\");
 
       // Effettua la richiesta AJAX
       deleteRow(cod, data, ora);
     });
   });
-</script>";
-
-?>
-
+</script>
 </body>
-
+<?php
+$conn = null;
+$db = null;
+?>
 </html>
-

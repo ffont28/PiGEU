@@ -94,7 +94,7 @@ document.addEventListener('click', function(event) {
         const popupText = document.getElementById('popup-text');
         console.log(codice);
         // Aggiorna il testo del popup in base ai dati
-        popupText.textContent = `Sei sicuro di voler cancellare l'insegnamento ${insegnamento}?`;
+        popupText.textContent = `Sei sicuro di voler eliminare definitivamente il CdL ${insegnamento}?`;
 
         // Mostra il popup con animazione
         popup.classList.add('active');

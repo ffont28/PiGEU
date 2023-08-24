@@ -29,8 +29,8 @@ echo $_SESSION['waitValue'];
 <body class="img js-fullheight" style="background-image: url(images/unimi.jpg);">
 <?php
 if(array_key_exists('logout', $_POST)) {
-    $_SESSION['username'] = null;
-    $_SESSION['password'] = null;
+    $_SESSION['username'] = "";
+    $_SESSION['password'] = "";
 
     echo '<script>alert("LOGOUT EFFETTUATO CON SUCCESSO")</script>';
 
@@ -69,12 +69,12 @@ session_start();
                             <button type="submit" class="form-control btn btn-primary submit px-3">Sign In</button>
                         </div>
                         <div class="form-group d-md-flex">
-                            <div class="w-50">
-                                <label class="checkbox-wrap checkbox-primary">Remember Me
-                                    <input type="checkbox" checked>
-                                    <span class="checkmark"></span>
-                                </label>
-                            </div>
+<!--                            <div class="w-50">-->
+<!--                                <label class="checkbox-wrap checkbox-primary">Remember Me-->
+<!--                                    <input type="checkbox" checked>-->
+<!--                                    <span class="checkmark"></span>-->
+<!--                                </label>-->
+<!--                            </div>-->
                             <div class="w-50 text-md-right">
                                 <a href="restorepwd.php" style="color: #fff">password dimenticata?</a>
                             </div>
@@ -101,7 +101,8 @@ session_start();
                             exit;
                             }
                         ?>
-                  <!--  <div class="social d-flex text-center">
+                  <!--  PARTEE RISERVATA PER USI FUTURI CON LOGIN TRAMITE SOCIAL NETWORK
+                        <div class="social d-flex text-center">
                         <a href="#" class="px-2 py-2 mr-md-1 rounded"><span class="ion-logo-facebook mr-2"></span> Facebook</a>
                         <a href="#" class="px-2 py-2 ml-md-1 rounded"><span class="ion-logo-twitter mr-2"></span> Twitter</a>
                     </div> -->

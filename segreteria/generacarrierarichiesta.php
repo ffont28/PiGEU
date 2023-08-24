@@ -100,5 +100,7 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
 
 </div>
 </div>
-<?php }
+<?php
+$conn = null;
+}
 ?>

@@ -80,13 +80,12 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
                     // Elaborazione dei risultati
                     foreach ($results as $row) {
-                        // Utilizza $row per accedere ai dati dei singoli record
-                        echo "<option value=\"".$row['codice']."\">".$row['nome']."</option> ";
-                    }
+?>                      <option value="<?php echo $row['codice']?>"><?php echo $row['nome']?></option>
+<?php               }
                 } catch (PDOException $e) {
                     echo "Errore: " . $e->getMessage();
                 }
-                ?>
+?>
             </select>
         </div>
 
@@ -188,6 +187,8 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     $params = array ($istitemail, $tiposegreteria);
     inserisciSegreteria($params);
     }
+
+    pg_close($db);
 }
  ?>
 

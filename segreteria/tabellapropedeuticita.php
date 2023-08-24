@@ -6,7 +6,7 @@ include('../conf.php');
 $selezioneCdL = $_GET['value'];
 
 try {
-    // Connessione al database utilizzando PDO
+
     $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -24,26 +24,28 @@ try {
     //echo "<option selected value=\"no\">nessuna propedeuticità</option>";
     // Genera le opzioni per il secondo menù a tendina
     foreach ($results as $row) {
+?>
+        <tr>
+            <th scope="row"><?php echo $counter++ ?></th>
+            <td><?php echo $row["cod1"] ?></td>
+            <td><?php echo $row["nom1"] ?></td>
+            <td style="text-align: center" > >>>> </td>
+            <td><?php echo $row["cod2"] ?></td>
+            <td><?php echo $row["nom2"] ?></td>
+            <td>
+            <button class="button-canc" 
+                      ins1="<?php echo $row["cod1"] ?>"
+                      ins2="<?php echo $row["cod2"] ?>"
+                      cdl="<?php echo $selezioneCdL ?>">🗑️</button></td>
+            </tr>
 
-        echo '  <tr>
-                        <th scope="row">' . $counter++ . '</th>
-                        <td>' . $row["cod1"] . '</td>
-                        <td>' . $row["nom1"] . '</td>
-                        <td style="text-align: center" > >>>> </td>
-                        <td>' . $row["cod2"] . '</td>
-                        <td>' . $row["nom2"] . '</td>
-                        <td>
-                        <button class="button-canc" 
-                                  ins1="' . $row["cod1"] . '" 
-                                  ins2="' . $row["cod2"] . '"
-                                  cdl="' . $selezioneCdL . '">🗑️</button></td>
-                        </tr>
-                    </tr>';
 
+<?php
     }
 }
 catch
     (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
+$conn = null;    
 ?>

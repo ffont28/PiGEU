@@ -126,5 +126,6 @@
   } catch (PDOException $e) {
       echo "Errore durante il recupero del percorso immagine: " . $e->getMessage();
   }
+  $db = null;
   ?>
 </html>

@@ -3,7 +3,8 @@ include('../functions.php');
 include('../conf.php');
 
 if(isset($_POST['search'])) {
-    echo '<div style="margin-bottom: 20px"></div>';
+?>  <div style="margin-bottom: 20px"></div>
+<?php
     $search = $_POST['search'];
         try {
 
@@ -18,29 +19,27 @@ if(isset($_POST['search'])) {
             // Esecuzione della query e recupero dei risultati
             $stmt->execute();
             if ($stmt->rowCount() == 0) {
-                echo '<div class="alert alert-warning" role="alert">
-                            Nessun utente trovato
-                      </div>';
-                die();
+?>              <div class="alert alert-warning" role="alert">
+                    Nessun utente trovato
+                </div>
+<?php           die();
             }
             $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-           echo '
+?>
             <div class="table-container">
-            <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Cognome</th>
-                <th scope="col">Nome</th>
-                <th scope="col">Email Istituzionale </th>
-                <th scope="col">tipo utenza</th>
-                <th scope="col" style="text-align: center;">RIMUOVI</th>
-            </tr>
-            </thead>
-            <tbody>';
-
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Cognome</th>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Email Istituzionale </th>
+                            <th scope="col">tipo utenza</th>
+                            <th scope="col" style="text-align: center;">RIMUOVI</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+<?php
             $counter = 1;
             foreach ($results as $row) {
                 $cognome = $row['cognome'];
@@ -71,29 +70,30 @@ if(isset($_POST['search'])) {
                 if ($stmt->rowCount() > 0) {
                     $tipo = "Segreteria";
                 }
+?>
 
-
-                echo '  <tr>
-                    <th scope="row">' . $counter++ . '</th>
-                    <td>' . $cognome . '</td>
-                    <td>' . $nome . '</td>
-                    <td>' . $email . '</td>
-                    <td>' . $tipo . '</td>
-                    <td style="text-align: center;">
-                      <button class="button-canc"
-                              utente="' . $email . '"
-                              nome="' . $nome . '"
-                              cognome="' . $cognome . '">RIMUOVI UTENTE</button></td>
-                    </tr> ';
-            }
-            echo '
-            </tbody>
-        </table>
-        </div>';
-            } catch
+                    <tr>
+                        <th scope="row"><?php echo $counter++ ?></th>
+                        <td><?php echo $cognome ?></td>
+                        <td><?php echo $nome ?></td>
+                        <td><?php echo $email ?></td>
+                        <td><?php echo $tipo ?></td>
+                        <td style="text-align: center;">
+                          <button class="button-canc"
+                                  utente="<?php echo $email ?>"
+                                  nome="<?php echo $nome ?>"
+                                  cognome="<?php echo $cognome ?>">RIMUOVI UTENTE</button></td>
+                    </tr>
+<?php        }
+?>
+                    </tbody>
+                </table>
+        </div>
+<?php
+        } catch
         (PDOException $e) {
             echo "Errore: " . $e->getMessage();
         }
     }
-
+$conn = null;
 ?>

@@ -33,21 +33,18 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
             $stmt->bindParam(':studente', $_SESSION['username']);
             $stmt->execute();
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($result) {?>
-
-                <a>CdL:<?php echo $result['nomecdl']."<br>"; ?></a>
-         tipo:
-
-                <?php
-                echo $result['tipo'];
+            if ($result) {
+?>
+               <a>CdL:<?php echo $result['nomecdl']."<br>"; ?></a>
+               tipo: <?php echo $result['tipo'];
             } else {
-                echo "Sembra che ".$_SESSION['username'] . "<br> non sia iscritto a nessun CdL";
+?>              Sembra che <?php echo $_SESSION['username'] . "<br> non sia iscritto a nessun CdL";
             }
         } catch
         (PDOException $e) {
             echo "Errore: " . $e->getMessage();
         }
-        ?>
+?>
     </div>
     <div class="text" id="carriera">
         QUI LA TABELLA CON INSEGNAMENTI E VOTI E DATA
@@ -112,7 +109,7 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
         (PDOException $e) {
             echo "Errore: " . $e->getMessage();
         }
-        ?>
+?>
     </div>
     <div>
 
@@ -127,3 +124,8 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
 
     </div>
 </div>
+</body>
+<?php
+$conn = null;
+?>
+</html>

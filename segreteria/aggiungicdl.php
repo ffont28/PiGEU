@@ -60,7 +60,9 @@ Tipo di CdL
     $result = pg_prepare($db,'insCdL',$sql);
     $result = pg_execute($db,'insCdL', $params);
 
+    pg_close($db);
 }
+
  ?>
 
 
