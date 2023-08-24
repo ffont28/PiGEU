@@ -44,7 +44,7 @@ if(isset($_POST['search'])) {
             </tr>
             </thead>
             <tbody>
-<?
+<?php
         $counter = 1;
         foreach ($results as $row) {
             $codice = $row['codice'];
