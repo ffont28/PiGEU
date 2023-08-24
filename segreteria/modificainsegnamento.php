@@ -8,6 +8,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 <html lang="it" data-bs-theme="auto">
 <head>
     <?php importVari();?>
+    <script src="../js/modificainsegnamento.js"></script>
     <title>Modifica Insegnamento · PiGEU</title>
 </head>
 
@@ -229,7 +230,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                                FROM utente u INNER JOIN docente d ON u.email = d.utente
                                              INNER JOIN docente_responsabile dr ON d.utente = dr.docente
                                              WHERE dr.insegnamento = :i
-                                             ";
+                               ORDER BY cognome";
 
         $stmt1 = $conn->prepare($query_insegnano);
         $stmt2 = $conn->prepare($query_non_insegnano);
@@ -243,18 +244,28 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         $results1 = $stmt1->fetchAll(PDO::FETCH_ASSOC);
         $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
         ?>
-        <div><label for="exampleFormControlInput1" class="form-label"><h3>Docenti coinvolti con l'insegnamento</h3></label></div>
+        <div><label for="exampleFormControlInput1" class="form-label"><h3>Docenti coinvolti con l'insegnamento</h3></label>
+        </div>
+
+        <div class="splitin2">
+            <div>
+                <label class="form-label"><h5>DOCENTI CHE INSEGNANO QUESTA DISCIPLINA</h5></label>
+            </div>
+            <div>
+                <label class="form-label"><h5>DOCENTI CHE NON INSEGNANO QUESTA DISCIPLINA</h5></label>
+            </div>
+        </div>
         <div class="splitin2">
             <div>
             <table class="table">
             <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">DOCENTI CHE INSEGNANO QUESTA DISCIPLINA </th>
+                <th scope="col">DOCENTE </th>
                 <th scope="col" style="text-align: center;">RIMUOVI</th>
             </tr>
             </thead>
-            <tbody>';
+            <tbody>
 <?php
         $counter = 1;
         foreach ($results1 as $row) {
@@ -271,32 +282,16 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         </table>
     </div>
             <div>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">DOCENTI CHE NON INSEGNANO QUESTA DISCIPLINA </th>
-                        <th scope="col" style="text-align: center;">AGGIUNGI</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    $counter = 1;
-                    foreach ($results2 as $row) {
-                        ?> <tr>
-                            <th scope="row"><?php echo $counter++ ?></th>
-                            <td><?php echo $row["cognome"]. " ".$row["nome"]?></td>
-                            <td style="text-align: center;">
-                                <button class="button-add-doc"
-                                        docente="<?php echo $row['email'] ?>"
-                                        insegnamento="<?php echo $codiceInsegnamento ?>">aggiungi docente</button></td>
-                        </tr>
-                    <?php   }
-                    ?>
-                    </tbody>
-                </table>
+                <div>
+                    <label for="cdl" >Ricerca Docente:</label>
+                    <input type="insertText" id="docdaricercare" placeholder="🔍 RICERCA per NOME o COGNOME del docente" name="utente">
+
+                </div>
+                <div id="tabelladocenti">
 
 
+
+                </div>
 
 
             </div>
@@ -307,86 +302,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
     }
 
    ?>
-        <script>
-  // RIMUOVI IL DOCENTE DALLA TABELLA INSEGNA
-  function cancellaDocDaIns(insegnamento, docente) {
-    const xhttp = new XMLHttpRequest();
 
-    xhttp.onreadystatechange = function() {
-      if (this.readyState === 4) {
-        if (this.status === 200) {
-          // Gestisci la risposta del server
-          const response = JSON.parse(this.responseText);
-          console.log(response);
-        if (response.success) {
-            window.location.reload();
-          }
-        } else {
-          // Gestisci eventuali errori
-          console.error('Errore nella richiesta AJAX 338:', this.statusText);
-          window.location.reload();
-         }
-      }
-    };
-
-    xhttp.open('POST', 'rimuovidocdains.php', true);
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + '&docente=' + encodeURIComponent(docente);
-    xhttp.send(params);
-  }
-
-  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
-  const removeDocDaIns = document.querySelectorAll('.button-canc-doc');
-  removeDocDaIns.forEach(button => {
-    button.addEventListener('click', function() {
-      const insegnamento = this.getAttribute('insegnamento');
-      const docente = this.getAttribute('docente');
-
-      // Effettua la richiesta AJAX
-      cancellaDocDaIns(insegnamento, docente);
-    });
-  });
-
-/// AGGIUNGI IL DOCENTE ALLA TABELLA INSEGNA
-
-  function inserisciDocInIns(insegnamento, docente) {
-      const xhttp = new XMLHttpRequest();
-
-      xhttp.onreadystatechange = function() {
-          if (this.readyState === 4) {
-              if (this.status === 200) {
-                  // Gestisci la risposta del server
-                  const response = JSON.parse(this.responseText);
-                  console.log(response);
-                  if (response.success) {
-                      window.location.reload();
-                  }
-              } else {
-                  // Gestisci eventuali errori
-                  console.error('Errore nella richiesta AJAX:', this.statusText);
-              }
-          }
-      };
-
-      xhttp.open('POST', 'aggiungidocains.php', true);
-      xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-      const params = 'insegnamento=' + encodeURIComponent(insegnamento) + '&docente=' + encodeURIComponent(docente);
-      xhttp.send(params);
-  }
-
-  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
-  const addDocIntoIns = document.querySelectorAll('.button-add-doc');
-  addDocIntoIns.forEach(button => {
-      button.addEventListener('click', function() {
-          const insegnamento = this.getAttribute('insegnamento');
-          const docente = this.getAttribute('docente');
-
-          // Effettua la richiesta AJAX
-          inserisciDocInIns(insegnamento, docente);
-      });
-  });
-
-</script>
 <?php
 ///////////////////////////// CDL DI CUI QUESTO INSEGNAMENTO FA PARTE E CHE POSSO RIMUOVERE //////////////////////
     try {
@@ -447,43 +363,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
     }
 ?>
 <script>
-  // Funzione per effettuare la richiesta AJAX
-  function cancellaInsdaCdl(insegnamento, cdl) {
-    const xhttp = new XMLHttpRequest();
 
-    xhttp.onreadystatechange = function() {
-      if (this.readyState === 4) {
-        if (this.status === 200) {
-          // Gestisci la risposta del server
-          const response = JSON.parse(this.responseText);
-          console.log(response);
-        if (response.success) {
-            window.location.reload();
-          }
-        } else {
-          // Gestisci eventuali errori
-          console.error('Errore nella richiesta AJAX:', this.statusText);
-         }
-      }
-    };
-
-    xhttp.open('POST', 'rimuoviinsdacdl.php', true);
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + '&cdl=' + encodeURIComponent(cdl);
-    xhttp.send(params);
-  }
-
-  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
-  const removeFromCdlButtons = document.querySelectorAll('.button-canc');
-  removeFromCdlButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const insegnamento = this.getAttribute('insegnamento');
-      const cdl = this.getAttribute('cdl');
-
-      // Effettua la richiesta AJAX
-      cancellaInsdaCdl(insegnamento, cdl);
-    });
-  });
 </script>
 <?php
     ///////////////////////////// CDL DI CUI QUESTO INSEGNAMENTO NON FA PARTE E CHE POSSO AGGIUNGERE ORA //////////////////////

@@ -268,9 +268,5 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 $conn = null;
  ?>
 
-
-<form action="../index.php">
-    <input type="submit" class="button1 lightblue" value="RITORNA ALLA HOMEPAGE" />
-    </form>
 </body>
 </html>
