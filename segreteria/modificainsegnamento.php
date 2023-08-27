@@ -65,7 +65,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         $responsabile = $_POST['responsabile'];
         $descrizione = $_POST['descrizione'];
         $cfu = $_POST['cfu'];
-
+        //echo $nome." | ".$codice." | ".$responsabile." | ".$descrizione." | ".$cfu." <br>";
         /////// AGGIORNO LA TABELLA INSEGNAMENTO
         try {
 
@@ -76,6 +76,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                                             cfu = :cfu
                             WHERE codice = :codice";
 
+            $pdo->query("LISTEN notifica");
             $stmt = $pdo->prepare($sql);
 
             $stmt->bindParam(':nome', $nome, PDO::PARAM_STR);
@@ -87,9 +88,16 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
             $rowCount = $stmt->rowCount();
             if ($rowCount > 0) {
-                echo "Update successful.";
-            } else {
-                echo "No rows updated.";
+?>              <div class="alert alert-success" role="alert" name="alert-message" >
+                    Dati generali dell'insegnamento aggiornati con successo
+                </div>
+<?php       } else {
+                $notify = $pdo->pgsqlGetNotify(PDO::FETCH_ASSOC, 50);
+                if ($notify) {
+?>              <div class="alert alert-danger" role="alert" name="alert-message" >
+                    <?php echo $notify["payload"] ?>
+                </div>
+<?php           }
             }
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
@@ -110,13 +118,24 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
             $rowCount = $stmt->rowCount();
             if ($rowCount > 0) {
-                echo "Update successful.";
-            } else {
-                echo "No rows updated.";
+                ?>              <div class="alert alert-success" role="alert" name="alert-message" >
+                    Docente Responsabile aggiornato con successo
+                </div>
+<?php       } else {
+                $notify = $pdo->pgsqlGetNotify(PDO::FETCH_ASSOC, 50);
+                if ($notify) {
+?>              <div class="alert alert-danger" role="alert" name="alert-message" >
+                    <?php echo $notify["payload"] ?>
+                </div>
+<?php           }
             }
         } catch (PDOException $e) {
             // Handle any errors that occurred during the process
-            echo "Error: " . $e->getMessage();
+            if (!strpos($e->getMessage(), 'violates foreign key constraint "rif_docente"') == false){
+?>              <div class="alert alert-danger" role="alert" name="alert-message" >
+                ERRORE nella modifica del docente responsabile: il docente chè stato inserito come responsabile non è presente nella base di dati come docente
+                </div>
+<?php           }
         }
     }
 
@@ -148,8 +167,8 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                     <input readonly type="text" value="<?php echo $row['nome']?>" class="form-control" id="nome" name="nome">
                 </div>
                 <div class="mb-3">
-                    <label for="exampleFormControlInput1" class="form-label">Codice</label>
-                    <input type="text" value="<?php echo $row['codice']?>" class="form-control" id="codice" name="codice">
+                    <label for="exampleFormControlInput1" class="form-label" >Codice</label>
+                    <input type="text" value="<?php echo $row['codice']?>" class="form-control" id="codice" name="codice" readonly="readonly">
                 </div>
                 <div class="mb-3">
                     <label for="exampleFormControlInput1" class="form-label">Docente Responsabile</label>
@@ -168,6 +187,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                                                   )
                                                   SELECT u.nome, u.cognome, u.email FROM utente u
                                                   INNER JOIN selezione s ON u.email = s.utente
+                                                  ORDER BY u.cognome
                 ";
 
                 $stmt2 = $conn->query($query);
@@ -176,7 +196,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                 foreach ($results as $row) {
 ?>                  <option
 <?php                   if ($responsabile == $row['email']) {?>selected<?php }
-?>                      value="<?php echo $row['email']?>"><?php echo $row['nome']." ".$row['cognome']?>
+?>                      value="<?php echo $row['email']?>"><?php echo $row['cognome']." ".$row['nome']?>
                     </option>
 <?php           }
             } catch (PDOException $e) {
@@ -190,7 +210,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                     <input type="text" value="<?php echo $descrizione?>" class="form-control" id="descrizione" name="descrizione">
                 </div>
                 <div id="cfu">
-                    <label for="exampleFormControlInput1" class="form-label">CFU previsti per l\'insegnamento</label>
+                    <label for="exampleFormControlInput1" class="form-label">CFU previsti per l'insegnamento</label>
                     <select class="form-select" aria-label="Default select example" id="cfu" name="cfu">
                         <option
 <?php                   if ($cfu == '6') {?> selected <?php }

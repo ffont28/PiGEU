@@ -1,4 +1,4 @@
-% UN PO DI IMPORT
+% UN PO DI IMPORT 
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
@@ -7,7 +7,6 @@
 \usepackage{listings}
 \usepackage{xcolor} % Per il colore del testo
 \usepackage{fontawesome5}
-
 
 % Definizione del nuovo comando
 \newcommand{\tabb}[1]{\texttt{\textcolor{blue}{#1}}}
@@ -42,102 +41,340 @@
         Questa guida ha lo scopo di mostrare al docente la praticità nell'uso di Pigeu
     \end{abstract}
 
+    \pagebreak
+
     \tableofcontents
 
-    \section{Il primo accesso}
+    \pagebreak
+
+    \section{Il primo accesso e le credenziali}
     Successivamente alla creazione dell'utenza di tipo \textit{Docente} da parte della segreteria, sarà subto fruibile il nuovo account docente con tutte le funzionalità di PiGEU.
 
-    Al primo accesso verrà chiesto di modificare la password, che non può coincidere con l'indirizzo della propria email personale. Dopo aver effettuato la modifica della password, si potrà accedere con le proprie nuove credenziali alla home page:
+    La password provvisoria per il primo accesso è l'intero indirizzo email indicato all'atto dell'iscrizione come \textit{email personale}: tale indirizzo sarà anche il recapito per le informazioni di recupero password qualora questa venga dimenticata e dalla pagina di login si clicchi \textit{password dimenticata?}
+
+    Al primo accesso verrà chiesto di modificare la password, che non può coincidere con l'indirizzo della propria email personale. Dopo aver effettuato la modifica della password, si potrà accedere con le proprie nuove credenziali alla home page.
+
 
     \section{La home Page}
-    La home page mostra già nel suo lato superiore la navbar con le operazioni proprie dell'utente di segreteria:
+    La home page mostra nel suo lato superiore la navbar con le operazioni proprie dell'utente di segreteria:
     \begin{itemize}
         \item la gestione delle utenze
+
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-24 22-24-04.png}
+
         \begin{itemize}
             \item inserimento di un utente
             \item modifica di un utente
             \item rimozione di un utente
         \end{itemize}
+
+        \pagebreak
         \item la gestione degli insegnamenti
+
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-24 22-24-09.png}
+
         \begin{itemize}
             \item inserimento di un insegnamento
             \item modifica di un insegnamento
             \item rimozione di un insegnamento
         \end{itemize}
         \item la gestione dei corsi di laurea
+
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-24 22-24-15.png}
+
         \begin{itemize}
             \item inserimento di un corso di laurea
             \item modifica di un corso di laurea
             \item rimozione di un corso di laurea
         \end{itemize}
-    \end{itemize}
-    viene mostrato inoltre il nome e cognome dell'utente attualmente loggato e vi è da ultimo il pulsate di logout.
-    Nella pagina invece è possibile caricare o modificare la propria foto profilo cliccando su "Scegli un'immagine" e poi "Aggiorna Foto".
-    Da ultimo vi è la possibilità di modificare la propria password cliccando sul pulsante rosso "MODIFICA PASSWORD".
 
-    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 19-19-16.png}
+        \pagebreak
+
+        \item le certificazioni
+
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-24 22-24-20.png}
+
+    \end{itemize}
+    Viene mostrato inoltre, sulla destra della navbar superiore, il nome e cognome dell'utente attualmente loggato e vi è da ultimo il pulsate di logout.
+    Nella pagina invece è possibile caricare o modificare la propria foto profilo cliccando su "Scegli un'immagine" e poi "Aggiorna Foto".
+    Da ultimo vi è la possibilità di modificare la propria password cliccando sul pulsante rosso "MODIFICA PASSWORD" accedendo così alla seguente pagina dove è possibile modificare la propria passwoed.
+
+    \includegraphics[scale=0.2]{images/Schermata del 2023-08-27 09-07-56.png}
+
+    \pagebreak
 
     \section{La \textit{gestione utenze}}
 
+    Cliccando nella navbar \textit{GESTIONE UTENZE} si aprirà un menù a tendina \textit{dropdown} come quella mostrata in figura qui sotto
+    \begin{center}
+        \includegraphics[scale=0.35]{images/Schermata del 2023-08-26 12-20-50.png}
+    \end{center}
+    dove è possibile scegliere tra tre diverse operazioni da effettuare per gestire un utente.
+    \subsection{L'inserimento di un utente}
+    Cliccando su \textit{Inserimento utente} verrà mostrata la pagina per inserire i dati del nuovo utente che si intende inserire nella base di dati:
 
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-26 12-41-05.png}
+    \end{center}
+    Dopo aver inserito:
+    \begin{itemize}
+        \item Nome
+        \item Cognome
+        \item Codice Fiscale
+        \item indirizzo, comprensivo di via e numero
+        \item città
 
+        \pagebreak
 
+        \item tipo di nuova utenza, selezionabile tra
+        \begin{itemize}
+            \item Studente
+            \item Docente
+            \item Segreteria
+        \end{itemize}
+        \item \danger ATTENZIONE:
+        \begin{itemize}
+            \item per gli utenti di tipo \textit{Studente} verrà richiesto anche il \textit{Corso di Laurea} a cui si vuole iscrivere il nuovo studente
+            \item per gli utenti di tipo \textit{Docente} verrà richiesto anche il \textit{tipo di contratto} che ha il docente (ad es. ricercatore, associato, ordinario,...)
+            \item per gli utenti di tipo \textit{Segreteria} verrà richiesto anche il \textit{tipo di segreteria} che può essere didattica, alunni o personale
+        \end{itemize}
+        \item l'indirizzo email istituzionale, ovvero l'username che il nuovo utente che si sta creando utilizzerà per accedere ai servizi PiGEU
+        \item l'indirizzo email personale, che ha una duplice funzionalità:
+        \begin{itemize}
+            \item esso è la password provvisoria da inserire per il primo accesso da parte del nuovo utente che dovrà subito scegliere una nuova password prima di poter usufruire dei servizi PiGEU
+            \item esso è il recapito a cui il mailer di PiGEU, \textit{postmaster@pigeu.it} invierà un link per il recupero della password qualora venisse dimenticata dall'utente
+        \end{itemize}
+    \end{itemize}
+    sarà quindi possibile, cliccando su \textit{INSERISCI UTENTE}, finalizzare la procedura di iscrizione con il conseguente inserimento dell'utenza nella base di dati.
 
-    -------------------------------- SONO ARRIVATO QUI
+    \pagebreak
 
+    \subsection{La Modifica di un utente}
+    Cliccando su \textit{Modifica utente} verrà mostrata una pagina contenente tutte le utenze presenti nella base di dati, per la loro gestione. Nella barra di ricerca superiore è possibile ricercare l'utente per nome, cognome oppure per email istutuzionale.
 
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-26 12-52-37.png}
+    \end{center}
 
+    quindi nella tabella mostrata in figura, oltre ad essere presenti i dati anagrafici di nome e cognome, l'email istituzionale e il tipo di utenza di tutti gli utenti presenti nella base di dati (ordinati per cognome), si trova una colonna con le azioni possibili su ogni riga di utenza. Tutti gli utenti possono essere gestiti, e solamente per gli studenti vi è la possibilità di essere spostato in storico.
+    Cliccando sull'utente che si desidera modificare, si aprirà una finestra dove è possibile modificare tutti i dati inseriti all'atto dell'iscrizione fuorchè l'email istituzionale.
 
+    sarà quindi possibile, cliccando su \textit{MODIFICA ANAGRAFICA UTENTE}, finalizzare la procedura di modifica con la conseguente modifica dei dati dell'utenza nella base di dati.
 
+    \pagebreak
 
+    \subsection{La Rimozione di un utente}
+    Cliccando su \textit{Rimozione Utente} verrà mostrata una pagina contenente tutte le utenze presenti nella base di dati, per la loro rimozione. Nella barra di ricerca superiore è possibile ricercare l'utente per nome, cognome oppure per email istutuzionale.
 
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-24 22-32-10.png}
+    \end{center}
 
+    quindi nella tabella mostrata in figura, oltre ad essere presenti i dati anagrafici di nome e cognome, l'email istituzionale e il tipo di utenza di tutti gli utenti presenti nella base di dati (ordinati per cognome), si trova una colonna con la possibilità di rimozione. Tutti gli utenti possono essere rimossi.
 
+    sarà quindi possibile, cliccando sul bottone rosso \textit{RIMUOVI UTENTE}, finalizzare la procedura di rimozione utente con la conseguente cancellazione di tutti dati dell'utenza dalla base di dati.
 
+    \alert ATTENZIONE: tale azione di rimozione è irreversibile
 
-    Cliccando nella navbar \textit{GESTIONE CALENDARIO ESAMI} si accede alla pagina di gesione degli esami dove per ciascun insegnameno di cui si è responsabile, è possibile inserire per la data e ora selezionata un nuovo appello di esame per quell'insegnamento.
+    \pagebreak
 
-    \includegraphics[scale=0.24]{images/Schermata del 2023-08-16 19-19-58.png}
+    \section{La \textit{Gestione degli insegnamenti}}
 
-    Ad esempio, inserendo un appello per la materia di \textit{Linguaggi Formali e Automi} in data \attr{23/12/2023} e ora \attr{15:50} e cliccando su inserisci
+    Cliccando nella navbar \textit{GESTIONE INSEGNAMENTI} si aprirà un menù a tendina \textit{dropdown} come quella mostrata in figura qui sotto
+    \begin{center}
+        \includegraphics[scale=0.35]{images/Schermata del 2023-08-26 12-21-05.png}
+    \end{center}
+    dove è possibile scegliere tra tre diverse operazioni da effettuare per gestire un insegnamento.
+    \subsection{L'inserimento di un Insegnamento}
+    Cliccando su \textit{Inserimento Insegnamento} verrà mostrata la pagina per inserire i dati del nuovo insegnamento che si intende inserire nella base di dati:
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-34-13.png}
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-26 13-06-41.png}
+    \end{center}
+    Dopo aver inserito:
+    \begin{itemize}
+        \item Nome dell'insegnamento
+        \item Codice dell'insegnamento (identificatore univoco tra tutti gli insegnamenti presenti nella base di dati)
+        \item Docente Responsabile
+        \item descrizione dell'insegnamento
+        \item CFU previsti per l'insegnamento
+        \item Corso di Laurea a cui appartiene questo insegnamento (successivamente nella sezione di modifica dell'insegnamento sarà possibile inserire altri corsi di laurea a cui tale insegnamento appartiene)
+        \item Anno in cui l'insegnamento viene erogato nel Corso di Laurea indicato precedentemente
+        \item eventuale Propedeuticità (che successivamente potrà essere modificata anche nella sezione di modifica insegnamento)
+    \end{itemize}
+    sarà quindi possibile, cliccando su \textit{INSERISCI L'INSEGNAMENTO NEL CORSO DI LAUREA}, finalizzare la procedura di inserimento dell'insegnamento nella base di dati.
 
-    la notifica su sfondo verde con la dicitura "Inserimento dell'esame andato a buon fine" indica il buon esito dell'operazione di inserimento: nella sezione "esami attualmente calendarizzati" comparirà l'esame appena inserito (insieme agli altri già eventualmente presenti) e gli studenti dalla loro interfaccia potranno vedere l'appello dell'insegnamento ed iscriversi all'esame.
+    \subsection{La Modifica di un insegnamento}
+    Cliccando su \textit{Modifica Insegnamento} verrà mostrata una pagina con un menù a tendina contenente tutti gli insegnamenti presenti nella base di dati, per la loro gestione. Selezionando l'insegnamento di interesse, e cliccando su \textit{CARICA INFORMAZIONI} verrà mostrata la pagina vera e propria di modifica insegnamento
+    Questa sezione è parecchio articolata, pertanto si presti particolare attenzione.
+    Dividiamo in tre parti la spiegazione della nuova pagina che ci viene mostrata
+    \begin{itemize}
+        \item Nella prima parte della pagina che si apre al click di \textit{CARICA INFORMAZIONI}, si trovano i dati principali che si possono modificare fuorchè il codice dell'insegnamento, ovvero sarà quindi possibile modificare:
+        \begin{itemize}
+            \item il nome dell'insegnamento
+            \item il Docente Responsabile dell'insegnamento
+            \item la Descrizione dell'insegnamento
+            \item i CFU previsti per l'insegnamento
+        \end{itemize}
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-34-18.png}
+        \begin{center}
+            \includegraphics[scale=0.18]{images/Schermata del 2023-08-26 17-10-58.png}
+        \end{center}
 
-    contrariamente, se si vuole inserire un esame per la stessa data in cui è già calendarizzato un altro esame dello stesso anno, di un corso di laurea che eroga il medesimo insegnamento,
+        sarà quindi possibile, cliccando su \textit{MODIFICA ANAGRAFICA UTENTE}, finalizzare la procedura di modifica con la conseguente modifica dei dati dell'utenza nella base di dati.
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-34-43.png}
+        \item Nella seconda parte della pagina che si apre al click di \textit{CARICA INFORMAZIONI}, si trovano i docenti che sono coinvolti con l'insegnamento ovvero quelli che in gergo sono i \textit{co-docenti}: dal momento che il Docente Responsabile non è rimovibile dalla docenza del corso, egli non sarà presente in tale elenco.
 
-    verrà impedito l'inserimento del nuovo esame, con una notifica su sfondo rosso indicante il messaggio associato al mancato inserimento.
+        \begin{center}
+            \includegraphics[scale=0.18]{images/Schermata del 2023-08-26 18-17-43.png}
+        \end{center}
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-39-37.png}
+        ovvero sarà quindi possibile aggiungere un docente come coinvolto con l'insegnamento selezionandolo dalla colonna "DOCENTI CHE NON INSEGNANO QUESTA DISCIPLINA", e parimenti sarà possibile rimuoverli premendo il pulsante rosso della colonna di sinistra sotto la dicitura "RIMUOVI".
 
-    \section{La verbalizzazione}
-    Ciascun docente responsabile di un insegnamento, oltre a calendarizzare gli esami per quell'insegnamento, può verbalizzare gli esiti degli esami che andranno inseriti nella carriera dello studente.
-    Selezionando l'insegnamento nel menù a tendina più a sinistra, compariranno nel menù a tendina di destra le date in cui ci sono stati esami di quell'insegnamento. Dopodichè cliccando sul tasto dallo sfondo verde "RICERCA STUDENTI ISCRITTI", compariranno gli studenti iscritti a quell'appello di esame
+        Si noti che nella colonna di destra, dove vi sono i docenti che si possono inserire per la co-docenza, si possono ricercare i docenti per nome o cognome e i risultati sono ordinati alfabeticamente.
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-39-48.png}
+        Attenzione: per esteticità della pagina i risultati della ricerca dei docenti sono limitati ai soli primi 10 risultati.
 
-    Per ciascuno studente è possibile verbalizzare un voto che sia compreso tra 0 e 31 (quest'ultimo equivalente del 30 e lode),
-    e se si inserisce un numero al di fuori di questo range, come nell'esempio il numero \texttt{250}
+        \item in maniera del tutto analoga alla sezione precedente, la terza parte della pagina di modifica insegnamento permette di inserire tale insegnamento all'interno di un corso di laurea, oppure visualizzare a quali corsi di laurea appartiene tale insegnamento, con la possibilità di rimozione da tale corso di laurea.
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 19-40-01.png}
+        \begin{center}
+            \includegraphics[scale=0.18]{images/Schermata del 2023-08-26 18-25-52.png}
+        \end{center}
 
-    viene mostrato un messaggio di errore:
+        Si noti nell'immagine qui sopra, che all'atto dell'inserimento in un corso di laurea, bisogna selezionare a in quale anno verrà erogato tale corso e se esso ha delle propedeuticità
+    \end{itemize}
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 20-55-28.png}
+    \subsection{La Rimozione di un insegnamento}
+    Cliccando su \textit{Rimozione Insegnamento} verrà mostrata una pagina contenente tutti gli insegnamenti presenti nella base di dati, indicanti ciascuno il docente Responsabile e il numero di Corsi di Laurea che erogano tale insegnamento. Nella barra di ricerca superiore è possibile ricercare l'insegnamento per nome, codice oppure per docente responsabile.
 
-    Se invece si inserisce un numero valido entro il range consentito, come ad esempio il numero \texttt{25}
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-26 18-35-24.png}
+    \end{center}
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 20-56-10.png}
+    quindi nella tabella mostrata in figura, si trova una colonna con la possibilità di rimozione. Tutti gli insegnamenti possono essere rimossi.
 
-    Il voto viene registrato correttamente in carriera:
+    sarà quindi possibile, cliccando sul bottone rosso \textit{RIMUOVI INSEGNAMENTO}, finalizzare la procedura di rimozione utente con la conseguente cancellazione di tutti dati dell'utenza dalla base di dati.
 
-    \includegraphics[scale=0.3]{images/Schermata del 2023-08-16 20-56-16.png}
+    \alert ATTENZIONE: tale azione di rimozione è irreversibile
 
-    Attenzione: prima di verbalizzare il voto, bisogna prestare particolare attenzione alla correttezza dei dati che si inviano premendo il pulsante azzurro "VERBALIZZA". Dopo la pressione del tasto, l'operazione è irreversibile.
+    \section{La \textit{Gestione dei corsi di laurea}}
+
+    Cliccando nella navbar \textit{GESTIONE CORSI DI LAUREA} si aprirà un menù a tendina \textit{dropdown} come quella mostrata in figura qui sotto
+    \begin{center}
+        \includegraphics[scale=0.35]{images/Schermata del 2023-08-26 12-21-19.png}
+    \end{center}
+    dove è possibile scegliere tra tre diverse operazioni da effettuare per gestire un corso di laurea.
+    \subsection{L'inserimento di un Corso di Laurea}
+    Cliccando su \textit{Inserimento Corso di Laurea} verrà mostrata la pagina per inserire i dati del nuovo Corso di Laurea che si intende inserire nella base di dati:
+
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-26 18-43-30.png}
+    \end{center}
+    Dopo aver inserito:
+    \begin{itemize}
+        \item Nome del corso di laurea
+        \item Codice del corso di laurea (identificatore univoco tra tutti i corsi di laurea presenti nella base di dati)
+        \item tipo di corso di laurea (triennale, magistrale, magistrale a ciclo unico)
+    \end{itemize}
+    sarà quindi possibile, cliccando su \textit{INSERISCI CORSO DI LAUREA}, finalizzare la procedura di inserimento del corso di laurea nella base di dati.
+
+    \subsection{La Modifica di un corso di laurea}
+    Cliccando su \textit{Modifica Corso di Laurea} verrà mostrata una pagina con un menù a tendina contenente tutti i corsi di laurea presenti nella base di dati, per la loro gestione. Selezionando il corso di laurea di interesse, e cliccando su \textit{CARICA INFORMAZIONI} verrà mostrata la pagina vera e propria di modifica del corso di laurea
+    Questa sezione è analoga a quella precedentemente presentata per la modifica dell'insegnamento.
+    Dividiamo in tre parti la spiegazione della nuova pagina che ci viene mostrata
+    \begin{itemize}
+        \item Nella prima parte della pagina che si apre al click di \textit{CARICA LE INFORMAZIONI DEL CDL}, si trovano i dati principali che si possono modificare fuorchè il codice del corso di laurea, ovvero sarà quindi possibile modificare:
+        \begin{itemize}
+            \item il nome del corso di laurea
+            \item il tipo di corso di studi
+        \end{itemize}
+
+        \begin{center}
+            \includegraphics[scale=0.18]{images/Schermata del 2023-08-26 18-43-30.png}
+        \end{center}
+
+        sarà quindi possibile, cliccando su \textit{MODIFICA CORSO DI LAUREA}, finalizzare la procedura di modifica con la conseguente modifica dei dati del corso di laurea nella base di dati.
+
+        \item Nella seconda parte della pagina che si apre al click di \textit{CARICA LE INFORMAZIONI DEL CDL}, si trovano gli insegnamenti che fanno parte del presente corso di laurea e quelli che non ne fanno parte.
+
+        \begin{center}
+            \includegraphics[scale=0.18]{images/Schermata del 2023-08-26 20-33-43.png}
+        \end{center}
+
+        ovvero sarà quindi possibile aggiungere un docente come coinvolto con l'insegnamento selezionandolo dalla colonna "DOCENTI CHE NON INSEGNANO QUESTA DISCIPLINA", e parimenti sarà possibile rimuoverli premendo il pulsante rosso della colonna di sinistra sotto la dicitura "RIMUOVI".
+
+        Si noti che nella colonna di destra, dove vi sono i docenti che si possono inserire per la co-docenza, si possono ricercare i docenti per nome o cognome e i risultati sono ordinati alfabeticamente.
+
+        Attenzione: per esteticità della pagina i risultati della ricerca dei docenti sono limitati ai soli primi 10 risultati.
+
+        \item in maniera del tutto analoga alla sezione precedente, la terza parte della pagina di modifica insegnamento permette di inserire tale insegnamento all'interno di un corso di laurea, oppure visualizzare a quali corsi di laurea appartiene tale insegnamento, con la possibilità di rimozione da tale corso di laurea.
+
+        \begin{center}
+            \includegraphics[scale=0.18]{images/Schermata del 2023-08-26 18-25-52.png}
+        \end{center}
+
+        Si noti nell'immagine qui sopra, che all'atto dell'inserimento in un corso di laurea, bisogna selezionare a in quale anno verrà erogato tale corso e se esso ha delle propedeuticità
+    \end{itemize}
+
+    \subsection{La Rimozione di un Corso di Laurea}
+    Cliccando su \textit{Rimozione Corso di Laurea} verrà mostrata una pagina contenente tutti gli insegnamenti presenti nella base di dati, indicanti ciascuno il docente Responsabile e il numero di Corsi di Laurea che erogano tale insegnamento. Nella barra di ricerca superiore è possibile ricercare il Corso di Laurea per nome oppure per codice.
+
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-27 08-15-06.png}
+    \end{center}
+
+    quindi nella tabella mostrata in figura, si trova una colonna con la possibilità di rimozione. Tutti i Corsi di Laurea possono essere rimossi.
+
+    Sarà quindi possibile, cliccando sul bottone rosso \textit{RIMUOVI CORSO DI LAUREA}, finalizzare la procedura di rimozione utente con la conseguente cancellazione di tutti dati dell'utenza dalla base di dati.
+
+    \alert ATTENZIONE: tale azione di rimozione è irreversibile
+
+    \pagebreak
+
+    \section{Le \textit{Certificazioni}}
+
+    Cliccando nella navbar \textit{CERTIFICAZIONI} si aprirà un menù a tendina \textit{dropdown} come quello mostrato in figura qui sotto
+    \begin{center}
+        \includegraphics[scale=0.35]{images/Schermata del 2023-08-26 12-21-36.png}
+    \end{center}
+    dove è possibile generare un certificato di carriera cliccando sull'apposito elemento del menù.
+
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-27 08-22-08.png}
+    \end{center}
+
+    È possibile generare la carriera completa oppure la carriera valida per ciascuno studente, compresi anche gli studenti presenti nello \textit{storico} ovvero che attualmente non sono iscritti a nessun Corso di Laurea ma precedentemente hanno frequentato. Questi studenti storici, sono contrassegnati da un punto esclamativo rosso accanto al numero progressivo delle righe.
+    È possibile ricercare lo studente di cui si vuole produrre la carriera, anche tramite la casella di ricerca presente nella pagina.
+
+    \pagebreak
+
+    \subsection{Generare la carriera completa}
+    Se si vuole generare la carriera completa per uno studente, è sufficiente premere il bottone azzurro della colonna \textit{GENERA CARRIERA} in corrispondenza della riga dello studente interessato, giungendo così alla seguente pagina
+
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-27 08-44-31.png}
+    \end{center}
+
+    dove oltre a consultare la \textit{carriera completa} dello studente, è possibile anche generarne il PDF con carta intestata, come mostrato in figura qui sotto
+
+    \begin{center}
+        \includegraphics[scale=0.33]{images/Schermata del 2023-08-27 08-31-50.png}
+    \end{center}
+
+    \pagebreak
+
+    \subsection{Generare la carriera valida}
+    Se si vuole generare la carriera valida per uno studente, è sufficiente premere il bottone verde della colonna \textit{GENERA CARRIERA} in corrispondenza della riga dello studente interessato, giungendo così alla seguente pagina
+
+    \begin{center}
+        \includegraphics[scale=0.2]{images/Schermata del 2023-08-27 08-44-52.png}
+    \end{center}
+
+    dove oltre a consultare la \textit{carriera valida} dello studente, è possibile anche generarne il PDF con carta intestata, come mostrato in figura qui sotto
+
+    \begin{center}
+        \includegraphics[scale=0.33]{images/Schermata del 2023-08-27 08-45-17.png}
+    \end{center}
+
 
 \end{document}

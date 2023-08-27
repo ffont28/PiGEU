@@ -97,7 +97,7 @@ function setNavbarSegreteria($link){
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item <?php echo $mc_disab ?>" href="modificacdl.php">Modifica Corso di Laurea</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item <?php echo $rc_disab ?>" href="rimuovicdl.php">RimozioneCorso di Laurea</a></li>
+                        <li><a class="dropdown-item <?php echo $rc_disab ?>" href="rimuovicdl.php">Rimozione Corso di Laurea</a></li>
                       </ul>
             </li>
             <li class="nav-item dropdown">

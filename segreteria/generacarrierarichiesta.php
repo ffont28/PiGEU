@@ -9,6 +9,7 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
     $nome = "";
     $cognome = "";
     $matricola = "";
+    $tipoCarriera = $_POST['action'] == 'carriera_completa' ? 'completa' : 'valida';
 
     try {
 
@@ -54,8 +55,9 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
         foreach ($results as $row) {
 
          if ($counter == 1){   ?>
-             <h3 style="margin: 13px">Carriera di
-                 <?php echo $row['cogstu']." ".$row['nomstu']." - matricola ".$row['matr'] ?></h3>
+             <h3 style="margin: 13px; color:grey"><i>Carriera <?php echo $tipoCarriera?></i> dello studente
+                 <a style="color: black"><?php echo strtoupper($row['cogstu']." ".$row['nomstu'])?></a>
+                 matricola <a style="color: black"><?php echo $row['matr'] ?></a></h3>
 <?php   }
 ?>
 

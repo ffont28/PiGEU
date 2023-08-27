@@ -64,10 +64,6 @@ Tipo di CdL
 }
 
  ?>
-
-
-<form action="../index.php">
-    <input type="submit" class="button1 lightblue" value="RITORNA ALLA HOMEPAGE" />
-    </form>
+  
 </body>
 </html>
