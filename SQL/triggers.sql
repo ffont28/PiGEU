@@ -287,7 +287,7 @@ BEGIN
 
     PERFORM * FROM docente_responsabile dr
     WHERE dr.insegnamento = NEW.insegnamento;
-    IF FOUND THEN
+    IF FOUND AND (TG_OP = 'INSERT') THEN
         RAISE NOTICE 'ATTENZIONE: un insegnamento non puo'' avere più di un responsabile';
         PERFORM pg_notify('notifica', 'ATTENZIONE: un insegnamento non puo'' avere più di un responsabile');
         RETURN NULL;

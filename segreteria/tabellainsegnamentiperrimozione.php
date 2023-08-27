@@ -71,7 +71,7 @@ if(isset($_POST['search'])) {
             </tbody>
         </table>
         </div>
-<?
+<?php
     } catch
     (PDOException $e) {
         echo "Errore: " . $e->getMessage();

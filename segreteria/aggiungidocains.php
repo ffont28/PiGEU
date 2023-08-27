@@ -2,6 +2,7 @@
 include('../functions.php');
 include('../conf.php');
 if (isset($_POST['insegnamento']) && isset($_POST['docente'])) {
+    error_log("SONO QUI AGGIUNGIDOCAINS");
     $insegnamento = $_POST['insegnamento'];
     $docente = $_POST['docente'];
 

@@ -22,10 +22,10 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
 <div>
     <div>
-        <label for="exampleFormControlInput1" class="form-label">Ricerca un insegnamento da rimuovere:</label>
+        <label for="exampleFormControlInput1" class="form-label">Ricerca un Corso di Laurea da rimuovere:</label>
     </div>
-    <label for="cdl" >Utente:</label>
-    <input type="insertText" id="daricercare" placeholder="🔍 RICERCA per NOME, CODICE o RESPONSABILE..." name="utente">
+    <label for="cdl" >CdL:</label>
+    <input type="insertText" id="daricercare" placeholder="🔍 RICERCA per NOME o CODICE del Corso di Laurea..." name="utente">
 
     </div>
 

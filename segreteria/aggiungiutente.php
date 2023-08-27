@@ -46,7 +46,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
             </div>
 
         <div class="mb-3">
-        <label for="exampleFormControlInput1" class="form-label">Seleziona un'utenza</label>
+        <label for="exampleFormControlInput1" class="form-label">tipo di utente</label>
         <select class="form-select" onchange="computeEmailDomain()"  aria-label="Default select example" id="tipo" name="tipo">
       <!--    <option selected value="">seleziona un valore</option> -->
           <option value="studente">Studente</option>
@@ -57,7 +57,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
         </div>
 
         <div id="cdl" class="mb-3">
-            <label for="exampleFormControlInput1" class="form-label">Corso di Laurea a cui appartiene questo insegnamento:</label>
+            <label for="exampleFormControlInput1" class="form-label">Corso di Laurea a cui iscrivere lo studente:</label>
             <select class="form-select" id="cdl" name="cdl">
                 <!--<option selected value="ciao">Open this select menu</option>-->
                 <?php
@@ -192,9 +192,5 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 }
  ?>
 
-
-<form action="../index.php">
-    <input type="submit" class="button1 lightblue" value="RITORNA ALLA HOMEPAGE" />
-    </form>
 </body>
 </html>

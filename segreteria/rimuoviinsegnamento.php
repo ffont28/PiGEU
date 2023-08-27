@@ -24,7 +24,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     <div>
         <label for="exampleFormControlInput1" class="form-label">Ricerca un insegnamento da rimuovere:</label>
     </div>
-    <label for="cdl" >Utente:</label>
+    <label for="cdl" >Insegnamento:</label>
     <input type="insertText" id="daricercare" placeholder="🔍 RICERCA per NOME, CODICE o RESPONSABILE..." name="utente">
 
 </div>
