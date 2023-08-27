@@ -7,7 +7,10 @@
 \usepackage{listings}
 \usepackage{xcolor} % Per il colore del testo
 \usepackage{fontawesome5}
-
+\usepackage{geometry}
+\usepackage{url}
+\geometry{top=5cm}
+\renewcommand{\abstractname}{Introduzione}
 
 % Definizione del nuovo comando
 \newcommand{\tabb}[1]{\texttt{\textcolor{blue}{#1}}}
@@ -56,8 +59,16 @@
                 \item eseguire interrogazioni al database in maniera più semplice, senza la pressione di bottoni di submit ma solamente con la digitazione da tastiera ad esempio durante la ricerca di una utenza
             \end{itemize}
         \end{itemize}
+
+        \pagebreak
+
         L'intero sviluppo del progetto in tutte le sue fasi, è documentato in un apposito repository di Github al seguente link \url{https://github.com/ffont28/PiGEU } di cui qui sotto viene mostrata un'immagine indicante gli stati di commit
-        \includegraphics[scale=0.437]{images/PiGEU-history.png}
+        \begin{center}
+            \includegraphics[scale=1.3]{images/Schermata del 2023-08-27 12-23-23.png}
+        \end{center}
+
+
+        Inoltre la piattaforma è raggiungibile al seguente link: \url{www.pigeu.it:8081}
     \end{abstract}
 
     \pagebreak
@@ -71,10 +82,12 @@
     Lo schema seguente è stato successivamente ristrutturato per la realizzazione dello schema logico, dato che la relazione in linguaggio SQL-DDL viene espressa con una tabella.
 
 
-    \includegraphics[scale=0.25]{images/SchemaER_PiGEU.png}
+    \includegraphics[scale=0.30]{images/SchemaER_PiGEU.png}
+
+    \pagebreak
 
     \section{Schema logico (relazionale) della base di dati}
-    Di seguito viene fornito lo schema logico della base di dati di PiGEU, tramite i comandi DDL utilizzati. La base di dati contiene 19 tabelle: per ognuna di esse verrà eventualmente fornito qualche commento per spiegare al meglio le scelte implementative derivanti dalle specifiche assegnate
+    Di seguito viene fornito lo schema logico della base di dati di PiGEU, tramite i comandi DDL utilizzati. La base di dati contiene 20 tabelle: per ognuna di esse verrà fornito qualche commento per spiegare al meglio le scelte implementative derivanti dai requisiti assegnati
 
     \lstset{
         basicstyle=\footnotesize,
@@ -100,7 +113,7 @@
         Questa tabella contiene i dati fondamentali di un utente, quali l'\texttt{email} che è l'identificatore univoco (chiave primaria) di ciascun utente nel database, corrisponde a quella che è l'email istituzionale di università, il suo \texttt{nome} e \texttt{cognome}, il suo \texttt{indirizzo} e \texttt{città} di residenza, il suo \texttt{codice fiscale} da cui si può desumere \textbf{la data di nascita} e il \textit{luogo di nascita} e da ultimo l'\texttt{emailpersonale} che rappresenta la mail di recupero dell'utente, al di fuori del dominio email di università.
         \begin{lstlisting}[
             language={SQL},
-            title={Utente}]
+            title={utente}]
 CREATE TABLE public.utente (
     email character varying(50) NOT NULL,
     nome character varying(50),
@@ -124,6 +137,8 @@ CREATE TABLE public.credenziali (
     FOREIGN KEY (username) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
         \end{lstlisting}
+
+        \pagebreak
 
         \item La tabella \tabb{Segreteria} contiene i dati degli utenti di tipo \textit{segreteria} identificati da un livello come ad esempio la segreteria del personale piuttosto che la segreteria studenti o segreteria didattica. L'attributo \texttt{utente} referenzia l'\attr{email} della tabella \tab{Utente}
         \begin{lstlisting}[
@@ -152,7 +167,7 @@ CREATE TABLE public.docente (
         \item La tabella \tabb{Studente} contiene i dati degli utenti di tipo \textit{studente}. Anch'essa referenzia l'\attr{email} della tabella \tab{Utente}, e contiene due attributi caratteristici di uno stuente:
         \begin{itemize}
             \item l'attributo \attr{matricola} che indica la matricola dello studente
-            \item l'attributo \attr{corso\und di\und laurea} in riferimento al corso di laurea a cui risulta iscritto lo studdente
+            \item l'attributo \attr{corso\und di\und laurea} in riferimento al corso di laurea a cui risulta iscritto lo studente
         \end{itemize}
         \begin{lstlisting}[
             language={SQL},
@@ -166,6 +181,8 @@ CREATE TABLE public.studente (
     FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
         \end{lstlisting}
+
+        \pagebreak
 
         \item La tabella \tabb{Corso\und di\und laurea} contiene i dati di un corso di laurea, quali:
         \begin{itemize}
@@ -211,6 +228,9 @@ CREATE TABLE public.insegnamento (
 
         \item Ogni insegnamento ha un \tabb{docente\und responsabile} ovvero un docente che si occupa dell'organizzazione didattica dell'insegnamento come ad esempio, come vedremo in seguito, la pianificazione del calendario esami per l'insegnamento, e la verbalizzazione degli esiti degli esami dell'insegnamento.
         Questa tabella quindi indica la relazione tra un \attr{docente} e un \attr{insegnamento} i quali referenziano le omonime tabelle nelle loro chiavi primarie.
+
+        \pagebreak
+
         \begin{lstlisting}[
             language={SQL},
             title={Docente Responsabile}]
@@ -223,7 +243,7 @@ CREATE TABLE public.docente_responsabile (
 );
         \end{lstlisting}
 
-        \item Ogni insegnamento può avere uno o più docenti: la tabella \tabb{insegnamento} esprime questa relazione. Questa tabella conterrà solamente i docenti di un insegnamento che non siano già responsabili di quell'insegnamento. Come nella tabella \tab{docente\und responsabile} i due attributi fanno riferimento a un docente e a un insegnamento.
+        \item Ogni insegnamento può avere uno o più docenti: la tabella \tabb{insegna} descrive tale situazione. Questa tabella conterrà solamente i docenti di un insegnamento che non siano già responsabili di quell'insegnamento. Come nella tabella \tab{docente\und responsabile} i due attributi fanno riferimento a un docente e a un insegnamento.
         \begin{lstlisting}[
             language={SQL},
             title={Insegna}]
@@ -254,6 +274,8 @@ CREATE TABLE public.insegnamento_parte_di_cdl (
 );
         \end{lstlisting}
 
+        \pagebreak
+
         \item La tabella \tabb{propedeuticita} descrive la relazione per la quale eventualmente un insegnamento \attr{insegnamento1} possa essere propedeutico a un altro insegnamento \attr{insegnamento2} all'interno di un \attr{corso\und di\und laurea}. Anche qui è importante notare come un insegnamento sia propedeutico a un altro solamente nel contesto di un corso di laurea, non in maniera assoluta.
 
         \begin{lstlisting}[
@@ -282,6 +304,8 @@ CREATE TABLE public.insegnamenti_per_carriera (
     FOREIGN KEY (studente) REFERENCES public.studente(utente) ON UPDATE CASCADE ON DELETE CASCADE
 );
         \end{lstlisting}
+
+        \pagebreak
 
         \item La tabella \tabb{calendario\und esami} rappresenta un calendario di esami in cui vengono indicati:
         \begin{itemize}
@@ -374,9 +398,12 @@ CREATE TABLE public.carriera_storico (
         \end{lstlisting}
 
         \item La tabella \tabb{foto\und profilo} contiene, per ciascun \attr{utente}, il corrispettivo percorso interno al server in cui si trova l'immagine del profilo, tramite l'attributo \attr{path}. Inoltre l'attirbuto \attr{timestamp} serve per tenere memoria delle vecchie foto profilo dell'utente in questione.
+
+        \pagebreak
+
         \begin{lstlisting}[
             language={SQL},
-            title={Foto Profilo}]
+            title={foto\und profilo}]
 CREATE TABLE public.foto_profilo (
     utente character varying(50) NOT NULL,
     path character varying(200),
@@ -385,15 +412,28 @@ CREATE TABLE public.foto_profilo (
     FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
 );
         \end{lstlisting}
+
+        \item La tabella \tabb{recupero\und credenziali} contiene, per ciascun \attr{utente} che abbia fatto richiesta di recupero credenziali, l'indirizzo email istituzionale dell'utente e un token assegnato all'utente stesso, che verrà inviato tramite email all'indirizzo di recupero come parametro di una richiesta GET, per ripristinare la password. Il token verrà rimosso dalla tabella nel momento in cui dall'email viene cliccato sul link generato per il recupero.
+        \begin{lstlisting}[
+            language={SQL},
+            title={recupero\und credenziali}]
+CREATE TABLE public.recupero_credenziali (
+    utente character varying(50) NOT NULL,
+    randomvalue character varying(50) NOT NULL,
+    PRIMARY KEY (utente, randomvalue),
+    FOREIGN KEY (utente) REFERENCES public.utente(email) ON UPDATE CASCADE ON DELETE CASCADE
+);
+        \end{lstlisting}
     \end{enumerate}
+
+    \pagebreak
 
     \section{Esauriente descrizione delle funzioni realizzate}
     \subsection{Funzioni SQL-DML Richieste}
     Questa sezione ha lo scopo di mostrare le funzioni in linguaggio SQL per la manipolazione dei dati interni al lato PostgreSQL di PiGEU. Per ciascuna funzione verrà mostrata l'ulitità ed eventuali osservazioni.
-    \subsubsection{Rimozione di uno studente - [specifica 2.2.1]}
-    Nelle specifiche indicate, la rimozione di uno studente \texttt{s} non corrisponde con il solo comando di \sqlcommand{DELETE} all'interno della tabella \tabb{utente} ma comporta il trasferimento di tutte le informazioni relative ad \texttt{s} in apposite tabelle di \textit{storico}. La funzione \sqlfunc{sposta\und dati\und studente} contiene diversi comandi DML che consentono di soddisfare le specifiche. Di seguito il codice sorgente della funzione che oltre alle operazioni richieste, restituisce anche un messaggio di stato oppure, nel caso di sollevamento di eccezioni, il messaggio di eccezione.
+    \subsubsection{Rimozione di uno studente - [requisito 2.2.1]}
+    Nelle specifiche indicate, la rimozione di uno studente \texttt{s} non corrisponde con il solo comando di \sqlcommand{DELETE} all'interno della tabella \tabb{utente} ma comporta il trasferimento di tutte le informazioni relative ad \texttt{s} in apposite tabelle di \textit{storico}. La funzione \sqlfunc{sposta\und dati\und studente} contiene diversi comandi DML che consentono di soddisfare il requisito in questione. Di seguito il codice sorgente della funzione che oltre alle operazioni richieste, restituisce anche un messaggio di stato oppure, nel caso di sollevamento di eccezioni, il messaggio di eccezione.
 
-    \pagebreak
     \begin{lstlisting}[
     language={SQL},
     title={sposta\und dati\und studente(\texttt{E} \attr{varchar})}]
@@ -435,8 +475,8 @@ CREATE TABLE public.foto_profilo (
     END;
     $$ LANGUAGE plpgsql;
 \end{lstlisting}
-\subsubsection{Correttezza delle iscrizioni agli esami - [specifica 2.2.2]}
-Nella \textit{specifica 2.2.2} viene detto che
+\subsubsection{Correttezza delle iscrizioni agli esami - [requisito 2.2.2]}
+Nel \textit{requisito 2.2.2} viene detto che
 \begin{quote}
     Ciascuno studente può iscriversi ad un esame solo se l'insegnamento è previsto dal proprio corso di laurea, e solamente se tutte le propedeuticità sono rispettate.
 \end{quote}
@@ -499,20 +539,25 @@ EXECUTE FUNCTION check_propedeuticita();
         title={\texttt{check\und propedeuticita()}}]
 CREATE OR REPLACE FUNCTION check_propedeuticita() RETURNS TRIGGER as $$
 BEGIN
+    -- cerco se c'e'' in propedeuticita'' e nel caso che in carriera 'insegnamento1' sia superato
     PERFORM * FROM propedeuticita p
+        --INNER JOIN carriera c ON c.insegnamento = p.insegnamento1 AND c.studente = NEW.studente
         INNER JOIN calendario_esami ce ON ce.insegnamento = p.insegnamento2
-        WHERE ce.id = NEW.esame;
+        INNER JOIN studente s ON s.corso_di_laurea = p.corso_di_laurea
+        WHERE ce.id = NEW.esame AND s.utente = NEW.studente;
         IF NOT FOUND THEN
             RETURN NEW;
         ELSE        PERFORM * FROM carriera c
                     INNER JOIN calendario_esami ce ON ce.insegnamento = c.insegnamento
                     INNER JOIN propedeuticita p ON p.insegnamento1 = ce.insegnamento
-                    WHERE c.valutazione >= 18;
+                    INNER JOIN studente s ON s.corso_di_laurea = p.corso_di_laurea
+                    WHERE c.studente = NEW.studente
+                    AND c.valutazione >= 18;
                     IF FOUND THEN
                         RETURN NEW;
                     ELSE
-                        RAISE NOTICE 'ATTENZIONE: non e'' possibile iscriversi ad un esame senza aver superato la sua propedeuticita'' ';
-                        PERFORM pg_notify('notifica', 'ATTENZIONE: non e' possibile iscriversi ad un esame senza aver superato la sua propedeuticita'' ');
+                        RAISE NOTICE 'ATTENZIONE: non e'' possibile iscriversi ad un esame senza aver superato la sua propedeuticita''';
+                        PERFORM pg_notify('notifica', 'ATTENZIONE: non e'' possibile iscriversi ad un esame senza aver superato la sua propedeuticita''');
                         RETURN NULL;
                     END IF;
         END IF;
@@ -521,8 +566,8 @@ $$ language 'plpgsql';
     \end{lstlisting}
     Le osservazioni su quanto riguarda il sollevamento della \sqlcommand{NOTICE} che verrà catturata poi dallo script PHP grazie al comando \sqlcommand{PERFORM pg\und notify} sono del tutto analoghe al punto precedente.
 \end{itemize}
-\subsubsection{Correttezza del calendario d'esame - [specifica 2.2.3]}
-Viene richiesto, tra le specifiche:
+\subsubsection{Correttezza del calendario d'esame - [requisito 2.2.3]}
+Viene richiesto, tra i requisiti:
 \begin{quote}
     Non è possibile programmare, nella stessa giornata, appelli per più esami dello stesso anno di un corso di laurea
 \end{quote}
@@ -536,7 +581,7 @@ CREATE OR REPLACE TRIGGER no_esami_stesso_anno_stesso_giorno
 EXECUTE FUNCTION check_inserimento_esame();
 
 \end{lstlisting}
-Dal momento che per scelta implementativa l'attributo \attr{anno} non parte di un \tabb{insegnamento} ma è identificabile solamente quando un \attr{insegnamento} è parte di un \attr{corso\und di\und laurea}, informazione presente nella tabella \tabb{insegnamento\und parte\und di\und cdl}, la funzione che effettua l'interrogazione alla base di dati risulterà leggermente articolata. Di seguito il codice sorgente:
+Dal momento che per scelta implementativa l'attributo \attr{anno} non fa parte di un \tabb{insegnamento} ma è identificabile solamente quando un \attr{insegnamento} è parte di un \attr{corso\und di\und laurea}, informazione presente nella tabella \tabb{insegnamento\und parte\und di\und cdl}, la funzione che effettua l'interrogazione alla base di dati risulterà leggermente articolata. Di seguito il codice sorgente:
 \begin{lstlisting}[
     language={SQL},
     title={\texttt{check\und inserimento\und esame()}}]
@@ -562,9 +607,9 @@ BEGIN
 END;
 $$ language 'plpgsql';
 \end{lstlisting}
-\subsubsection{Produzione della carriera completa di uno studente - [specifica 2.2.4]}
+\subsubsection{Produzione della carriera completa di uno studente - [requisito 2.2.4]}
 Ogni università deve potere produrre, come documento ufficiale istituzionale, la carriera dei propri studenti, attestante gli studi effettuati. Definiamo con \textbf{carriera completa} l'insieme di insegnamenti di cui lo studente abbia sostenuto almeno una volta l'esame, includendo quindi esami anche ripetuti ed esami non superati.
-La \textit{specifica 2.2.4} chiede che:
+Il \textit{requisito 2.2.4} chiede che:
 \begin{itemize}
     \item ciascuno studente possa produrre la propria \textit{carriera completa}
     \item la segreteria possa produrre la \textit{carriera completa} di ciascuno studente
@@ -760,8 +805,10 @@ END;
 $$ LANGUAGE plpgsql;
 \end{lstlisting}
 
-\subsubsection{Produzione delle informazioni su un corso di laurea - [specifica 2.2.6]}
-Ciascuno studente deve poter conoscere, per ogni corso di laurea, gli insegnamenti erogati, con le rispettive descrizioni e docente responsabile. Per aderire a questa specifica, vi è la vista \sqlview{informazioni\und CdL} che viene mostrata di seguito:
+\pagebreak
+
+\subsubsection{Produzione delle informazioni su un corso di laurea - [requisito 2.2.6]}
+Ciascuno studente deve poter conoscere, per ogni corso di laurea, gli insegnamenti erogati con le rispettive descrizioni e docente responsabile. Per aderire a questo requisito, vi è la vista \sqlview{informazioni\und CdL} che viene mostrata di seguito:
 \begin{lstlisting}[
     language={SQL},
     title={\texttt{informazioni\und CdL}}]
@@ -772,6 +819,8 @@ FROM corso_di_laurea c INNER JOIN insegnamento_parte_di_cdl ip ON c.codice = ip.
                        INNER JOIN docente_responsabile d ON i.codice = d.insegnamento
                        INNER JOIN utente u ON u.email = d.docente;
 \end{lstlisting}
+
+
 \subsubsection{Il docente responsabile}
 Viene richiesto, tra le specifiche, che un docente sia responsabile di al più tre insegnamenti: per aderire a questa specifica vi è il seguente trigger:
 
@@ -810,56 +859,95 @@ $$ LANGUAGE plpgsql;
 \end{lstlisting}
 
 \subsection{Ulteriori Funzioni realizzate}
+\subsubsection{Il loop di propedeuticità}
+Ricodiamo che nel dominio applicativo di PiGEU intendiamo che un insegnamento \texttt{A} si dice \textit{propedeutico} ad un altro insegnamento \texttt{B} in un corso di laurea \texttt{l} se per iscriversi ad un esame dell'insegnamento \texttt{B} è obbligatorio aver superato con profitto (ovvero valutazione $\geq$ 18) l'esame dell'insegnamento \texttt{A}.
+Può capitare una situazione erronea in cui, dopo aver impostato lato segreteria un insegnamento \texttt{A} come propedeutico a \texttt{B} si inserisca anche la propedeuticità di \texttt{B} per \texttt{A}: questa situazione genera un circolo vizioso senza fine in cui non ci si potrà mai iscrivere a nessuno dei due esami. Analogo discorso se vi è una catena di propedeuticità il cui insegnamento a capo della catena è lo stesso della coda della catena.
+Per questa motivazione nella base di dati è presente il seguente trigger:
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{no\und cicli\und propedeuticità}}]
+CREATE OR REPLACE TRIGGER no_cicli_propedeuticita
+    BEFORE INSERT OR UPDATE ON propedeuticita
+    FOR EACH ROW
+EXECUTE FUNCTION check_propedeuticita_ciclo();
+\end{lstlisting}
+
+che controlla che nell'inserimento di una propedeuticità non si vadano a formare cicli di propedeuticità come quello appena descritto. Tale trigger richiama la seguente funzione
+
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{no\und cicli\und propedeuticità}}]
+CREATE OR REPLACE TRIGGER no_cicli_propedeuticita
+    BEFORE INSERT OR UPDATE ON propedeuticita
+    FOR EACH ROW
+EXECUTE FUNCTION check_propedeuticita_ciclo();
+\end{lstlisting}
+
 \subsubsection{Carriera completa con tutti gli insegnamenti}
 Può essere utile produrre la carriera di uno studente che contenga non solamente gli insegnamenti di cui si è sostenuto almeno una volta l'esame, ma più in generale, un elenco che contenga tutti gli insegnamenti di cui lo studente debba sostenere l'esame per conseguire il titolo di laurea: in sintesi, sarà una \sqlfunc{carriera\und completa} con l'inserimento ulteriore degli esami non sostenuti con la dicitura "non sostenuto". Di seguito il codice sorgente che produce quanto appena spiegato:
 
 \begin{lstlisting}[
     language={SQL},
     title={\texttt{informazioni\und CdL}}]
-CREATE OR REPLACE FUNCTION carriera_completa_tutti(TARGET varchar) RETURNS TABLE (
-       studente varchar,
-       nomstu varchar,
-       cogstu varchar,
-       cdl varchar,
-       matr integer,
-       codins varchar,
-       nomins varchar,
-       nomdoc varchar,
-       cogdoc varchar,
-       voto varchar,
-       data varchar
-   ) AS $$
+CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo() RETURNS TRIGGER AS $$
+DECLARE
+    counter INTEGER := 0;
+    size INTEGER;
+    instemp VARCHAR;
+    riga record;
 BEGIN
-    RETURN QUERY
-        SELECT ic.studente,
-               u2.nome nomstu,
-               u2.cognome cogstu,
-               cdl.nome cdl,
-               s.matricola matr,
-               ic.insegnamento,
-               i.nome,
-               u.nome nomedoc,
-               u.cognome cogndoc,
-               CASE
-                   WHEN c.valutazione IS NULL THEN 'non sostenuto'
-                   ELSE c.valutazione::VARCHAR
-                   END,
-               CASE
-                   WHEN c.data IS NULL THEN 'non sostenuto'
-                   ELSE c.data::VARCHAR
-                   END
-        FROM insegnamenti_per_carriera ic
-                 LEFT JOIN carriera c ON ic.insegnamento = c.insegnamento
-                 INNER JOIN docente_responsabile d ON d.insegnamento = ic.insegnamento
-                 INNER JOIN utente u ON d.docente = u.email
-                 INNER JOIN utente u2 ON ic.studente = u2.email
-                 INNER JOIN studente s ON ic.studente = s.utente
-                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
-                 INNER JOIN insegnamento i ON ic.insegnamento = i.codice
-        WHERE ic.studente = TARGET and c.studente = TARGET;
+
+    -- tabella temporanea con le propedeuticita'' visitate
+    CREATE TEMP TABLE propedeuticita_visitate
+    (ins1 varchar, ins2 varchar, cdl varchar) ON COMMIT DROP;
+
+    -- simulo inserimento della nuova propedeuticita
+    INSERT INTO propedeuticita_visitate
+    VALUES (NEW.insegnamento1, NEW.insegnamento2, NEW.corso_di_laurea);
+
+    -- inserisco le propedeuticita presenti
+    INSERT INTO propedeuticita_visitate
+    SELECT insegnamento1, insegnamento2, corso_di_laurea
+    FROM propedeuticita WHERE corso_di_laurea = NEW.corso_di_laurea;
+
+    SELECT count(*) INTO size
+    FROM propedeuticita_visitate;
+            LOOP
+                IF counter = size THEN
+                    EXIT;
+                END IF;
+
+                FOR riga IN
+                SELECT pv1.ins1, pv2.ins2, pv1.cdl
+                FROM propedeuticita_visitate pv1 INNER JOIN  propedeuticita_visitate pv2
+                    ON pv1.ins1 <> pv2.ins1 AND pv1.ins2 <> pv2.ins2
+                WHERE pv2.ins1 = pv1.ins2
+                LOOP
+                    IF riga.ins1 = riga.ins2 THEN
+                        RAISE EXCEPTION 'Propedeuticita'' circolare non consentita';
+                    END IF;
+                    INSERT INTO propedeuticita_visitate
+                    VALUES (riga.ins1, riga.ins2, NEW.corso_di_laurea);
+                END LOOP;
+                counter := counter + 1;
+            END LOOP;
+
+    -- VERIFICA FINALE
+    PERFORM *
+    FROM propedeuticita_visitate
+    WHERE   cdl = NEW.corso_di_laurea
+      AND ins1 = NEW.insegnamento2
+      AND ins2 = NEW.insegnamento1;
+    IF FOUND THEN
+        RAISE EXCEPTION 'Propedeuticita'' circolare non consentita';
+    ELSE
+    RETURN NEW;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 \end{lstlisting}
+
+\pagebreak
 
 \section{Prove di funzionamento}
 Assumendo il fatto che ciò che è consentito a basso livello (terminale e comandi SQL-DML) è ciò che viene anche consentito ad alto livello (GUI relizzata tramite HTML con interazioni grazie a PHP e Javascript), le prove di funzionamento verranno esibite mostrando soprattutto schermate del terminale in cui si prova il funzionamento di quanto descritto finora, per la corretta esecuzione delle operazioni previste. Più precisamente verranno mostrate:
@@ -872,6 +960,7 @@ Si cercherà, lungo l'esposizione di seguire un filo cronologico che possa rispe
 La prima operazione da compiere per poter usufruire delle potenzialità di PiGEU è popolare la base di dati con utenti, ricordando che tra i tre diversi tipi di utenza, \textit{Segreteria}, \textit{Docente}, \textit{Studente}, solo la prima tipologia è autorizzata alla gestione delle utenze, nelle operazioni di inserimento, modifica e rimozione (consideriamo lo spostamento dello studente in \textit{storico} come un particolare tipo di rimozione)
 \subsubsection{Studente}
 Proviamo ora ad inserire un nuovo \textbf{studente} e verifichiamo come si comporta la base di dati dopo il suo inserimento come nuovo utente.
+
 Lo studente che prendiamo come modello è \texttt{demo\und studente@studenti.unimi.it}. Come mostrato nella schermata sottostante, tale studente in un primo momento non è presente nella base di dati:
 
 \includegraphics[scale=0.2]{images/Schermata del 2023-08-14 12-21-45.png}
@@ -879,6 +968,8 @@ Lo studente che prendiamo come modello è \texttt{demo\und studente@studenti.uni
 Ora, dopo aver effettuato l'accesso come utente di segreteria, inseriamo il nuovo utente avente tipoloia \textit{studente}, come iscritto al corso di laurea in \textit{informatica}
 
 \includegraphics[scale=0.2]{images/Schermata del 2023-08-14 14-09-50.png}
+
+\pagebreak
 
 Ed ecco mostrata la situazione all'interno della base di dati successivamente l'inserimento:
 
@@ -935,6 +1026,8 @@ dobbiamo tentare l'iscrizione da terminale così da vedere se veramente il compo
 
     \includegraphics[scale=0.2]{images/Schermata del 2023-08-14 16-39-16.png}
 
+    \pagebreak
+
     \item tentativo di iscrizione ad un esame non consentito
 
     \includegraphics[scale=0.2]{images/Schermata del 2023-08-14 16-47-21.png}
@@ -976,8 +1069,11 @@ Notiamo subito che il trigger impostato per non permettere nella stessa giornata
 
     \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-28-54.png}
 
+
+    \pagebreak
+
     \subsection{Il docente Responsabile}
-    Nelle specifiche viene richiesto che un docente sia responsabile di al più tre insegnamenti. Anche in questo caso proviamo a forzare la base di dati e vediamo se il trigger adibito al controllo funziona correttamente:
+    Nei requisiti viene richiesto che un docente sia responsabile di al più tre insegnamenti. Anche in questo caso proviamo a forzare la base di dati e vediamo se il trigger adibito al controllo funziona correttamente:
     \begin{itemize}
         \item Notiamo dalla seguente interrogazione che \texttt{demo\und docente@unimi.it} è responsabile di un solo insegnamento, \attr{IP}:
 
@@ -1000,17 +1096,22 @@ Notiamo subito che il trigger impostato per non permettere nella stessa giornata
         \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-42-34.png}
     \end{itemize}
 
+    \pagebreak
 
 \end{itemize}
 \section{Funzionalità \textit{user-friendly}}
-\subsection{Icona di connessione}
+\subsection{Icona di connessione alla base di dati}
 Nella pagina di login, sotto al form in cui inserire le proprie credenziali, vi è un'icona indicante lo stato della connessione con la base di dati, così che l'utente che sia difficoltato all'accesso può comprendere se le cause del mancato servizio sono dovute a cause tecniche della connessione con la base di dati oppure a problematiche del dispositivo dell'utente. Le icone di stato sono due:
 \begin{itemize}
     \item un cerchio ripieno verde con la dicitura ONLINE indica la connessione corretta con la base di dati
     \item un cerchio ripieno rosso con la dicitura OFFLINE indica la connessione corretta con la base di dati
 \end{itemize}
-
+\subsection{Recupero delle credenziali}
+Nella pagina di login, sempre sotto al form in cui inserire le proprie credenziali, c'è la dicitura "Password dimenticata" che rimanda a una pagina dove poter inserire il proprio indirizzo email di recupero, che deve corrispondere con quello impostato come email personale (non istituzionale!) all'atto dell'iscrizione. Se vi è corrispondenza tra ciò che è stato inserito e quanto è presente nella base di dati, verrà inviata una email a tale indirizzo di recupero contenente un link per reimpostare la propria password.
 \subsection{Produzione dei documenti in PDF}
+PiGEU dispone anche della possibilità di generare la documentazione di carriera anche in formato PDF scaricabile o stampabile. Tale funzionalità è presente sia nel profilo dello studente, che può produrre il PDF con la propria carriera (valida o completa), sia nel profilo della segreteria che può produrre il PDF con la carriera (valida o completa) di qualsiasi studente.
+
+
 \section{Sicurezza di PiGEU}
 \subsection{crittografia delle credenziali}
 Le credenziali, fin dalla homepage di login, vengono sempre trasmesse con il metodo POST, quindi con i valori non visibili dalla barra degli indirizzi, e per quanto riguarda la password viene usata la cifratura MD5 per garantire la sicurezza.
@@ -1024,7 +1125,7 @@ La home page, in fase di autenticazione, effettua un redirecting a seconda della
 \subsubsection{controllo in testa a ogni pagina}
 Una parte interessante per quanto riguarda la sicurezza è proprio il controllo che viene fatto all'atto del caricamento di ogni pagina: tutte le pagine tengono in considerazione le variabili \sqltrigger{\$\und SESSION} in cui sono memorizzati l'username e la password cifrata. Al caricamento di ogni pagina del tipo di utente, viene effettuata una interrogazione al database per verificare se quelle credenziali sono associate ad un tipo di utenza che sia autorizzata ad accedere alle informazioni e comandi presenti nella pagina desiderata. Ciò risolve anche i problemi di manipolazione di codice o di barra degli indirizzi descritti all'inizio di questa sezione. Se questo criterio di appartenenza di tipo non viene rispettato, PiGEU esegue un \textbf{logout forzato} eseguendo un redirecting alla home page dove inserire le credenziali.
 \subsubsection{Prevenzione attacchi DOS}
-La pagina di login è pensata per prevenire anche attacchi di \textit{Denial of Service}, bloccando qualsiasi interazione con la pagina per alcuni secondi, qualora le credenziali siano errate: ciò può arginare i danni originati da \textit{bot} programmati per fare \textit{bruteforcing} sulle password una volta note le credenziali di un utente, per esempio.
+La pagina di login è pensata per prevenire anche attacchi di \textit{Denial of Service}, bloccando qualsiasi interazione con la pagina per alcuni secondi, qualora le credenziali siano errate: ciò può arginare i danni originati da \textit{bot} programmati per fare \textit{bruteforcing} sulle password una volta note le credenziali di un utente, per esempio. Da notare che il tempo di blocco-attesa tra un tentativo di accesso e il successivo raddoppia ogni volta che si tenta di accedere con credenziali non autorizzate
 \subsubsection{Modifica password iniziale}
 Nel momento in cui la segreteria inserisce una nuova utenza nella base di dati, a questa viene assegnata come password provvisoria l'indirizzo email di recupero. Quest'ultima è considerata poco affidabile in termini di sicurezza quindi al primo accesso verrà richiesto di cambiare la propria password. Non è consentito mantenere come password il proprio indirizzo email di recupero.
 \end{document}
