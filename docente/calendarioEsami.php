@@ -65,47 +65,50 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
         if (isset($_POST['data']) && isset($_POST['ora'])) {
             if ($_POST['data'] == "") {
 ?>              <div class="alert alert-warning" role="alert" name="alert-message" >
-                Attenzione: devi inserire una data e un\'ora prima di selezionare INSERISCI
+                Attenzione: devi inserire una data e un'ora prima di selezionare INSERISCI
                 </div>
-<?php       }
-            try {
-                $insegnamento = $_POST['insegnamento'];
-                $data = $_POST['data'];
-                $ora = $_POST['ora'];
+<?php
+            } else{
+                try {
+                    $insegnamento = $_POST['insegnamento'];
+                    $data = $_POST['data'];
+                    $ora = $_POST['ora'];
 
-                $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                $db->query("LISTEN notifica");
-                $sql = "INSERT INTO calendario_esami (insegnamento, data, ora) VALUES (:insegnamento, :data, :ora)";
+                    $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
+                    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                    $db->query("LISTEN notifica");
+                    $sql = "INSERT INTO calendario_esami (insegnamento, data, ora) VALUES (:insegnamento, :data, :ora)";
 
-                $stmt = $db->prepare($sql);
+                    $stmt = $db->prepare($sql);
 
-                $stmt->bindParam(':insegnamento', $insegnamento, PDO::PARAM_STR);
-                $stmt->bindParam(':data', $data, PDO::PARAM_STR);
-                $stmt->bindParam(':ora', $ora, PDO::PARAM_STR);
+                    $stmt->bindParam(':insegnamento', $insegnamento, PDO::PARAM_STR);
+                    $stmt->bindParam(':data', $data, PDO::PARAM_STR);
+                    $stmt->bindParam(':ora', $ora, PDO::PARAM_STR);
 
-                $stmt->execute();
+                    $stmt->execute();
 
-                while (true) {
-                    $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
-                    if ($notify === false) {
-?>
-                     <div class="alert alert-success" role="alert" name="alert-message" >
-                        Inserimento dell\'esame andato a buon fine
-                     </div>
-<?php                break;
-                    } else {
-?>                   <div class="alert alert-danger" role="alert" name="alert-message" >
-                        <?php echo $notify["payload"]?>
-                     </div>
-<?php                break;
+                    while (true) {
+                        $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
+                        if ($notify === false) {
+    ?>
+                         <div class="alert alert-success" role="alert" name="alert-message" >
+                            Inserimento dell'esame andato a buon fine
+                         </div>
+    <?php                break;
+                        } else {
+    ?>                   <div class="alert alert-danger" role="alert" name="alert-message" >
+                            <?php echo $notify["payload"]?>
+                         </div>
+    <?php                break;
+                        }
                     }
+                } catch (PDOException $e) {
+                   echo "Errore in inserimento: " . $e->getMessage();
                 }
-            } catch (PDOException $e) {
-               echo "Errore in inserimento: " . $e->getMessage();
+                $_POST['data'] = "";
             }
-            $_POST['data'] = "";
         }
+        $_SERVER['REQUEST_METHOD']='null';
     }
 
     try {
@@ -150,7 +153,7 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
                     <th scope="row"><?php echo $counter++?></th>
                     <td><?php echo $row["codice"]?></td>
                     <td><?php echo $row["nome"]?></td>
-                    <td><?php echo $row["data"]?></td>
+                    <td><?php echo date("d/m/Y", strtotime($row['data']))?></td>
                     <td><?php echo $row["ora"]?></td>
                     <td>
                       <button class="button-canc" 
@@ -169,44 +172,56 @@ controller("docente", $_SESSION['username'], $_SESSION['password']);
     }
 ?>
 <script>
-  function deleteRow(cod, data, ora) {
-    const xhttp = new XMLHttpRequest();
 
-    xhttp.onreadystatechange = function() {
-      if (this.readyState === 4) {
-        if (this.status === 200) {
+document.addEventListener('DOMContentLoaded', function() {
 
-          const response = JSON.parse(this.responseText);
-          console.log(response);
-        if (response.success) {
-            window.location.reload();
-          }
-        } else {
+    function deleteRow(cod, data, ora) {
+        const xhttp = new XMLHttpRequest();
 
-          console.error('Errore nella richiesta AJAX:', this.statusText);
-         }
-      }
-    };
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4) {
+                if (this.status === 200) {
 
-    
-    xhttp.open('POST', '../cancella_esame.php', true);
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const params = 'cod=' + encodeURIComponent(cod) + '&data=' + encodeURIComponent(data) + '&ora=' + encodeURIComponent(ora);
-    xhttp.send(params);
-  }
+                    const response = JSON.parse(this.responseText);
+                    console.log(response);
+                    if (response.success) {
+                        window.location.reload();
+                    }
+                } else {
 
-  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
-  const deleteButtons = document.querySelectorAll('.button-canc');
-  deleteButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const cod = this.getAttribute('data-cod');
-      const data = this.getAttribute('data-dat');
-      const ora = this.getAttribute('data-ora');
+                    console.error('Errore nella richiesta AJAX:', this.statusText);
+                }
+            }
+        };
 
-      // Effettua la richiesta AJAX
-      deleteRow(cod, data, ora);
+
+        xhttp.open('POST', '../cancella_esame.php', true);
+        xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        const params = 'cod=' + encodeURIComponent(cod) + '&data=' + encodeURIComponent(data) + '&ora=' + encodeURIComponent(ora);
+        xhttp.send(params);
+    }
+
+    let deleteButtons = document.querySelectorAll('.button-canc');
+    function setDeleteButtons () {
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const cod = this.getAttribute('data-cod');
+                const data = this.getAttribute('data-dat');
+                const ora = this.getAttribute('data-ora');
+
+                // Effettua la richiesta AJAX
+                deleteRow(cod, data, ora);
+            });
+        });
+    }
+    setDeleteButtons();
+    // Aggiungo un evento per tutti i pulsanti di classe \"button-canc\" quando vengono cliccati
+    document.addEventListener('submit', function() {
+    setDeleteButtons();
     });
-  });
+    console.log(deleteButtons);
+});
 </script>
 </body>
 <?php

@@ -188,7 +188,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 ?>              <div>
-                    <label for="exampleFormControlInput1" class="form-label"><h3>Studenti che hanno sostenuto l\'esame, in attesa di verbalizzazione</h3></label>
+                    <label for="exampleFormControlInput1" class="form-label"><h3>Studenti che hanno sostenuto l'esame, in attesa di verbalizzazione</h3></label>
                 </div>
                 <div>
                 <table class="table">

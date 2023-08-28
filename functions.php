@@ -197,7 +197,7 @@ function setNavbarDocente($link){
             </li>
             <li class="nav-item">
                 <a class="nav-link <?php echo $ve_active. ' '.$ve_disab ?>" href="verbalizzazione.php"  role="button" aria-expanded="true">
-                <strong>🧑‍🏫 VERBALIZZAZIONE APPELLI D\'ESAME</strong>
+                <strong>🧑‍🏫 VERBALIZZAZIONE APPELLI D'ESAME</strong>
                 </a>
             </li>
             <li class="nav-item">

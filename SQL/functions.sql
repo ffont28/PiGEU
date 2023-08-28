@@ -232,7 +232,7 @@ CREATE OR REPLACE FUNCTION carriera_completa(TARGET varchar) RETURNS TABLE (
             nomins varchar,
             nomdoc varchar,
             cogdoc varchar,
-            voto smallint,
+            voto varchar,
             data date
             ) AS $$
 BEGIN
@@ -246,7 +246,10 @@ BEGIN
                i.nome,
                u.nome nomedoc,
                u.cognome cogndoc,
-               c.valutazione,
+                CASE
+                    WHEN c.valutazione = 31 THEN '30 e LODE'
+                    ELSE c.valutazione::VARCHAR
+                    END,
                c.data
         FROM insegnamenti_per_carriera ic
                  INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
@@ -271,7 +274,7 @@ CREATE OR REPLACE FUNCTION carriera_completa_sto(TARGET varchar) RETURNS TABLE (
                nomins varchar,
                nomdoc varchar,
                cogdoc varchar,
-               voto smallint,
+               voto varchar,
                data date
            ) AS $$
 BEGIN
@@ -285,7 +288,10 @@ BEGIN
                         i.nome,
                         u.nome nomedoc,
                         u.cognome cogndoc,
-                        c.valutazione,
+                        CASE
+                            WHEN c.valutazione = 31 THEN '30 e LODE'
+                            ELSE c.valutazione::VARCHAR
+                            END,
                         c.data
         FROM carriera_storico c
                  INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
@@ -311,7 +317,7 @@ CREATE OR REPLACE FUNCTION carriera_valida(TARGET varchar) RETURNS TABLE (
            nomins varchar,
            nomdoc varchar,
            cogdoc varchar,
-           voto smallint,
+           voto varchar,
            data date
        ) AS $$
 BEGIN
@@ -325,7 +331,10 @@ BEGIN
                i.nome,
                u.nome nomedoc,
                u.cognome cogndoc,
-               c.valutazione,
+                CASE
+                    WHEN c.valutazione = 31 THEN '30 e LODE'
+                    ELSE c.valutazione::VARCHAR
+                    END,
                c.data
         FROM carriera c
                  INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
@@ -355,7 +364,7 @@ CREATE OR REPLACE FUNCTION carriera_valida_sto(TARGET varchar) RETURNS TABLE (
                  nomins varchar,
                  nomdoc varchar,
                  cogdoc varchar,
-                 voto smallint,
+                 voto varchar,
                  data date
              ) AS $$
 BEGIN
@@ -369,7 +378,10 @@ BEGIN
                         i.nome,
                         u.nome nomedoc,
                         u.cognome cogndoc,
-                        c.valutazione,
+                        CASE
+                            WHEN c.valutazione = 31 THEN '30 e LODE'
+                            ELSE c.valutazione::VARCHAR
+                            END,
                         c.data
         FROM  carriera_storico c
                  INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento

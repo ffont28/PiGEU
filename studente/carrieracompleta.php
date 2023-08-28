@@ -47,7 +47,7 @@ controller("studente", $_SESSION['username'], $_SESSION['password']);
 ?>
     </div>
     <div class="text" id="carriera">
-        QUI LA TABELLA CON INSEGNAMENTI E VOTI E DATA
+
 <?php
         try {
 

@@ -1,41 +1,3 @@
-------------------------------------------------------------------------------
------- VERIFICA CHE IN UNA DATA d NON POSSANO ESSERE INSERITI DUE ESAMI DELLO STESSO ANNO
------ sotto c'è la versione più aggiornata, questo trigger è stato DROPPED
--- CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER as $$
--- BEGIN
--- --     PERFORM * FROM calendario_esami c
--- --        -- INNER JOIN insegnamento i ON c.insegnamento = i.codice
--- --         INNER JOIN insegnamento_parte_di_cdl ip1 ON c.insegnamento= ip1.insegnamento
--- --         INNER JOIN insegnamento_parte_di_cdl ip2 ON ip1.anno = ip2.anno AND
--- --         WHERE c.data = NEW.data AND ip.anno = (SELECT anno FROM insegnamento_parte_di_cdl ip
--- --                                                WHERE codice = NEW.insegnamento);
---
---         WITH esamipresenti AS (SELECT DISTINCT c1.insegnamento, ip.corso_di_laurea, ip.anno ,c1.data
---                                FROM calendario_esami c1
---                                INNER JOIN insegnamento_parte_di_cdl ip ON c1.insegnamento = ip.insegnamento),
---              cdltarget AS (SELECT ip.corso_di_laurea, ip.anno
---                            FROM insegnamento_parte_di_cdl ip
---                            WHERE ip.insegnamento = NEW.insegnamento)
---         PERFORM *
---         FROM esamipresenti e INNER JOIN cdltarget c
---             ON e.corso_di_laurea = c.corso_di_laurea AND e.anno = c.anno
---             WHERE e.data = NEW.data;
---     IF FOUND THEN
---         RAISE NOTICE 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata';
---         PERFORM pg_notify('notifica', 'ATTENZIONE: è già presente un altro esame dello stesso anno per la data selezionata+');
---         RETURN NULL;
---     ELSE
---         RETURN NEW;
---     END IF;
--- END;
--- $$ language 'plpgsql';
---
---
--- CREATE OR REPLACE TRIGGER no_esami_stesso_anno_stesso_giorno
--- BEFORE INSERT OR UPDATE ON calendario_esami
--- FOR EACH ROW
--- EXECUTE FUNCTION check_inserimento_esame();
-------------------------------------------------------------------------------
 ------ VERIFICA CHE L'INSEGNAMENTO A CUI LO STUDENTE SI VUOLE ISCRIVERE FACCIA PARTE DEL SUO CdL
 CREATE OR REPLACE FUNCTION check_appartenenza_cdl() RETURNS TRIGGER as $$
 BEGIN
@@ -94,7 +56,7 @@ EXECUTE FUNCTION check_propedeuticita();
 
 -------------------------------------------------------------------------------
 ------ INSERISCI RIGHE NELLA TABELLA CARRIERA APPENA INSERITO UN NUOVO STUDENTE
----------------------------------------------------------- trigger rimosso
+
 CREATE OR REPLACE FUNCTION inserisci_in_insegnamenti_per_carriera() RETURNS TRIGGER as $$
 BEGIN
     -- creo la carriera (con tutti i voti del CdL pari a 0) lo studente appena inserito
@@ -182,34 +144,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 -----------------------------------
-----RIPROVO ANCORA
-CREATE OR REPLACE FUNCTION check_inserimento_esame() RETURNS TRIGGER AS $$
-BEGIN
-    IF EXISTS (
-        SELECT 1
-        FROM insegnamento_parte_di_cdl ip
---             INNER JOIN insegnamento i ON ip.insegnamento = i.codice
-        --WHERE i.codice = NEW.insegnamento
---           WHERE ip.anno = ANY (
---             SELECT anno
---             FROM insegnamento_parte_di_cdl ip2
---                 WHERE ip2.insegnamento = NEW.insegnamento )
-        WHERE ip.corso_di_laurea = ANY (
-            SELECT corso_di_laurea
-            FROM calendario_esami c
-                INNER JOIN insegnamento_parte_di_cdl ip2 ON c.insegnamento = ip2.insegnamento
-                WHERE ip2.anno = ANY (SELECT anno from cdl_di_appartenenza(NEW.insegnamento))
-        )
-    ) THEN
-        RAISE NOTICE 'Violazione della condizione: esiste già un esame dello stesso anno per la data selezionata.';
-        PERFORM pg_notify('notifica', 'Violazione della condizione: esiste già un esame dello stesso anno per la data selezionata');
-        RETURN NULL;
-    ELSE
-        RETURN NEW;
-        END IF;
-
-END;
-$$ LANGUAGE plpgsql;
 --------------------------------------------------------------
 -------------- VERIFICA CHE IL VOTO VERBALIZZATO SIA COMPRESO TRA 0 E 31 (= 30L)
 CREATE OR REPLACE FUNCTION check_voto_valido() RETURNS TRIGGER as $$
@@ -309,8 +243,8 @@ BEGIN
     PERFORM * FROM docente_responsabile dr
     WHERE dr.docente = NEW.docente AND dr.insegnamento = NEW.insegnamento;
     IF FOUND THEN
-        RAISE NOTICE 'ATTENZIONE: un insegnamento non puo'' avere più di un responsabile';
-        PERFORM pg_notify('notifica', 'ATTENZIONE: un insegnamento non puo'' avere più di un responsabile');
+        RAISE NOTICE 'ATTENZIONE: il docente responsasbile non puo'' essere un co-docente';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: il docente responsasbile non puo'' essere un co-docente');
         RETURN NULL;
     ELSE
         RETURN NEW;
@@ -323,168 +257,13 @@ CREATE OR REPLACE TRIGGER responsabile_non_in_insegna
     FOR EACH ROW
 EXECUTE FUNCTION responsabile_non_in_insegna();
 ---------------------------------------------------------------------------------------------------------
+----------------------------------------
 ----------- TRIGGER PER VERIFICARE CHE NON CI SIANO CICLI NELLE PROPEDEUTICITÀ
---
--- CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo()
---     RETURNS TRIGGER AS $$
--- BEGIN
---     -- tabella temporanea con le propedeuticità visitate
---     CREATE TEMP TABLE propedeuticita_visitate (ins1 varchar, ins2 varchar, cdl varchar) ON COMMIT DROP;
---
---     -- Loop through the chain of propedeuticità
---     LOOP
---         -- Check if the current exam is the same as insegnamenti_id
---         PERFORM *
---         FROM propedeuticita_visitate
---         WHERE   cdl = NEW.corso_di_laurea
---            AND ins1 = NEW.insegnamento2
---            AND ins2 = NEW.insegnamento1;
---         IF FOUND THEN
---             RAISE EXCEPTION 'There is a circular chain of propedeuticita''';
---         ELSE
---             DECLARE righe propedeuticita_visitate%ROWTYPE;
---             DECLARE cursore CURSOR FOR
---                 SELECT *
---                 FROM propedeuticita_visitate
---                 WHERE  cdl = NEW.corso_di_laurea
---                   AND ins2 = NEW.insegnamento1;
---             OPEN cursore;
---
---             LOOP
---                 FETCH cursore INTO righe;
---                 EXIT WHEN NOT FOUND;
---
---                 INSERT INTO propedeuticita_visitate
---                 VALUES (propedeuticita_visitate.ins1, NEW.insegnamento2, NEW.cdl)
---
---             END LOOP;
---             CLOSE cursore;
---
---         END IF;
---
---         INSERT INTO propedeuticita_visitate
---             VALUES (NEW.insegnamento1, NEW.insegnamento2, NEW.corso_di_laurea);
---         -- Check if the current exam has already been visited
---         SELECT INTO temp_exam_id exam_id FROM visited_exams WHERE exam_id = current_exam_id;
---         END IF;
---
---     RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE TRIGGER no_cicli_propedeuticità
     BEFORE INSERT OR UPDATE ON propedeuticita
     FOR EACH ROW
 EXECUTE FUNCTION check_propedeuticita_ciclo();
 
--- ------------------------------------ VERSIONE TROVATA IN INTERNET
--- CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo()
---     RETURNS TRIGGER AS $$
--- DECLARE
---     propedeuticita_visitate propedeuticita%ROWTYPE;
---     righe propedeuticita%ROWTYPE;
---     cursore CURSOR FOR
---         SELECT *
---         FROM propedeuticita_visitate
---         WHERE corso_di_laurea = NEW.corso_di_laurea
---           AND insegnamento2 = NEW.insegnamento1;
---
--- BEGIN
---         IF NOT EXISTS (
---             SELECT 1
---             FROM propedeuticita_visitate
---             WHERE corso_di_laurea = NEW.corso_di_laurea
---               AND insegnamento1 = NEW.insegnamento2
---               AND insegnamento2 = NEW.insegnamento1
---         ) THEN
---             OPEN cursore;
---
---             LOOP
---                 FETCH cursore INTO righe;
---                 EXIT WHEN NOT FOUND;
---
---                 -- Inserire nella tabella temporanea
---                 INSERT INTO propedeuticita_visitate
---                 VALUES (righe.insegnamento2, NEW.insegnamento2, NEW.corso_di_laurea);
---             END LOOP;
---
---             CLOSE cursore;
---         ELSE
---             RAISE EXCEPTION 'There is a circular chain of propedeuticita''';
---         END IF;
---
---         -- Inserire nella tabella temporanea
---         INSERT INTO propedeuticita_visitate
---         VALUES (NEW.insegnamento1, NEW.insegnamento2, NEW.corso_di_laurea);
---         RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
--- --------------------------------------------------------------------------------
--- -------------- VERSIONE MIA CHE MI STO ROMPENDO
--- CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo() RETURNS TRIGGER AS $$
--- DECLARE
---     counter INTEGER := 0;
---     size INTEGER;
---     instemp VARCHAR;
---     riga record;
--- BEGIN
---     RAISE LOG 'INIZIA FUNZIONE';
---     SELECT count(*) INTO size
---     FROM propedeuticita;
---
---     -- tabella temporanea con le propedeuticità visitate
---     CREATE TEMP TABLE propedeuticita_visitate
---                 (ins1 varchar, ins2 varchar, cdl varchar) ON COMMIT DROP;
---
--- --     INSERT INTO propedeuticita_visitate
--- --     VALUES (NEW.insegnamento1, NEW.insegnamento2, NEW.corso_di_laurea);
---
---     INSERT INTO propedeuticita_visitate
---     SELECT insegnamento1, insegnamento2, corso_di_laurea
---     FROM propedeuticita;
---
---     -- Loop through the chain of propedeuticità
---     LOOP
---         IF counter = size THEN EXIT;
---         END IF;
---
---         PERFORM *
---         FROM propedeuticita_visitate
---         WHERE   cdl = NEW.corso_di_laurea
---           AND ins1 = NEW.insegnamento2
---           AND ins2 = NEW.insegnamento1;
---         IF FOUND THEN
---             RAISE EXCEPTION 'Propedeuticita'' circolare non consentita';
--- --         ELSE
--- --             RAISE LOG 'SONO QUI';
--- --             PERFORM *
--- --             FROM propedeuticita_visitate
--- --             WHERE  cdl = NEW.corso_di_laurea
--- --               AND ins1 = NEW.insegnamento1
--- --               AND ins2 = NEW.insegnamento2;
--- --             IF NOT FOUND THEN
---
---             FOR riga IN
---                 SELECT ins1
---                 FROM propedeuticita_visitate
---                 WHERE ins2 = NEW.insegnamento2
---                 LOOP
---                 RAISE LOG 'instemp è %',riga.ins1;
---                 END LOOP;
---
---                 INSERT INTO propedeuticita_visitate
---                 VALUES (instemp, NEW.insegnamento2, NEW.corso_di_laurea);
---             END IF;
---         END IF;
---
---     counter := counter +1;
---     END LOOP;
--- RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
-
-
---------------------------------------------------------------------
 --------------- CIAK 1000 ----------------- FUNZIONANTE TRIGGER CHE ORA È ABILITATO
 CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo() RETURNS TRIGGER AS $$
 DECLARE
@@ -559,3 +338,88 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+
+-------------------------------------------------------------
+--- CONTROLLO CHE UN INSEGNAMENTO A PROPEDEUTICO A INSEGNAMENTO B IN UN CORSO DI LAUREA CDL
+--- A.ANNO NON SIA MAGGIORE DI B.ANNO
+CREATE OR REPLACE FUNCTION propedeuticita_a_prima_b_dopo() RETURNS TRIGGER AS $$
+DECLARE
+    anno_ins1 INTEGER;
+    anno_ins2 INTEGER;
+BEGIN
+    SELECT anno INTO anno_ins1
+    FROM insegnamento_parte_di_cdl
+    WHERE insegnamento = NEW.insegnamento1 AND corso_di_laurea = NEW.corso_di_laurea;
+
+    SELECT anno INTO anno_ins2
+    FROM insegnamento_parte_di_cdl
+    WHERE insegnamento = NEW.insegnamento2 AND corso_di_laurea = NEW.corso_di_laurea;
+
+    IF (anno_ins1 > anno_ins2) THEN
+        RAISE NOTICE 'ATTENZIONE: un insegnamento A non puo'' essere propedeutico ad un insegnamento B in un Corso di Laurea C se A è erogato in un anno successivo a B in C';
+        RAISE LOG 'ATTENZIONE: un insegnamento A non puo'' essere propedeutico ad un insegnamento B in un Corso di Laurea C se A è erogato in un anno successivo a B in C';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: un insegnamento A non puo'' essere propedeutico ad un insegnamento B in un Corso di Laurea C se A è erogato in un anno successivo a B in C');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tempi_di_propedeuticita
+    BEFORE INSERT OR UPDATE ON propedeuticita
+    FOR EACH ROW
+EXECUTE FUNCTION propedeuticita_a_prima_b_dopo();
+---------------------------------------------------------------------
+--- CONTROLLO CHE NON VENGA INSERITO UN ESAME IN DATA ANTERIORE ALLA DATA DI OGGI
+CREATE OR REPLACE FUNCTION data_esame_non_retro() RETURNS TRIGGER AS $$
+DECLARE
+    adesso TIMESTAMP := CURRENT_TIMESTAMP;
+    esame TIMESTAMP;
+BEGIN
+    esame := NEW.data + NEW.ora;
+
+    IF (esame >= adesso) THEN
+        RETURN NEW;
+    ELSE
+        RAISE NOTICE 'ATTENZIONE: non puoi inserire un esame in una data e/o ora già passata';
+        RAISE LOG 'ATTENZIONE: non puoi inserire un esame in una data e/o ora già passata';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: non puoi inserire un esame in una data e/o ora già passata');
+        RETURN NULL;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER data_non_anteriore
+    BEFORE INSERT OR UPDATE ON calendario_esami
+    FOR EACH ROW
+EXECUTE FUNCTION data_esame_non_retro();
+
+------------------------------------------------------------------------------------
+--- CONTROLLO CHE NON VENGA CANCELLATA L'ISCRIZIONE DA UN ESAME GIÀ VERBALIZZATO
+CREATE OR REPLACE FUNCTION verifica_se_verbalizzato() RETURNS TRIGGER AS $$
+
+BEGIN
+    PERFORM *
+    FROM carriera c INNER JOIN calendario_esami ce ON ce.insegnamento = c.insegnamento
+                                                   AND ce.data = c.data
+    WHERE c.studente = OLD.studente AND ce.id= OLD.esame;
+    IF FOUND THEN
+        RAISE NOTICE 'ATTENZIONE: non puoi cancellare l''iscrizione di un esame gia'' verbalizzato';
+        RAISE LOG 'ATTENZIONE: non puoi cancellare l''iscrizione di un esame gia'' verbalizzato';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: non puoi cancellare l''iscrizione di un esame gia'' verbalizzato');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER no_disiscr_se_verbalizzato
+    BEFORE DELETE ON iscrizione
+    FOR EACH ROW
+EXECUTE FUNCTION verifica_se_verbalizzato();
