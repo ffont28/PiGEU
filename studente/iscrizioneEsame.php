@@ -65,7 +65,6 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
         try {
             $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
             $db->query("LISTEN notifica");
             $sql = "DELETE FROM iscrizione WHERE studente = :s AND esame = :e";
             $stmt = $db->prepare($sql);

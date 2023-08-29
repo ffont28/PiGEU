@@ -413,7 +413,7 @@ BEGIN
         PERFORM pg_notify('notifica', 'ATTENZIONE: non puoi cancellare l''iscrizione di un esame gia'' verbalizzato');
         RETURN NULL;
     ELSE
-        RETURN NEW;
+        RETURN OLD;
     END IF;
 END;
 $$ LANGUAGE plpgsql;
