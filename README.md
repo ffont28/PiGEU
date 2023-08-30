@@ -58,7 +58,7 @@ sudo a2ensite pigeu.conf
 ```bash
 systemctl reload apache2
 ``` 
-PiGEU sarà operativo sulla macchina server.
+   PiGEU sarà operativo sulla macchina server.
 
 6. Controllare la corretta installazione e funzionamento di PiGEU digitando
 nel browser [http://localhost](http://localhost)
