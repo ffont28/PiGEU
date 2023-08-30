@@ -15,6 +15,8 @@ Il presente repository contiene diverse cartelle contenenti file:
 - La directory ```studente``` contiene i file ```.php``` inerenti la parte di PiGEU che riguarda l'utenza *studente*
 - La directory ```docente``` contiene i file ```.php``` inerenti la parte di PiGEU che riguarda l'utenza *docente*
 - La directory ```segreteria``` contiene i file ```.php``` inerenti la parte di PiGEU che riguarda l'utenza *segreteria*
+- La directory ```js``` contiene i file ```.js``` Javascript inerenti diverse parti di PiGEU per le parti generali e anche per l'utenza di tipo *studente*, *docente* e *segreteria*
+
 Le altre directory non specificate in questo elenco non godono di particolare rilevanza al fine della comprensione per l'utilizzo di PiGEU
 
 ## Installazione sulla macchina SERVER
