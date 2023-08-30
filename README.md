@@ -1,4 +1,4 @@
-# PiGEU
+# README di PiGEU
 La PIattaforma per la Gestione degli Esami Universitari, d'ora in poi 
 chiamata PiGEU è una soluzione Software per gestire la realtà universitaria
 nella sua complessità.
