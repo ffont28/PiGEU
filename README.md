@@ -3,6 +3,15 @@ La PIattaforma per la Gestione degli Esami Universitari, d'ora in poi
 chiamata PiGEU è una soluzione Software per gestire la realtà universitaria
 nella sua complessità.
 
+Essa offre tre diversi tipi di utenza, quali il tipo di:
+- Segreteria
+- Docente
+- Studente
+
+Ciascuna con proprie funzionalità, ben descritte in ```manuali/PIGEU - relazione.pdf``` a cui si rimanda la spiegazione dettagliata dell'intero sistema.
+
+Questo README ha il solo scopo di fornire una prima spiegazione per l'utente che vuole comprendere cosa sia PiGEU e come sia composto, e lo voglia installare su una macchina server.
+
 ## Composizione del presente repository
 Il presente repository contiene diverse cartelle contenenti file:
 - La directory ```SQL``` contiene file in formato ```.sql``` con le funzioni e trigger e viste implementate nella base di dati
