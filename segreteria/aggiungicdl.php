@@ -60,12 +60,10 @@ Tipo di CdL
     $result = pg_prepare($db,'insCdL',$sql);
     $result = pg_execute($db,'insCdL', $params);
 
+    pg_close($db);
 }
+
  ?>
-
-
-<form action="../index.php">
-    <input type="submit" class="button1 lightblue" value="RITORNA ALLA HOMEPAGE" />
-    </form>
+  
 </body>
 </html>

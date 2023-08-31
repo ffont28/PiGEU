@@ -4,20 +4,27 @@ include('../functions.php');
 include('../conf.php');
 if (isset($_POST['action']) && isset($_POST['utente']) &&
     ($_POST['action'] == 'carriera_completa' || $_POST['action'] == 'carriera_valida')){
-
+    $tipo = $_POST['tipo'];
     $studente = $_POST['utente'];
     $nome = "";
     $cognome = "";
     $matricola = "";
+    $tipoCarriera = $_POST['action'] == 'carriera_completa' ? 'completa' : 'valida';
 
     try {
 
     $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-    $query = "SELECT * FROM carriera_completa_esami_sostenuti(:studente)";
-    if ($_POST['action'] == 'carriera_completa'){
-        $query = "SELECT * FROM carriera_completa_tutti(:studente)";
+    $query = "SELECT * FROM carriera_valida(:studente)";
+    if ($tipo == 'storico' && $_POST['action'] == 'carriera_completa') {
+        $query = "SELECT * FROM carriera_completa_sto(:studente)";
+    } else if ($tipo == 'storico' && $_POST['action'] == 'carriera_valida') {
+        $query = "SELECT * FROM carriera_valida_sto(:studente)";
+    } else if ($tipo == 'normal' && $_POST['action'] == 'carriera_completa'){
+        $query = "SELECT * FROM carriera_completa(:studente)";
     }
-    $stmt = $conn->prepare($query);
+
+
+        $stmt = $conn->prepare($query);
 
     $stmt->bindParam(':studente', $studente);
 
@@ -25,7 +32,7 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
     if ($stmt->rowCount() == 0) {
         ?>
         <div class="alert alert-warning" role="alert">
-            Nessun insegnamento trovato in carriera per <?php echo $studente ?>
+            Nessun insegnamento registrato in carriera per <?php echo $studente ?>
         </div>
         <?php
     } else {
@@ -48,8 +55,9 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
         foreach ($results as $row) {
 
          if ($counter == 1){   ?>
-             <h3 style="margin: 13px">Carriera di
-                 <?php echo $row['cogstu']." ".$row['nomstu']." - matricola ".$row['matr'] ?></h3>
+             <h3 style="margin: 13px; color:grey"><i>Carriera <?php echo $tipoCarriera?></i> dello studente
+                 <a style="color: black"><?php echo strtoupper($row['cogstu']." ".$row['nomstu'])?></a>
+                 matricola <a style="color: black"><?php echo $row['matr'] ?></a></h3>
 <?php   }
 ?>
 
@@ -94,5 +102,7 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
 
 </div>
 </div>
-<?php }
+<?php
+$conn = null;
+}
 ?>

@@ -29,7 +29,6 @@ BEGIN
 
   -- cancello i dati dalla tabella utente dopo averli spostati in utente_storico
   DELETE FROM utente where email = $1;
-
   -- le seguenti operazioni sono fatte già in CASCADE
         -- cancello i dati dalla tabella studente dopo averli spostati in stutente_storico
         -- DELETE FROM studente WHERE utente = $1;
@@ -126,6 +125,9 @@ WITH esamipresenti AS (SELECT DISTINCT c1.insegnamento, ip.corso_di_laurea, ip.a
     WHERE e.anno = :anno AND e.data = :data;
 
 --------------------------------------------------------------------------
+-----------------------
+----------------------- FUNZIONE CREATA DA ME, NON DA UTILIZZARE!-------------
+-------------------------------------------------------------------------------
 -- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [ANCHE ESAMI MAI SOSTENUTI, ANCHE DUPLICATI]
 --- va bene sia per lo studente
 CREATE OR REPLACE FUNCTION carriera_completa_tutti(TARGET varchar) RETURNS TABLE (
@@ -168,11 +170,14 @@ BEGIN
                  INNER JOIN studente s ON ic.studente = s.utente
                  INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
                  INNER JOIN insegnamento i ON ic.insegnamento = i.codice
-        WHERE ic.studente = TARGET;
+        WHERE ic.studente = TARGET and c.studente = TARGET;
 END;
 $$ LANGUAGE plpgsql;
 
 --------------------------------------------------------------------------
+-----------------------
+----------------------- FUNZIONE DA DROPPARE ------------------
+--------------------------------------------------------------
 -- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
 --- va bene sia per lo studente
 CREATE OR REPLACE FUNCTION carriera_completa_esami_sostenuti(TARGET varchar) RETURNS TABLE (
@@ -212,3 +217,208 @@ BEGIN
         WHERE ic.studente = TARGET;
 END;
 $$ LANGUAGE plpgsql;
+
+--------------------------------------------------------------------------
+-- VERSIONE CORRETTA ------------
+-- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
+--- va bene sia per lo studente
+CREATE OR REPLACE FUNCTION carriera_completa(TARGET varchar) RETURNS TABLE (
+            studente varchar,
+            nomstu varchar,
+            cogstu varchar,
+            cdl varchar,
+            matr integer,
+            codins varchar,
+            nomins varchar,
+            nomdoc varchar,
+            cogdoc varchar,
+            voto varchar,
+            data date
+            ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT DISTINCT ic.studente,
+               u2.nome nomstu,
+               u2.cognome cogstu,
+               cdl.nome cdl,
+               s.matricola matr,
+               ic.insegnamento,
+               i.nome,
+               u.nome nomedoc,
+               u.cognome cogndoc,
+                CASE
+                    WHEN c.valutazione = 31 THEN '30 e LODE'
+                    ELSE c.valutazione::VARCHAR
+                    END,
+               c.data
+        FROM insegnamenti_per_carriera ic
+                 INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
+                 INNER JOIN docente_responsabile d ON d.insegnamento = ic.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente u2 ON ic.studente = u2.email
+                 INNER JOIN studente s ON ic.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON ic.insegnamento = i.codice
+        WHERE ic.studente = TARGET AND c.studente = TARGET
+        GROUP BY ic.studente, u2.nome, u2.cognome, cdl.nome, s.matricola, ic.insegnamento, i.nome, u.nome, u.cognome, c.valutazione, c.data;
+END;
+$$ LANGUAGE plpgsql;
+----------------------------------
+CREATE OR REPLACE FUNCTION carriera_completa_sto(TARGET varchar) RETURNS TABLE (
+               studente varchar,
+               nomstu varchar,
+               cogstu varchar,
+               cdl varchar,
+               matr integer,
+               codins varchar,
+               nomins varchar,
+               nomdoc varchar,
+               cogdoc varchar,
+               voto varchar,
+               data date
+           ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT DISTINCT c.studente,
+                        u2.nome nomstu,
+                        u2.cognome cogstu,
+                        cdl.nome cdl,
+                        s.matricola matr,
+                        c.insegnamento,
+                        i.nome,
+                        u.nome nomedoc,
+                        u.cognome cogndoc,
+                        CASE
+                            WHEN c.valutazione = 31 THEN '30 e LODE'
+                            ELSE c.valutazione::VARCHAR
+                            END,
+                        c.data
+        FROM carriera_storico c
+                 INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente_storico u2 ON c.studente = u2.email
+                 INNER JOIN studente_storico s ON c.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON c.insegnamento = i.codice
+        WHERE c.studente = TARGET;
+        END;
+$$ LANGUAGE plpgsql;
+--------------------------------------------------------------------------
+-- VERSIONE CORRETTA ------------
+-- FUNZIONE PER PRODURRE UNA CARRIERA COMPLETA DATO UNO STUDENTE [SOLO ESAMI SOSTENUTI, ANCHE DUPICATI]
+--- va bene sia per lo studente
+CREATE OR REPLACE FUNCTION carriera_valida(TARGET varchar) RETURNS TABLE (
+           studente varchar,
+           nomstu varchar,
+           cogstu varchar,
+           cdl varchar,
+           matr integer,
+           codins varchar,
+           nomins varchar,
+           nomdoc varchar,
+           cogdoc varchar,
+           voto varchar,
+           data date
+       ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT DISTINCT (c.studente),
+               u2.nome nomstu,
+               u2.cognome cogstu,
+               cdl.nome cdl,
+               s.matricola matr,
+               c.insegnamento,
+               i.nome,
+               u.nome nomedoc,
+               u.cognome cogndoc,
+                CASE
+                    WHEN c.valutazione = 31 THEN '30 e LODE'
+                    ELSE c.valutazione::VARCHAR
+                    END,
+               c.data
+        FROM carriera c
+                 INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente u2 ON c.studente = u2.email
+                 INNER JOIN studente s ON c.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON c.insegnamento = i.codice
+        WHERE c.studente = TARGET
+          AND c.valutazione >= 18
+          AND c.data = (SELECT MAX(c2.data)
+                            FROM carriera c2 WHERE c2.insegnamento = c.insegnamento
+                                             AND c2.studente = s.utente)
+    GROUP BY c.studente, u2.nome, u2.cognome, cdl.nome, s.matricola, c.insegnamento, i.nome, u.nome, u.cognome, c.valutazione, c.data;
+END;
+$$ LANGUAGE plpgsql;
+
+--------------
+
+CREATE OR REPLACE FUNCTION carriera_valida_sto(TARGET varchar) RETURNS TABLE (
+                 studente varchar,
+                 nomstu varchar,
+                 cogstu varchar,
+                 cdl varchar,
+                 matr integer,
+                 codins varchar,
+                 nomins varchar,
+                 nomdoc varchar,
+                 cogdoc varchar,
+                 voto varchar,
+                 data date
+             ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT DISTINCT c.studente,
+                        u2.nome nomstu,
+                        u2.cognome cogstu,
+                        cdl.nome cdl,
+                        s.matricola matr,
+                        c.insegnamento,
+                        i.nome,
+                        u.nome nomedoc,
+                        u.cognome cogndoc,
+                        CASE
+                            WHEN c.valutazione = 31 THEN '30 e LODE'
+                            ELSE c.valutazione::VARCHAR
+                            END,
+                        c.data
+        FROM  carriera_storico c
+                 INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente_storico u2 ON c.studente = u2.email
+                 INNER JOIN studente_storico s ON c.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON c.insegnamento = i.codice
+        WHERE c.studente = TARGET
+          AND c.valutazione >= 18
+          AND c.data = (SELECT MAX(c2.data)
+                        FROM carriera_storico c2 WHERE c2.insegnamento = c.insegnamento
+                                                   AND c2.studente = s.utente);
+END;
+$$ LANGUAGE plpgsql;
+
+
+----------------------------------------------------
+----------- creo una funzione che restituisca una tabella con tutti i cdl di cui fa parte un dato insegnamento
+CREATE OR REPLACE FUNCTION cdl_di_appartenenza(I varchar) RETURNS TABLE (
+             codice varchar,
+             nome varchar,
+             anno integer,
+             cfu char,
+             codiceins varchar
+         ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT c.codice,
+               c.nome,
+               ip.anno,
+               ins.cfu,
+               ins.codice
+        FROM corso_di_laurea c
+                 INNER JOIN insegnamento_parte_di_cdl ip ON c.codice = ip.corso_di_laurea
+                 INNER JOIN insegnamento ins ON ip.insegnamento = ins.codice
+        WHERE ip.insegnamento = I;
+END;
+$$ LANGUAGE plpgsql;
+

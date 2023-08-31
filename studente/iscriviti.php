@@ -10,7 +10,7 @@ if (isset($_POST['id']) && isset($_POST['utente'])) {
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $sql = "INSERT INTO iscrizione (studente, esame) VALUES (:s, :e)";
-//    $sql = "INSERT INTO iscrizione (studente, esame) VALUES (:s, 1)";
+
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':s', $utente, PDO::PARAM_STR);
     $stmt->bindParam(':e', $id, PDO::PARAM_INT);
@@ -24,4 +24,5 @@ if (isset($_POST['id']) && isset($_POST['utente'])) {
         echo json_encode(['success' => false, 'message' => 'Errore durante l\'iscrizione']);
     }
 }
+$db = null;
 ?>

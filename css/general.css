@@ -113,6 +113,17 @@
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
 }
 
+.splitin2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Divide la griglia in due colonne, l'immagine occupa una e il testo l'altra */
+    grid-gap: 20px; /* Spazio tra le colonne */
+    align-items: center; /* Allinea verticalmente al centro */
+    border: 2px solid #ccc;
+    padding: 13px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+}
+
 .photo-container-my {
     font-size: 14pt;
     display: grid;
@@ -191,3 +202,39 @@
 .background-purple{
     background-color: #8a35e5;
 }
+
+
+/*.tabinsegn {*/
+/*    width: 100%;*/
+/*    border-collapse: collapse;*/
+/*}*/
+
+/*.tabinsegn th, .tabinsegn td {*/
+/*    border: 1px solid black;*/
+/*    padding: 8px;*/
+/*}*/
+
+/*!* Imposta larghezza specifica per le colonne della tabinsegn *!*/
+/*.tabinsegn th:nth-child(1), .tabinsegn td:nth-child(1) {*/
+/*    width: 30%;*/
+/*}*/
+
+/*.tabinsegn th:nth-child(2), .tabinsegn td:nth-child(2) {*/
+/*    width: 50%;*/
+/*}*/
+
+/*.tabinsegn th:nth-child(3), .tabinsegn td:nth-child(3) {*/
+/*    width: 20%;*/
+/*}*/
+/*.tabinsegn th:nth-child(4), .tabinsegn td:nth-child(3) {*/
+/*    width: 20%;*/
+/*}*/
+/*.tabinsegn th:nth-child(5), .tabinsegn td:nth-child(3) {*/
+/*    width: 20%;*/
+/*}*/
+/*.tabinsegn th:nth-child(6), .tabinsegn td:nth-child(3) {*/
+/*    width: 20%;*/
+/*}*/
+/*.tabinsegn th:nth-child(7), .tabinsegn td:nth-child(3) {*/
+/*    width: 20%;*/
+/*}*/

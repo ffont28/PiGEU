@@ -47,6 +47,21 @@ class MYPDF extends TCPDF {
         }
         $this->Cell(array_sum($w), 0, '', 'T');
     }
+
+    public function Footer() {
+        // 15 mm di margine dal basso
+        $this->SetY(-20);
+
+        // Font del footer
+        $this->SetFont('helvetica', 'I', 12);
+
+        // data in cui è generato il documento da parte di PiGEU
+        $this->Cell(0, 10, 'Documento generato il ' . date('d-m-Y') . ' alle ore ' . date('H:i:s'), 0, false, 'L', 0, '', 0, false, 'T', 'M');
+
+        // Numero di pagina che ho inserito io
+        $this->Cell(0, 10, 'Pagina ' . $this->getAliasNumPage() . '/' . $this->getAliasNbPages(), 0, false, 'C', 0, '', 0, false, 'T', 'M');
+    }
+
 }
 $contenuto = '';
 $mainArray = array();
@@ -63,9 +78,9 @@ if (isset($_POST['action']) && isset($_POST['utente']) &&
     try {
 
         $conn = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
-        $query = "SELECT * FROM carriera_completa_esami_sostenuti(:studente)";
+        $query = "SELECT * FROM carriera_valida(:studente)";
         if ($_POST['action'] == 'carriera_completa'){
-            $query = "SELECT * FROM carriera_completa_tutti(:studente)";
+            $query = "SELECT * FROM carriera_completa(:studente)";
         }
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':studente', $studente);
@@ -121,7 +136,7 @@ $pdf = new MYPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8',
 // set document information
 $pdf->SetCreator(PDF_CREATOR);
 $pdf->SetAuthor('PiGEU web services');
-$pdf->SetTitle('carriera di '.$cognomestudente.' '.$nomestudente);
+$pdf->SetTitle('carriera '.strtolower($tipocarriera).' di '.$cognomestudente.' '.$nomestudente);
 $pdf->SetSubject('Certificazione');
 $pdf->SetKeywords('Carriera, Certificato, Attestato');
 
@@ -140,7 +155,7 @@ $pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 // set margins
 $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
 $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
-$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+$pdf->SetFooterMargin(PDF_MARGIN_FOOTER + 10);
 
 // set auto page breaks
 $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
@@ -166,7 +181,7 @@ $pdf->AddPage();
 $header = array('Insegnamento', 'Codice', 'Docente', 'Valutazione', 'Data');
 
 // data loading
-    $data = $pdf->LoadData('support.txt');
+                    // $data = $pdf->LoadData('support.txt');
   //  print_r($data);
 // print colored table
     $pdf->ColoredTable($header, $mainArray);

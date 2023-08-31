@@ -17,13 +17,8 @@
 
     <h1> PAGINA DI ISCRIZIONE A UN ESAME</h1>
 
-<!--    <div class="alert alert-primary" role="alert">-->
-<!--        Benvenuto --><?php //echo $_SESSION['nome'] . " " . $_SESSION['cognome']; ?><!-- !-->
-<!--    </div>-->
 
 <?php
-//include('../functions.php');
-//include('../conf.php');
 
 $studente = $_SESSION['username'];
 
@@ -33,8 +28,6 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     $esame = $_POST['esame'];
 
     if ($operazione == "ISCR"){
-
-        //echo "ciao ISCR=" . $_POST['esame'] . " CANC= " ;
 
         try {
             $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
@@ -52,33 +45,26 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
                 $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
                 if ($notify === false) {
                     //echo '<script> console.log("qui"); window.location.reload();</script>';
-                    echo '  <div class="alert alert-success" role="alert" name="alert-message" >
-                                  Iscrizione andata a buon fine 
-                                </div>';
-                    //  echo '<script> console.log("qui"); window.location.reload();</script>';
-                    break;
+?>                  <div class="alert alert-success" role="alert" name="alert-message" >
+                        Iscrizione andata a buon fine
+                    </div>
+<?php               break;
                 } else {
-                    //echo '<script> console.log("qui"); window.location.reload();</script>';
-                    echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
-                                  ' . $notify["payload"] . '
-                                </div>';
-                    break;
+?>                  <div class="alert alert-danger" role="alert" name="alert-message" >
+                    <?php echo $notify["payload"] ?>
+                    </div>
+<?php               break;
                 }
             }
         } catch (PDOException $e) {
-
-            // echo "Errore in inserimento: " . $e->getMessage();
-        }
+            }
     }
 
     if ($operazione == "CANC"){
 
-        //echo "ciao ISCR=" . $_POST['esame'] . " CANC= " ;
-
         try {
             $db = new PDO("pgsql:host=" . myhost . ";dbname=" . mydbname, myuser, mypassword);
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
             $db->query("LISTEN notifica");
             $sql = "DELETE FROM iscrizione WHERE studente = :s AND esame = :e";
             $stmt = $db->prepare($sql);
@@ -91,21 +77,20 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
                 $notify = $db->pgsqlGetNotify(PDO::FETCH_ASSOC, 50); // Aspetta per la notifica per 50 millisecondi
                 if ($notify === false) {
 
-                    echo '  <div class="alert alert-success" role="alert" name="alert-message" >
-                                  Ti sei cancellato correttamene dall\'iscrizione 
-                                </div>';
-                    break;
+?>                  <div class="alert alert-success" role="alert" name="alert-message" >
+                        Ti sei cancellato correttamene dall'iscrizione
+                    </div>
+<?php               break;
                 } else {
-                    echo '  <div class="alert alert-danger" role="alert" name="alert-message" >
-                                  ' . $notify["payload"] . '
-                                </div>';
-                    break;
+?>                  <div class="alert alert-danger" role="alert" name="alert-message" >
+                    <?php echo $notify["payload"]?>
+                    </div>
+<?php               break;
                 }
             }
         } catch (PDOException $e) {
 
-            // echo "Errore in inserimento: " . $e->getMessage();
-        }
+           }
     }
 
 }
@@ -133,7 +118,9 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
 
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        echo ' <div><label for="exampleFormControlInput1" class="form-label"><h3>Esami attualmente calendarizzati</h3></label></div> 
+?>      <div>
+            <label for="exampleFormControlInput1" class="form-label"><h3>Esami attualmente calendarizzati</h3></label>
+        </div>
         <div>
         <table class="table">
             <thead>
@@ -146,8 +133,8 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
                 <th scope="col">ISCRIZIONE</th>
             </tr>
             </thead>
-            <tbody>';
-
+            <tbody>
+<?php
         $counter = 1;
         foreach ($results as $row) {
             // VERIFICO ISISCRITTO
@@ -224,9 +211,10 @@ if($_SERVER['REQUEST_METHOD']=='POST'){
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
+
+$conn = null;
+$db = null;
 ?>
-
 </body>
-
 </html>
 

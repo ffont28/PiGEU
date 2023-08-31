@@ -43,3 +43,8 @@ function submitForm() {
     form.submit();
 }
 
+
+var waitValue = 3000;
+
+
+

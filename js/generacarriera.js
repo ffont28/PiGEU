@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateUtentiTrovati() {
         var search = searchInput.value;
         var xhr = new XMLHttpRequest();
+        console.log(">" + search);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', function(event) {
         if (event.target.classList.contains('button-verb') || event.target.classList.contains('button-iscr')) {
             const utente = event.target.getAttribute('utente');
+            const tipo = event.target.getAttribute('tipo');
             utenteSelected = utente; // Memorizza l'utente selezionato
 
             // Esegui l'azione associata al pulsante (es. generare carriera completa o valida)
@@ -40,11 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             console.log('chiamo la performAction');
 
-            performAction(actionType, utente);
+            performAction(actionType, utente, tipo);
         }
     });
 
-    function performAction(actionType, utente) {
+    function performAction(actionType, utente, tipo) {
         // Esegui l'azione tramite la chiamata AJAX
         const xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -56,7 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         xhr.open('POST', 'generacarrierarichiesta.php', true);
         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-        const params = 'action=' + encodeURIComponent(actionType) + '&utente=' + encodeURIComponent(utente);
+        const params = 'action=' + encodeURIComponent(actionType) +
+            '&utente=' + encodeURIComponent(utente) +
+            '&tipo=' + encodeURIComponent(tipo);
         xhr.send(params);
     }
 

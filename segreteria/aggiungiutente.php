@@ -46,7 +46,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
             </div>
 
         <div class="mb-3">
-        <label for="exampleFormControlInput1" class="form-label">Seleziona un'utenza</label>
+        <label for="exampleFormControlInput1" class="form-label">tipo di utente</label>
         <select class="form-select" onchange="computeEmailDomain()"  aria-label="Default select example" id="tipo" name="tipo">
       <!--    <option selected value="">seleziona un valore</option> -->
           <option value="studente">Studente</option>
@@ -57,7 +57,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
         </div>
 
         <div id="cdl" class="mb-3">
-            <label for="exampleFormControlInput1" class="form-label">Corso di Laurea a cui appartiene questo insegnamento:</label>
+            <label for="exampleFormControlInput1" class="form-label">Corso di Laurea a cui iscrivere lo studente:</label>
             <select class="form-select" id="cdl" name="cdl">
                 <!--<option selected value="ciao">Open this select menu</option>-->
                 <?php
@@ -80,13 +80,12 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
                     // Elaborazione dei risultati
                     foreach ($results as $row) {
-                        // Utilizza $row per accedere ai dati dei singoli record
-                        echo "<option value=\"".$row['codice']."\">".$row['nome']."</option> ";
-                    }
+?>                      <option value="<?php echo $row['codice']?>"><?php echo $row['nome']?></option>
+<?php               }
                 } catch (PDOException $e) {
                     echo "Errore: " . $e->getMessage();
                 }
-                ?>
+?>
             </select>
         </div>
 
@@ -143,7 +142,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     $utente = $_COOKIE['username'];
         if ($_POST['username'] != ""){ $utente = $_POST['username'];}
     $dominio = $_COOKIE['dominio'];
-    $istitemail = $utente.$dominio;
+    $istitemail = strtolower($utente.$dominio);
 
     $nome = $_POST['nome'];
     $cognome = $_POST['cognome'];
@@ -188,12 +187,10 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
     $params = array ($istitemail, $tiposegreteria);
     inserisciSegreteria($params);
     }
+
+    pg_close($db);
 }
  ?>
 
-
-<form action="../index.php">
-    <input type="submit" class="button1 lightblue" value="RITORNA ALLA HOMEPAGE" />
-    </form>
 </body>
 </html>

@@ -8,6 +8,7 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 <html lang="it" data-bs-theme="auto">
 <head>
     <?php importVari();?>
+    <script src="../js/modificainsegnamento.js"></script>
     <title>Modifica Insegnamento · PiGEU</title>
 </head>
 
@@ -20,9 +21,6 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
 
 <h1>MODIFICA UN INSEGNAMENTO</h1>
 
-<div class="alert alert-primary" role="alert">
-    Benvenuto <?php echo $_SESSION['nome'] . " " . $_SESSION['cognome']; ?> !
-</div>
 <div>
     <label for="exampleFormControlInput1" class="form-label">Seleziona l'Insegnamento che vuoi modificare:</label>
     <form id="ricercaInsegnamento" action="" method="POST">
@@ -35,23 +33,22 @@ controller("segreteria", $_SESSION['username'], $_SESSION['password']);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
                 // vedo TUTTI gli insegnamenti
-                $query = "  SELECT distinct i.nome, i.codice  FROM insegnamento i";
+                $query = "  SELECT distinct i.nome, i.codice  FROM insegnamento i ORDER BY i.nome";
                 $stmt = $conn->prepare($query);
                 $stmt->execute();
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 foreach ($results as $row) {
-                    echo "<option ";
-                    if ($_POST['insegnamento'] == $row['codice']){ echo "selected";}
-                    echo " value=\"".$row['codice']."\">".$row['nome']."</option> ";
-                }
-                echo ' </select>';
+?>                  <option
+<?php               if ($_POST['insegnamento'] == $row['codice']){?>selected<?php }
+?>                  value="<?php echo $row['codice']?>"><?php echo $row['nome']?>
+                    </option>
+<?php           }
 
             } catch (PDOException $e) {
                 echo "Errore: " . $e->getMessage();
             }
-
-            ?>
+?>
         </select>
         <input type="submit" class="button1 green" value="CARICA INFORMAZIONI" >
     </form>
@@ -63,17 +60,12 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
     $codiceInsegnamento = $_POST['insegnamento'];
 
     if ($_POST['action'] == 'MODIFICA INSEGNAMENTO') {
-        $db = open_pg_connection();
-        echo "sono qui";
-        // definisco le variabili
-
         $nome = $_POST['nome'];
         $codice = $_POST['codice'];
         $responsabile = $_POST['responsabile'];
         $descrizione = $_POST['descrizione'];
         $cfu = $_POST['cfu'];
-
-        echo "<script>console.log('Debug Objects: >>" . $nome . " " . $tipo . " " . $codiceInsegnamento. "' );</script>";
+        //echo $nome." | ".$codice." | ".$responsabile." | ".$descrizione." | ".$cfu." <br>";
         /////// AGGIORNO LA TABELLA INSEGNAMENTO
         try {
 
@@ -84,6 +76,7 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                                             cfu = :cfu
                             WHERE codice = :codice";
 
+            $pdo->query("LISTEN notifica");
             $stmt = $pdo->prepare($sql);
 
             $stmt->bindParam(':nome', $nome, PDO::PARAM_STR);
@@ -95,12 +88,18 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
             $rowCount = $stmt->rowCount();
             if ($rowCount > 0) {
-                echo "Update successful.";
-            } else {
-                echo "No rows updated.";
+?>              <div class="alert alert-success" role="alert" name="alert-message" >
+                    Dati generali dell'insegnamento aggiornati con successo
+                </div>
+<?php       } else {
+                $notify = $pdo->pgsqlGetNotify(PDO::FETCH_ASSOC, 50);
+                if ($notify) {
+?>              <div class="alert alert-danger" role="alert" name="alert-message" >
+                    <?php echo $notify["payload"] ?>
+                </div>
+<?php           }
             }
         } catch (PDOException $e) {
-            // Handle any errors that occurred during the process
             echo "Error: " . $e->getMessage();
         }
 
@@ -119,13 +118,24 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
 
             $rowCount = $stmt->rowCount();
             if ($rowCount > 0) {
-                echo "Update successful.";
-            } else {
-                echo "No rows updated.";
+                ?>              <div class="alert alert-success" role="alert" name="alert-message" >
+                    Docente Responsabile aggiornato con successo
+                </div>
+<?php       } else {
+                $notify = $pdo->pgsqlGetNotify(PDO::FETCH_ASSOC, 50);
+                if ($notify) {
+?>              <div class="alert alert-danger" role="alert" name="alert-message" >
+                    <?php echo $notify["payload"] ?>
+                </div>
+<?php           }
             }
         } catch (PDOException $e) {
             // Handle any errors that occurred during the process
-            echo "Error: " . $e->getMessage();
+            if (!strpos($e->getMessage(), 'violates foreign key constraint "rif_docente"') == false){
+?>              <div class="alert alert-danger" role="alert" name="alert-message" >
+                ERRORE nella modifica del docente responsabile: il docente chè stato inserito come responsabile non è presente nella base di dati come docente
+                </div>
+<?php           }
         }
     }
 
@@ -142,107 +152,178 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         // Esecuzione della query e recupero dei risultati
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        echo "<form method=\"POST\" > <div class=\"center bblue\">";
-
+?>
+        <form method="POST" >
+            <div class="center bblue">
+<?php
         foreach ($results as $row) {
             $responsabile = $row['docente'];
             $anno = $row['anno'];
             $descrizione = $row['descrizione'];
             $cfu = $row['cfu'];
 
-            echo "<div class=\"mb-3\">
-                                <label for=\"exampleFormControlInput1\" class=\"form-label\">Nome</label>
-                      <input readonly type=\"text\" value=\"".$row['nome']."\" class=\"form-control\" id=\"nome\" name=\"nome\">
-                        </div>
-                       <div class=\"mb-3\">
-                                <label for=\"exampleFormControlInput1\" class=\"form-label\">Codice</label>
-                     <input type=\"text\" value=\"".$row['codice']."\" class=\"form-control\" id=\"codice\" name=\"codice\">
-                       </div>
-                       <div class=\"mb-3\">
-                       <label for=\"exampleFormControlInput1\" class=\"form-label\">Docente Responsabile</label>
-                     
-                        <select class=\"form-select\" id=\"responsabile\" name=\"responsabile\">";
+?>              <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Nome</label>
+                    <input readonly type="text" value="<?php echo $row['nome']?>" class="form-control" id="nome" name="nome">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label" >Codice</label>
+                    <input type="text" value="<?php echo $row['codice']?>" class="form-control" id="codice" name="codice" readonly="readonly">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Docente Responsabile</label>
+                    <select class="form-select" id="responsabile" name="responsabile">";
+<?php
+            try {
+                $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                    try {
-                    // Connessione al database utilizzando PDO
-                    $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
-                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $query = "     WITH selezione AS (
+                                                  SELECT utente FROM docente
+                                                  EXCEPT
+                                                  SELECT docente FROM docente_responsabile
+                                                  GROUP BY 1
+                                                  HAVING count(*) >2
+                                                  )
+                                                  SELECT u.nome, u.cognome, u.email FROM utente u
+                                                  INNER JOIN selezione s ON u.email = s.utente
+                                                  ORDER BY u.cognome
+                ";
 
-                    // Query con CTE
-                    $query = "     WITH selezione AS (
-                                                      SELECT utente FROM docente
-                                                      EXCEPT
-                                                      SELECT docente FROM docente_responsabile
-                                                      GROUP BY 1
-                                                      HAVING count(*) >2
-                                                      )
-                                                      SELECT u.nome, u.cognome, u.email FROM utente u
-                                                      INNER JOIN selezione s ON u.email = s.utente
-                           ";
+                $stmt2 = $conn->query($query);
+                $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
-                           // Esecuzione della query e recupero dei risultati
-                           $stmt2 = $conn->query($query);
-                           $results = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($results as $row) {
+?>                  <option
+<?php                   if ($responsabile == $row['email']) {?>selected<?php }
+?>                      value="<?php echo $row['email']?>"><?php echo $row['cognome']." ".$row['nome']?>
+                    </option>
+<?php           }
+            } catch (PDOException $e) {
+                echo "Errore: " . $e->getMessage();
+            }
+?>
+                   </select>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleFormControlInput1" class="form-label">Descrizione</label>
+                    <input type="text" value="<?php echo $descrizione?>" class="form-control" id="descrizione" name="descrizione">
+                </div>
+                <div id="cfu">
+                    <label for="exampleFormControlInput1" class="form-label">CFU previsti per l'insegnamento</label>
+                    <select class="form-select" aria-label="Default select example" id="cfu" name="cfu">
+                        <option
+<?php                   if ($cfu == '6') {?> selected <?php }
+?>                      value="6">6</option>
+                        <option
+<?php                   if ($cfu == '9') {?> selected <?php }
+?>                      value="9">9</option>
+                        <option
+<?php                   if ($cfu == '12') {?> selected <?php }
+?>                      value="12">12</option>
+                    </select>
+                </div>
 
-
-                           foreach ($results as $row) {
-                                 echo "<option ";
-                                 if ($responsabile == $row['email']) {echo 'selected ';}
-                                 echo "value=\"".$row['email']."\">".$row['nome']." ".$row['cognome']."</option> ";
-                                 }
-                            } catch (PDOException $e) {
-                                echo "Errore: " . $e->getMessage();
-                            }
-                        echo "
-                        </select>
-                       </div>
-                       <div class=\"mb-3\">
-                       <label for=\"exampleFormControlInput1\" class=\"form-label\">Descrizione</label>
-                     <input type=\"text\" value=\"".$descrizione."\" class=\"form-control\" id=\"descrizione\" name=\"descrizione\">
-                       </div>
-                     ";
-
-            echo '<div id="cfu">
-                        <label for="exampleFormControlInput1" class="form-label">CFU previsti per l\'insegnamento</label>
-                        <select class="form-select" aria-label="Default select example" id="cfu" name="cfu">
-                              <option ';
-            if ($cfu == '6') {echo " selected ";}
-            echo 'value="6">6</option>
-                              <option ';
-            if ($cfu== '9') {echo 'selected ';}
-            echo 'value="9">9</option>
-                              <option ';
-            if ($cfu == '12') {echo 'selected ';}
-            echo 'value="12">12</option>
-                            </select>
-                    </div>';
-
-                                        //// VA TENUTO PER LA RICHIESTA AJAX ////
-//            echo '<div id="anno">
-//                    <label for="exampleFormControlInput1" class="form-label">Anno dell\'insegnamento</label>
-//                    <select class="form-select" aria-label="Default select example" id="anno" name="anno">
-//                              <option ';
-//            if ($cfu == '6') {echo " selected ";}
-//            echo 'value="6">6</option>
-//                              <option ';
-//            if ($cfu== '9') {echo 'selected ';}
-//            echo 'value="9">9</option>
-//                              <option ';
-//            if ($cfu == '12') {echo 'selected ';}
-//            echo 'value="12">12</option>
-//                            </select>
-//                    </div>';
-
-            echo " <input type=\"submit\" class=\"button1 orange\" value=\"MODIFICA INSEGNAMENTO\" name='action'/>
-                        </div>
-                    </form>
-                    ";
-
-        }
+            <input type="submit" class="button1 orange" value="MODIFICA INSEGNAMENTO" name='action'/>
+            </div>
+        </form>
+<?php   }
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
+    ///////////// DOCENTI COINVOLTI CON L'INSEGNAMENTO: tabella "insegna" ///////////////
+    try {
+
+
+        $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $query_insegnano =   "SELECT u.nome, u.cognome, u.email
+                              FROM utente u INNER JOIN docente d ON u.email = d.utente
+                                            INNER JOIN insegna i ON d.utente = i.docente
+                                            WHERE i.insegnamento = :i";
+        $query_non_insegnano ="SELECT u.nome, u.cognome, u.email
+                               FROM utente u INNER JOIN docente d ON u.email = d.utente
+                                             WHERE d.utente <> ALL (SELECT docente FROM insegna WHERE insegnamento = :i)
+                               EXCEPT
+                               SELECT u.nome, u.cognome, u.email
+                               FROM utente u INNER JOIN docente d ON u.email = d.utente
+                                             INNER JOIN docente_responsabile dr ON d.utente = dr.docente
+                                             WHERE dr.insegnamento = :i
+                               ORDER BY cognome";
+
+        $stmt1 = $conn->prepare($query_insegnano);
+        $stmt2 = $conn->prepare($query_non_insegnano);
+
+        $stmt1->bindParam(':i', $codiceInsegnamento, PDO::PARAM_STR);
+        $stmt2->bindParam(':i', $codiceInsegnamento, PDO::PARAM_STR);
+
+        $stmt1->execute();
+        $stmt2->execute();
+
+        $results1 = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+        $results2 = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+        <div><label for="exampleFormControlInput1" class="form-label"><h3>Docenti coinvolti con l'insegnamento</h3></label>
+        </div>
+
+        <div class="splitin2">
+            <div>
+                <label class="form-label"><h5>DOCENTI CHE INSEGNANO QUESTA DISCIPLINA</h5></label>
+            </div>
+            <div>
+                <label class="form-label"><h5>DOCENTI CHE NON INSEGNANO QUESTA DISCIPLINA</h5></label>
+            </div>
+        </div>
+        <div class="splitin2">
+            <div>
+            <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">DOCENTE </th>
+                <th scope="col" style="text-align: center;">RIMUOVI</th>
+            </tr>
+            </thead>
+            <tbody>
+<?php
+        $counter = 1;
+        foreach ($results1 as $row) {
+            ?> <tr>
+               <th scope="row"><?php echo $counter++ ?></th>
+               <td><?php echo $row["cognome"]. " ".$row["nome"]?></td>
+               <td style="text-align: center;">
+               <button class="button-canc-doc"
+                       docente="<?php echo $row['email'] ?>"
+                       insegnamento="<?php echo $codiceInsegnamento ?>">rimuovi docente</button></td>
+<?php   }
+        ?>
+            </tbody>
+        </table>
+    </div>
+            <div>
+                <div>
+                    <label for="cdl" >Ricerca Docente:</label>
+                    <input type="insertText" id="docdaricercare" placeholder="🔍 RICERCA per NOME o COGNOME del docente" name="utente">
+
+                </div>
+                <div id="tabelladocenti">
+
+
+
+                </div>
+
+
+            </div>
+        </div>
+    <?php
+    } catch (PDOException $e) {
+        echo "Errore: " . $e->getMessage();
+    }
+
+   ?>
+
+<?php
 ///////////////////////////// CDL DI CUI QUESTO INSEGNAMENTO FA PARTE E CHE POSSO RIMUOVERE //////////////////////
     try {
 
@@ -262,7 +343,9 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         $stmt->bindParam(':i', $codiceInsegnamento, PDO::PARAM_STR);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo ' <div><label for="exampleFormControlInput1" class="form-label"><h3>Corsi di laurea che contemplano questo insegnamento</h3></label></div> 
+?>      <div>
+            <label for="exampleFormControlInput1" class="form-label"><h3>Corsi di laurea che contemplano questo insegnamento</h3></label>
+        </div>
         <div>
         <table class="table">
             <thead>
@@ -275,71 +358,34 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                 <th scope="col" style="text-align: center;">RIMUOVI</th>
             </tr>
             </thead>
-            <tbody>';
-
+            <tbody>
+<?php
         $counter = 1;
         foreach ($results as $row) {
-            echo '  <tr>
-                    <th scope="row">'.$counter++.'</th>
-                    <td>'.$row["codice"].'</td>
-                    <td>'.$row["nome"].'</td>
-                    <td>'.$row["anno"].'</td>
-                    <td>'.$row["cfu"].'</td>
-                    <td style="text-align: center;">
-                      <button class="button-canc" 
-                              insegnamento="'. $codiceInsegnamento .'" 
-                              cdl="' . $row["codice"] . '">rimuovi da questo CdL</button></td>
-                    </tr> ';
-        }
-        echo '
-            </tbody>
+?>          <tr>
+                <th scope="row"><?php echo $counter++?></th>
+                <td><?php echo $row["codice"]?></td>
+                <td><?php echo $row["nome"]?></td>
+                <td><?php echo $row["anno"]?></td>
+                <td><?php echo $row["cfu"]?></td>
+                <td style="text-align: center;">
+                  <button class="button-canc" 
+                          insegnamento="<?php echo  $codiceInsegnamento ?>"
+                          cdl="<?php echo $row["codice"]?>">rimuovi da questo CdL</button></td>
+                </tr>
+<?php   }
+?>         </tbody>
         </table>
-    </div>';
+    </div>
+<?php
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
+?>
+<script>
 
-    echo "
-        <script>
-  // Funzione per effettuare la richiesta AJAX
-  function cancellaInsdaCdl(insegnamento, cdl) {
-    const xhttp = new XMLHttpRequest();
-
-    xhttp.onreadystatechange = function() {
-      if (this.readyState === 4) {
-        if (this.status === 200) {
-          // Gestisci la risposta del server
-          const response = JSON.parse(this.responseText);
-          console.log(response);
-        if (response.success) {
-            window.location.reload();
-          }
-        } else {
-          // Gestisci eventuali errori
-          console.error('Errore nella richiesta AJAX:', this.statusText);
-         }
-      }
-    };
-
-    xhttp.open('POST', 'rimuoviinsdacdl.php', true);
-    xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    const params = 'insegnamento=' + encodeURIComponent(insegnamento) + '&cdl=' + encodeURIComponent(cdl);
-    xhttp.send(params);
-  }
-
-  // Aggiungi un evento clic per i pulsanti di classe \"button-canc\"
-  const removeFromCdlButtons = document.querySelectorAll('.button-canc');
-  removeFromCdlButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      const insegnamento = this.getAttribute('insegnamento');
-      const cdl = this.getAttribute('cdl');
-
-      // Effettua la richiesta AJAX
-      cancellaInsdaCdl(insegnamento, cdl);
-    });
-  });
-</script>";
-
+</script>
+<?php
     ///////////////////////////// CDL DI CUI QUESTO INSEGNAMENTO NON FA PARTE E CHE POSSO AGGIUNGERE ORA //////////////////////
     try {
 
@@ -364,7 +410,9 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
         $stmt->bindParam(':i', $codiceInsegnamento, PDO::PARAM_STR);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        echo ' <div><label for="exampleFormControlInput1" class="form-label"><h3>Corsi di laurea che NON contemplano questo insegnamento</h3></label></div> 
+?>      <div>
+            <label for="exampleFormControlInput1" class="form-label"><h3>Corsi di laurea che NON contemplano questo insegnamento</h3></label>
+        </div>
         <div>
         <table class="table">
             <thead>
@@ -379,64 +427,59 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                 <th scope="col" style="text-align: center;">AGGIUNGI</th>
             </tr>
             </thead>
-            <tbody>';
-
+            <tbody>
+<?php
         $counter = 1;
         foreach ($results as $row) {
             $codiceCdL = $row["codice"];
-            echo '  <tr>
-                    <th scope="row">'.$counter++.'</th>
-                    <td>'.$row["codice"].'</td>
-                    <td>'.$row["nome"].'</td>
-                    <td>'.$row["tipo"].'</td>
+?>          <tr>
+                <th scope="row"><?php echo $counter++?></th>
+                <td><?php echo $row["codice"]?></td>
+                <td><?php echo $row["nome"]?></td>
+                <td><?php echo $row["tipo"]?></td>
 
-                    <td>
-                    
-                    <select class="form-control" id="anno" name="anno">';
-
-                    try {
-                    // Connessione al database utilizzando PDO
-                    $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
-                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                    // Query con CTE
-                    $query = "SELECT tipo
-                              FROM corso_di_laurea
-                              WHERE codice = :c";
-                    $stmt = $conn->prepare($query);
-
-                    $stmt->bindParam(':c', $codiceCdL, PDO::PARAM_STR);
-                    $stmt->execute();
-                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                    $tipo = "";
-                        foreach ($results as $row) {
-                            echo '<option value="' . 1 . '">' . "primo" . '</option>';
-                            echo '<option value="' . 2 . '">' . "secondo" . '</option>';
-                            if ($row['tipo'] == 'magistrale a ciclo unico' || $row['tipo'] == 'triennale' ){
-                                echo '<option value="' . 3 . '">' . "terzo" . '</option>';
-                            }
-                            if ($row['tipo'] == 'magistrale a ciclo unico'){
-                                echo '<option value="' . 4 . '">' . "quarto" . '</option>';
-                                echo '<option value="' . 5 . '">' . "quinto" . '</option>';
-                            }
-                        }
-                    } catch (PDOException $e) {
-                        echo "Errore: " . $e->getMessage();
-                    }
-         echo '     </select>
-                    </td>
-                    <td>'.$cfu.'</td>
-                    <td>
-                    
-                    <select class="form-control2" id="propedeuticita" name="propedeuticita">';
-
-            try {
-                // Connessione al database utilizzando PDO
+                <td>
+                <select class="form-control" id="anno" name="anno">
+<?php
+                try {
                 $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                // Query con CTE
+                $query = "SELECT tipo
+                          FROM corso_di_laurea
+                          WHERE codice = :c";
+                $stmt = $conn->prepare($query);
+
+                $stmt->bindParam(':c', $codiceCdL, PDO::PARAM_STR);
+                $stmt->execute();
+                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $tipo = "";
+                foreach ($results as $row) {
+?>                  <option value="1">primo</option>
+                    <option value="2">secondo</option>
+<?php               if ($row['tipo'] == 'magistrale a ciclo unico' || $row['tipo'] == 'triennale' ){
+?>                  <option value="3">terzo</option>
+<?php               }
+                    if ($row['tipo'] == 'magistrale a ciclo unico'){
+?>                  <option value="4">quarto</option>
+                    <option value="5">quinto</option>
+<?php               }
+                }
+            } catch (PDOException $e) {
+                echo "Errore: " . $e->getMessage();
+            }
+?>
+                </select>
+                </td>
+                <td><?php echo $cfu?></td>
+                <td>
+                <select class="form-control2" id="propedeuticita" name="propedeuticita">
+<?php
+            try {
+                $conn = new PDO("pgsql:host=".myhost.";dbname=".mydbname, myuser, mypassword);
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
                 $query = "SELECT i.codice, i.nome
                           FROM insegnamento i 
                           INNER JOIN insegnamento_parte_di_cdl ip ON i.codice = ip.insegnamento 
@@ -449,32 +492,31 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
                 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 $tipo = "";
-                echo "<option selected value=\"no\">nessuna propedeuticità</option>";
-                foreach ($results as $row) {
-                    echo '<option value="' . $row['codice'] . '">' . $row['nome'] . '</option>';
-                }
+?>              <option selected value="no">nessuna propedeuticità</option>
+<?php           foreach ($results as $row) {
+?>              <option value="<?php echo $row['codice']?>"><?php echo $row['nome'] ?></option>
+<?php           }
             } catch (PDOException $e) {
                 echo "Errore: " . $e->getMessage();
             }
-            echo '  </select>
-                    </td>
-                    <td style="text-align: center;">
-                      <button class="button-iscr" 
-                              insegnamento="'. $codiceInsegnamento .'" 
-                              cdl="' . $codiceCdL  . '">inserisci nel CdL</button></td>
-                    </tr>';
-        }
-        echo '
+?>              </select>
+                </td>
+                <td style="text-align: center;">
+                    <button class="button-iscr"
+                        insegnamento="<?php echo $codiceInsegnamento ?>"
+                        cdl="<?php echo $codiceCdL?>">inserisci nel CdL</button></td>
+            </tr>
+<?php   }
+?>
             </tbody>
         </table>
-    </div>';
+    </div>
+<?php
     } catch (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
-
-    echo "
-
-        <script>
+?>
+<script>
  document.addEventListener('DOMContentLoaded', function() {
   // Funzione per effettuare la richiesta AJAX
   function inserisciInsinCdL(insegnamento, cdl, anno, propedeuticita) {
@@ -523,11 +565,12 @@ if($_SERVER['REQUEST_METHOD']=='POST') {
   });
   
   });
-</script>";
+</script>
 
-
+<?php
 }
-
+$conn = null;
+$pdo= null;
 ?>
 
 </body>

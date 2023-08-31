@@ -3,7 +3,8 @@ include('../functions.php');
 include('../conf.php');
 
 if(isset($_POST['search'])) {
-    echo '<div style="margin-bottom: 20px"></div>';
+?>  <div style="margin-bottom: 20px"></div>
+<?php
     $search = $_POST['search'];
     try {
 
@@ -25,15 +26,13 @@ if(isset($_POST['search'])) {
         // Esecuzione della query e recupero dei risultati
         $stmt->execute();
         if ($stmt->rowCount() == 0) {
-            echo '<div class="alert alert-warning" role="alert">
-                            Nessun insegnamento trovato
-                      </div>';
-            die();
+?>      <div class="alert alert-warning" role="alert">
+            Nessun insegnamento trovato
+        </div>
+<?php   die();
         }
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-
-        echo '
+?>
             <div class="table-container">
             <table class="table">
             <thead>
@@ -46,8 +45,8 @@ if(isset($_POST['search'])) {
                 <th scope="col" style="text-align: center;">RIMUOVI</th>
             </tr>
             </thead>
-            <tbody>';
-
+            <tbody>
+<?php
         $counter = 1;
         foreach ($results as $row) {
             $codice = $row['codice'];
@@ -56,26 +55,27 @@ if(isset($_POST['search'])) {
             $nome = $row['nomedoc'];
             $numcorsi = $row['conta'];
 
-            echo '  <tr>
-                    <th scope="row">' . $counter++ . '</th>
-                    <td>' . $codice. '</td>
-                    <td>' . $nomeIns . '</td>
-                    <td>' . $cognome . " " . $nome. '</td>
-                    <td>' . $numcorsi . '</td>
-                    <td style="text-align: center;">
-                      <button class="button-canc"
-                              codice="' . $codice . '"
-                              ins="' . $nomeIns . '">RIMUOVI INSEGNAMENTO</button></td>
-                    </tr> ';
-        }
-        echo '
+?>           <tr>
+                <th scope="row"><?php echo $counter++ ?></th>
+                <td><?php echo $codice?></td>
+                <td><?php echo $nomeIns ?></td>
+                <td><?php echo $cognome . " " . $nome?></td>
+                <td><?php echo $numcorsi ?></td>
+                <td style="text-align: center;">
+                  <button class="button-canc"
+                          codice="<?php echo $codice ?>"
+                          ins="<?php echo $nomeIns ?>">RIMUOVI INSEGNAMENTO</button></td>
+                </tr>
+<?php   }
+?>
             </tbody>
         </table>
-        </div>';
+        </div>
+<?php
     } catch
     (PDOException $e) {
         echo "Errore: " . $e->getMessage();
     }
 }
-
+$conn = null;
 ?>
