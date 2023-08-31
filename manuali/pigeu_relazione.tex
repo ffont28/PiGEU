@@ -64,7 +64,7 @@
 
         L'intero sviluppo del progetto in tutte le sue fasi, è documentato in un apposito repository di Github al seguente link \url{https://github.com/ffont28/PiGEU } di cui qui sotto viene mostrata un'immagine indicante gli stati di commit
         \begin{center}
-            \includegraphics[scale=1.3]{images/Schermata del 2023-08-27 12-23-23.png}
+            \includegraphics[scale=1.3]{images/Schermata del 2023-08-31 18-07-37.png}
         \end{center}
 
 
@@ -110,7 +110,7 @@
     \begin{enumerate}
         \item La tabella \tabb{utente} contiene i dati di qualsiasi utente, che sia di tipo \emph{segreteria}, \emph{studente} oppure \emph{docente}. Questa soluzione di utenza generica è pensata appositamente nell'ottica della \emph{scalabilità} di questo software, così da poter aggiungere anche altri tipi di utenze mediante ulteriori tabelle.
 
-        Questa tabella contiene i dati fondamentali di un utente, quali l'\texttt{email} che è l'identificatore univoco (chiave primaria) di ciascun utente nel database, corrisponde a quella che è l'email istituzionale di università, il suo \texttt{nome} e \texttt{cognome}, il suo \texttt{indirizzo} e \texttt{città} di residenza, il suo \texttt{codice fiscale} da cui si può desumere \textbf{la data di nascita} e il \textit{luogo di nascita} e da ultimo l'\texttt{emailpersonale} che rappresenta la mail di recupero dell'utente, al di fuori del dominio email di università.
+        Questa tabella contiene i dati fondamentali di un utente, quali l'\texttt{email} che è l'identificatore univoco (chiave primaria) di ciascun utente nel database, corrisponde a quella che è l'email istituzionale di università, il suo \texttt{nome} e \texttt{cognome}, il suo \texttt{indirizzo} e \texttt{città} di residenza, il suo \texttt{codice fiscale} da cui si può desumere la \textit{data di nascita} e il \textit{luogo di nascita} e da ultimo l'\texttt{emailpersonale} che rappresenta la mail di recupero dell'utente, al di fuori del dominio email di università.
         \begin{lstlisting}[
             language={SQL},
             title={utente}]
@@ -628,7 +628,7 @@ CREATE OR REPLACE FUNCTION carriera_completa(TARGET varchar) RETURNS TABLE (
             nomins varchar,
             nomdoc varchar,
             cogdoc varchar,
-            voto smallint,
+            voto varchar,
             data date
             ) AS $$
 BEGIN
@@ -642,7 +642,10 @@ BEGIN
                i.nome,
                u.nome nomedoc,
                u.cognome cogndoc,
-               c.valutazione,
+               CASE
+                            WHEN c.valutazione = 31 THEN '30 e LODE'
+                            ELSE c.valutazione::VARCHAR
+                            END,
                c.data
         FROM insegnamenti_per_carriera ic
                  INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
@@ -675,9 +678,9 @@ CREATE OR REPLACE FUNCTION carriera_completa_sto(TARGET varchar) RETURNS TABLE (
                nomins varchar,
                nomdoc varchar,
                cogdoc varchar,
-               voto smallint,
+               voto varchar,
                data date
-           ) AS $$
+) AS $$
 BEGIN
     RETURN QUERY
         SELECT DISTINCT c.studente,
@@ -689,7 +692,10 @@ BEGIN
                         i.nome,
                         u.nome nomedoc,
                         u.cognome cogndoc,
-                        c.valutazione,
+                        CASE
+                            WHEN c.valutazione = 31 THEN '30 e LODE'
+                            ELSE c.valutazione::VARCHAR
+                            END,
                         c.data
         FROM carriera_storico c
                  INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
@@ -704,9 +710,9 @@ $$ LANGUAGE plpgsql;
 \end{lstlisting}
 
 
-\subsubsection{Produzione della carriera valida di uno studente - [specifica 2.2.5]}
+\subsubsection{Produzione della carriera valida di uno studente - [requisito 2.2.5]}
 Definiamo ora con \textbf{carriera valida} l'insieme di insegnamenti di cui lo studente abbia sostenuto almeno una volta l'esame, e che quest'ultimo sia stato superato (valutazione $\geq$ 18). In caso di esami sostenuti più volte, è d considerarsi solo la valutazione ottenuta in data più recente.
-La \textit{specifica 2.2.4} chiede che:
+Il \textit{requisito 2.2.4} chiede che:
 \begin{itemize}
     \item ciascuno studente possa produrre la propria \textit{carriera valida}
     \item la segreteria possa produrre la \textit{carriera valida} di ciascuno studente
@@ -725,7 +731,7 @@ CREATE OR REPLACE FUNCTION carriera_valida(TARGET varchar) RETURNS TABLE (
            nomins varchar,
            nomdoc varchar,
            cogdoc varchar,
-           voto smallint,
+           voto varchar,
            data date
        ) AS $$
 BEGIN
@@ -739,7 +745,10 @@ BEGIN
                i.nome,
                u.nome nomedoc,
                u.cognome cogndoc,
-               c.valutazione,
+               CASE
+                            WHEN c.valutazione = 31 THEN '30 e LODE'
+                            ELSE c.valutazione::VARCHAR
+                            END,
                c.data
         FROM insegnamenti_per_carriera ic
                  INNER JOIN carriera c ON ic.insegnamento = c.insegnamento
@@ -774,9 +783,8 @@ CREATE OR REPLACE FUNCTION carriera_valida_sto(TARGET varchar) RETURNS TABLE (
                  nomins varchar,
                  nomdoc varchar,
                  cogdoc varchar,
-                 voto smallint,
-                 data date
-             ) AS $$
+                 voto varchar,
+                 data date ) AS $$
 BEGIN
     RETURN QUERY
         SELECT DISTINCT c.studente,
@@ -788,7 +796,10 @@ BEGIN
                         i.nome,
                         u.nome nomedoc,
                         u.cognome cogndoc,
-                        c.valutazione,
+                        CASE
+                            WHEN c.valutazione = 31 THEN '30 e LODE'
+                            ELSE c.valutazione::VARCHAR
+                            END,
                         c.data
         FROM  carriera_storico c
                  INNER JOIN docente_responsabile d ON d.insegnamento = c.insegnamento
@@ -805,7 +816,6 @@ END;
 $$ LANGUAGE plpgsql;
 \end{lstlisting}
 
-\pagebreak
 
 \subsubsection{Produzione delle informazioni su un corso di laurea - [requisito 2.2.6]}
 Ciascuno studente deve poter conoscere, per ogni corso di laurea, gli insegnamenti erogati con le rispettive descrizioni e docente responsabile. Per aderire a questo requisito, vi è la vista \sqlview{informazioni\und CdL} che viene mostrata di seguito:
@@ -822,7 +832,7 @@ FROM corso_di_laurea c INNER JOIN insegnamento_parte_di_cdl ip ON c.codice = ip.
 
 
 \subsubsection{Il docente responsabile}
-Viene richiesto, tra le specifiche, che un docente sia responsabile di al più tre insegnamenti: per aderire a questa specifica vi è il seguente trigger:
+Viene richiesto, tra le specifiche, che un docente sia responsabile di al più tre insegnamenti: per aderire a questo requisito vi è il seguente trigger:
 
 \begin{lstlisting}[
     language={SQL},
@@ -876,19 +886,7 @@ che controlla che nell'inserimento di una propedeuticità non si vadano a formar
 
 \begin{lstlisting}[
     language={SQL},
-    title={\texttt{no\und cicli\und propedeuticità}}]
-CREATE OR REPLACE TRIGGER no_cicli_propedeuticita
-    BEFORE INSERT OR UPDATE ON propedeuticita
-    FOR EACH ROW
-EXECUTE FUNCTION check_propedeuticita_ciclo();
-\end{lstlisting}
-
-\subsubsection{Carriera completa con tutti gli insegnamenti}
-Può essere utile produrre la carriera di uno studente che contenga non solamente gli insegnamenti di cui si è sostenuto almeno una volta l'esame, ma più in generale, un elenco che contenga tutti gli insegnamenti di cui lo studente debba sostenere l'esame per conseguire il titolo di laurea: in sintesi, sarà una \sqlfunc{carriera\und completa} con l'inserimento ulteriore degli esami non sostenuti con la dicitura "non sostenuto". Di seguito il codice sorgente che produce quanto appena spiegato:
-
-\begin{lstlisting}[
-    language={SQL},
-    title={\texttt{informazioni\und CdL}}]
+    title={\texttt{check\und propedeuticita\und ciclo()}}]
 CREATE OR REPLACE FUNCTION check_propedeuticita_ciclo() RETURNS TRIGGER AS $$
 DECLARE
     counter INTEGER := 0;
@@ -947,7 +945,178 @@ END;
 $$ LANGUAGE plpgsql;
 \end{lstlisting}
 
+\subsubsection{Carriera completa con tutti gli insegnamenti}
+Può essere utile produrre la carriera di uno studente che contenga non solamente gli insegnamenti di cui si è sostenuto almeno una volta l'esame, ma più in generale, un elenco che contenga tutti gli insegnamenti di cui lo studente debba sostenere l'esame per conseguire il titolo di laurea: in sintesi, sarà una \sqlfunc{carriera\und completa} con l'inserimento ulteriore degli esami non sostenuti con la dicitura "non sostenuto". Di seguito il codice sorgente che produce quanto appena spiegato:
+
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{carriera\und completa\und tutti()}}]
+CREATE OR REPLACE FUNCTION carriera_completa_tutti(TARGET varchar) RETURNS TABLE (
+       studente varchar,
+       nomstu varchar,
+       cogstu varchar,
+       cdl varchar,
+       matr integer,
+       codins varchar,
+       nomins varchar,
+       nomdoc varchar,
+       cogdoc varchar,
+       voto varchar,
+       data varchar
+   ) AS $$
+BEGIN
+    RETURN QUERY
+        SELECT ic.studente,
+               u2.nome nomstu,
+               u2.cognome cogstu,
+               cdl.nome cdl,
+               s.matricola matr,
+               ic.insegnamento,
+               i.nome,
+               u.nome nomedoc,
+               u.cognome cogndoc,
+               CASE
+                   WHEN c.valutazione IS NULL THEN 'non sostenuto'
+                   ELSE c.valutazione::VARCHAR
+                   END,
+               CASE
+                   WHEN c.data IS NULL THEN 'non sostenuto'
+                   ELSE c.data::VARCHAR
+                   END
+        FROM insegnamenti_per_carriera ic
+                 LEFT JOIN carriera c ON ic.insegnamento = c.insegnamento
+                 INNER JOIN docente_responsabile d ON d.insegnamento = ic.insegnamento
+                 INNER JOIN utente u ON d.docente = u.email
+                 INNER JOIN utente u2 ON ic.studente = u2.email
+                 INNER JOIN studente s ON ic.studente = s.utente
+                 INNER JOIN corso_di_laurea cdl ON s.corso_di_laurea = cdl.codice
+                 INNER JOIN insegnamento i ON ic.insegnamento = i.codice
+        WHERE ic.studente = TARGET and c.studente = TARGET;
+END;
+$$ LANGUAGE plpgsql;
+\end{lstlisting}
+
+\subsubsection{I tempi della propedeuticità}
+È importante che se un insegnamento \attr{A} è propedeutico ad un insegnamento \attr{B} per un corso di laurea \attr{C}, l'anno in cui viene erogato \attr{A} in \attr{C} non sia successivo all'anno in cui viene erogato \attr{B} sempre in \attr{C}. Per controllare questa condizione, c'è il seguente trigger
+
+
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{tempi\und di\und propedeuticità}}]
+CREATE OR REPLACE TRIGGER tempi_di_propedeuticita
+    BEFORE INSERT OR UPDATE ON propedeuticita
+    FOR EACH ROW
+EXECUTE FUNCTION propedeuticita_a_prima_b_dopo();
+\end{lstlisting}
+
+che richiama l'esecuzione della seguente funzione:
+
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{propedeuticita\und a\und prima\und b\und dopo()}}]
+CREATE OR REPLACE FUNCTION propedeuticita_a_prima_b_dopo() RETURNS TRIGGER AS $$
+DECLARE
+    anno_ins1 INTEGER;
+    anno_ins2 INTEGER;
+BEGIN
+    SELECT anno INTO anno_ins1
+    FROM insegnamento_parte_di_cdl
+    WHERE insegnamento = NEW.insegnamento1 AND corso_di_laurea = NEW.corso_di_laurea;
+
+    SELECT anno INTO anno_ins2
+    FROM insegnamento_parte_di_cdl
+    WHERE insegnamento = NEW.insegnamento2 AND corso_di_laurea = NEW.corso_di_laurea;
+
+    IF (anno_ins1 > anno_ins2) THEN
+        RAISE NOTICE 'ATTENZIONE: un insegnamento A non puo'' essere propedeutico ad un insegnamento B in un Corso di Laurea C se A è erogato in un anno successivo a B in C';
+        RAISE LOG 'ATTENZIONE: un insegnamento A non puo'' essere propedeutico ad un insegnamento B in un Corso di Laurea C se A è erogato in un anno successivo a B in C';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: un insegnamento A non puo'' essere propedeutico ad un insegnamento B in un Corso di Laurea C se A è erogato in un anno successivo a B in C');
+        RETURN NULL;
+    ELSE
+        RETURN NEW;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+\end{lstlisting}
+
+
+\subsubsection{La data dell'esame}
+Per mantenere aderenza alla realtà, non è possibile che il docente calendarizzi un esame per una data anteriore a quella attuale: per controllare questa condizione, c'è il seguente trigger
+
+
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{data\und non\und anteriore}}]
+CREATE OR REPLACE TRIGGER data_non_anteriore
+    BEFORE INSERT OR UPDATE ON calendario_esami
+    FOR EACH ROW
+EXECUTE FUNCTION data_esame_non_retro();
+\end{lstlisting}
+
+che richiama l'esecuzione della seguente funzione:
+
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{data\und esame\und non\und retro()}}]
+CREATE OR REPLACE FUNCTION data_esame_non_retro() RETURNS TRIGGER AS $$
+DECLARE
+    adesso TIMESTAMP := CURRENT_TIMESTAMP;
+    esame TIMESTAMP;
+BEGIN
+    esame := NEW.data + NEW.ora;
+
+    IF (esame >= adesso) THEN
+        RETURN NEW;
+    ELSE
+        RAISE NOTICE 'ATTENZIONE: non puoi inserire un esame in una data e/o ora gia'' passata';
+        RAISE LOG 'ATTENZIONE: non puoi inserire un esame in una data e/o ora gia'' passata';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: non puoi inserire un esame in una data e/o ora gia'' passata');
+        RETURN NULL;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+\end{lstlisting}
+
+\subsubsection{Disiscriversi da un esame già verbalizzato}
+Non è consentito a uno studente di effettuare la cancellazione dall'iscrizione di un esame qualora l'esito di tale esame sia già stato verbalizzato dal docente. Non solo la GUI impedisce tale azione mostrando il pulsante inibito con la scritta "ESITO GIÀ VERBALIZZATO", ma è presente anche il trigger
+
+
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{no\und disiscr\und se\und verbalizzato}}]
+CREATE OR REPLACE TRIGGER no_disiscr_se_verbalizzato
+    BEFORE DELETE ON iscrizione
+    FOR EACH ROW
+EXECUTE FUNCTION verifica_se_verbalizzato();
+\end{lstlisting}
+
+che richiama l'esecuzione della seguente funzione:
+
+\begin{lstlisting}[
+    language={SQL},
+    title={\texttt{verifica\und se\und verbalizzato()}}]
+CREATE OR REPLACE FUNCTION verifica_se_verbalizzato() RETURNS TRIGGER AS $$
+
+BEGIN
+    PERFORM *
+    FROM carriera c INNER JOIN calendario_esami ce ON ce.insegnamento = c.insegnamento
+                                                   AND ce.data = c.data
+    WHERE c.studente = OLD.studente AND ce.id= OLD.esame;
+    IF FOUND THEN
+        RAISE NOTICE 'ATTENZIONE: non puoi cancellare l''iscrizione di un esame gia'' verbalizzato';
+        RAISE LOG 'ATTENZIONE: non puoi cancellare l''iscrizione di un esame gia'' verbalizzato';
+        PERFORM pg_notify('notifica', 'ATTENZIONE: non puoi cancellare l''iscrizione di un esame gia'' verbalizzato');
+        RETURN NULL;
+    ELSE
+        RETURN OLD;
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+\end{lstlisting}
+
+
 \pagebreak
+
 
 \section{Prove di funzionamento}
 Assumendo il fatto che ciò che è consentito a basso livello (terminale e comandi SQL-DML) è ciò che viene anche consentito ad alto livello (GUI relizzata tramite HTML con interazioni grazie a PHP e Javascript), le prove di funzionamento verranno esibite mostrando soprattutto schermate del terminale in cui si prova il funzionamento di quanto descritto finora, per la corretta esecuzione delle operazioni previste. Più precisamente verranno mostrate:
@@ -1002,7 +1171,7 @@ Una delle richieste fatte nelle speficiche indica che lo \textit{studente} deve 
 
 \includegraphics[scale=0.2]{images/Schermata del 2023-08-14 15-24-37.png}
 
-\subsubsection{Iscrizione all'un esame di un insegnamento al di fuori del corso di laurea}
+\subsubsection{Iscrizione all'esame di un insegnamento al di fuori del corso di laurea}
 
 Ora possiamo provare a "forzare" l'iscrizione dal momento che notiamo che nella base di dati non sono presenti in calendario esami di altri insegnamenti,
 
@@ -1090,6 +1259,8 @@ Notiamo subito che il trigger impostato per non permettere nella stessa giornata
         \item ma cosa succede se proviamo a rendere \texttt{demo\und docente@unimi.it} responsabile di altri due insegnamenti, ovvero arrivando a quattro responsabilità cercando così di violare la specifica con l'ultimo inserimento?
 
         \includegraphics[scale=0.29]{images/Schermata del 2023-08-15 23-39-58.png}
+
+        \pagebreak
 
         \item come da comportamento desiderato, l'ultimo inserimento viene vietato, mostrando il messaggio del trigger indicante il raggiungimento della soglia massima di insegnamenti per cui un docente può essere responsabile, mantenendo così, nonostante le 4 richieste di responsabilità, la consistenza della base di dati che contiene tre responsabilità per \texttt{demo\und docente@unimi.it}:
 
